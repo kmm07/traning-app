@@ -11,3 +11,4 @@ export { Modal } from "./Modal";
 export { SubState } from "./SubState";
 export { Card } from "./Card";
 export { Select } from "./Select";
+export { UploadImg } from "./UploadImg";

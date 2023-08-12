@@ -2,26 +2,28 @@ import React from "react";
 
 type Props = {
   children: React.ReactNode;
-  label?: string;
+  label?: string | React.ReactNode;
   id?: string;
 
   modalOnDelete?: () => void;
-  modalOnSave?: () => void;
+  onSave?: () => void;
+  className?: string;
 };
 
 function Modal({
   label,
+  className,
   children,
   id = "my_modal",
   modalOnDelete,
-  modalOnSave,
+  onSave,
 }: Props) {
   return (
     <>
       {/* The button to open modal */}
       <label
         htmlFor={id}
-        className="btn !btn-primary drawer-button rounded-full"
+        className={`${className} btn drawer-button rounded-full `}
       >
         {label}
       </label>
@@ -31,26 +33,26 @@ function Modal({
       <div className="modal">
         <div className="modal-box">
           {children}
-          <div className="modal-action">
+          <div className="modal-action flex gap-4 justify-start">
             {/* if there is a button in form, it will close the modal */}
             <label
               htmlFor={id}
-              className="btn px-5 flex-1 bg-gradient-to-tr from-sky-500 to-blue-600 rounded-xl"
+              className="btn !px-10 bg-gradient-to-tr from-sky-500 to-blue-600 text-white rounded-xl"
             >
               الغاء
             </label>
             {modalOnDelete && (
               <label
                 htmlFor={id}
-                className="btn px-5 flex-1 bg-gradient-to-tr from-sky-500 to-blue-600 rounded-xl"
+                className="btn !px-10 bg-gradient-to-tr from-sky-500 to-red-600 rounded-xl"
               >
                 حذف
               </label>
             )}
-            {modalOnSave && (
+            {onSave && (
               <label
                 htmlFor={id}
-                className="btn px-5 flex-1 bg-gradient-to-tr from-sky-500 to-blue-600 rounded-xl"
+                className="btn !px-10 bg-gradient-to-tr from-green-300 to-green-700 text-white rounded-xl"
               >
                 حفظ
               </label>

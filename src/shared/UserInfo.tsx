@@ -23,8 +23,8 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col gap-2 mt-[5px] w-full h-full">
-      <div className="flex gap-[9px] justify-between w-full ">
+    <div className="flex flex-col gap-2 mt-[5px] w-full">
+      <div className="grid grid-cols-3 gap-[9px] justify-between w-full">
         <Info />
 
         <Card className="p-4 space-y-4">

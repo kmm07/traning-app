@@ -25,7 +25,7 @@ export interface TableProps<ColumnsType> {
   modalTitle?: string;
   modalContent?: React.ReactNode;
   modalOnDelete?: () => void;
-  modalOnSave?: () => void;
+  onSave?: () => void;
 }
 
 const Table = <ColumnsType,>({
@@ -39,7 +39,7 @@ const Table = <ColumnsType,>({
   rowOnClick,
   modalContent,
   modalOnDelete,
-  modalOnSave,
+  onSave,
   pagination = { current_page: 1, per_page: 1, total: 1, total_pages: 0 },
 }: TableProps<ColumnsType>) => {
   const {
@@ -76,7 +76,7 @@ const Table = <ColumnsType,>({
         <div className="flex me-auto gap-4 items-center">
           <Modal
             modalOnDelete={modalOnDelete}
-            modalOnSave={modalOnSave}
+            onSave={onSave}
             label={modalTitle}
           >
             {modalContent}

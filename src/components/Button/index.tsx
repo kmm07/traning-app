@@ -2,7 +2,7 @@ import React from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const button = cva(
-  "p-3 text-white px-7 text-center flex justify-center gap-3 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
+  "p-3 text-white px-7 btn text-center flex justify-center gap-3 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
   {
     variants: {
       primary: {
