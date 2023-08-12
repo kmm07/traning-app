@@ -16,7 +16,7 @@ interface getPagesCutProps {
 const Pagination = ({
   currentPage = 1,
   onPageChange,
-  limit = 10,
+
   total,
 }: PaginationProps) => {
   let pagesCount = Math.ceil(total / 1);

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const SignInPage: React.FC = () => {
   return (
-    <Formik>
+    <Formik initialValues={{}} onSubmit={() => {}}>
       <Form className="bg-gray-900_09 h-screen flex sm:flex-col md:flex-col flex-row   sm:gap-10 md:gap-10 items-center justify-between w-full">
         <div className="flex flex-col justify-center h-full w-1/2">
           <div className="w-1/2 mx-auto flex flex-col gap-14">
