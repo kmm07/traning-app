@@ -179,7 +179,8 @@ ul li a {
   background: #6b6b6b;
   border-radius: 10px;
 }
-.drawer-style {
+.drawer-style,
+.modal-box {
   border-radius: 25px;
   border: 1px solid #26243f !important;
   background: #151423 !important;

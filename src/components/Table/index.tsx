@@ -4,8 +4,13 @@ import NoDataFounded from "../NoData";
 import Pagination from "../Pagination";
 // import Search from "svg/search.svg";
 import PaginationType from "./paginationType";
-import { Button, Input, Text } from "components";
-
+import { Input, Modal, Text } from "components";
+declare global {
+  interface Window {
+    my_modal_1: any;
+    showModal: () => void;
+  }
+}
 export interface TableProps<ColumnsType> {
   columns: Array<(Column<object> & ColumnsType) | any>;
   data: object[];
@@ -17,20 +22,24 @@ export interface TableProps<ColumnsType> {
   noPagination?: boolean;
   rowOnClick?: (row: any) => void;
   title?: string;
-  btnOnClick?: () => void;
-  btnTitle?: string;
+  modalTitle?: string;
+  modalContent?: React.ReactNode;
+  modalOnDelete?: () => void;
+  modalOnSave?: () => void;
 }
 
 const Table = <ColumnsType,>({
   columns,
   data,
-  searchValue,
+  // searchValue,
   title,
   setPage,
+  modalTitle,
   noPagination = false,
-  btnOnClick,
-  btnTitle,
   rowOnClick,
+  modalContent,
+  modalOnDelete,
+  modalOnSave,
   pagination = { current_page: 1, per_page: 1, total: 1, total_pages: 0 },
 }: TableProps<ColumnsType>) => {
   const {
@@ -50,43 +59,35 @@ const Table = <ColumnsType,>({
   );
   return data.length !== 0 ? (
     <div className="flex flex-col p-5 items-end gap-9 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
-      <div className=" flex gap-7  w-full justify-start items-center">
-        <Button size="large" rounded="full" primary onClick={btnOnClick}>
-          {btnTitle}
-        </Button>
-        <div className="drawer drawer-end z-50">
-          <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content">
-            {/* Page content here */}
-            <label
-              htmlFor="my-drawer"
-              className="btn btn-primary drawer-button"
-            >
-              Open drawer
-            </label>
-          </div>
-          <div className="drawer-side ">
-            <label htmlFor="my-drawer" className="drawer-overlay"></label>
-            <div className="drawer-style p-6 w-1/3 h-[85%] mt-auto">
-              {/* Sidebar content here */}
-              asd
-            </div>
+      <div className=" flex gap-7 w-full justify-between items-center">
+        <div className="flex-1 flex items-center gap-7">
+          <Text size="2xl">{title}</Text>
+          <div className="w-1/2">
+            <Input
+              name=""
+              isForm={false}
+              inputSize="large"
+              className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
           </div>
         </div>
 
-        <div className="!w-1/3">
-          <Input
-            name=""
-            isForm={false}
-            inputSize="large"
-            isSearch
-            onChange={(e) => setGlobalFilter(e.target.value)}
-          />
+        <div className="flex me-auto gap-4 items-center">
+          <Modal
+            modalOnDelete={modalOnDelete}
+            modalOnSave={modalOnSave}
+            label={modalTitle}
+          >
+            {modalContent}
+          </Modal>
         </div>
-        <Text size="3xl">{title}</Text>
       </div>
 
-      <table className="z-0 table w-full relative " {...getTableProps()}>
+      <table
+        className="z-0 table w-full relative text-right"
+        {...getTableProps()}
+      >
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr

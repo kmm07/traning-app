@@ -30,7 +30,7 @@ const button = cva(
         xSmall: ["text-sm", "!px-2", "py-1", "h-fit"],
         small: ["!text-sm", "!px-2", "!py-2", "!h-fit"],
         medium: ["text-md", "h-10", "px-3"],
-        large: "py-4 px-10 font-bold",
+        large: "py-3 px-10 font-bold",
       },
     },
     defaultVariants: {

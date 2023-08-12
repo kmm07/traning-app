@@ -7,45 +7,45 @@ function SidePar() {
   const naveItems = [
     {
       name: "الرسائل",
-      link: "/dashboard",
+      link: "/messages",
       src: "images/img_mail11.png",
     },
     {
       name: "المستخدمين",
-      link: "/dashboard/users",
+      link: "/users",
       src: "images/img_group30copy9.svg",
       isActive: true,
     },
     {
       name: "التغذية",
       //   src: "images/img_down1.png",
-      link: "/dashboard/nutrition",
+      link: "/nutrition",
       src: "images/img_fork3.png",
       isActive: false,
     },
     {
       name: "التمرين",
-      link: "/dashboard/exercises",
+      link: "/exercises",
       src: "images/img_weight3.png",
     },
     {
       name: "الاشعارات",
-      link: "/dashboard/notifications",
+      link: "/notifications",
       src: "images/img_notification3.png",
     },
     {
       name: "الكوبونات",
-      link: "/dashboard/coupons",
+      link: "/coupons",
       src: "images/img_coupon3.png",
     },
     {
       name: "المسؤلين",
-      link: "/dashboard/admins",
+      link: "/admins",
       src: "images/img_setting1.png",
     },
   ];
   return (
-    <div className="bg-gray-900_01 relative h-full py-24 border border-blue_gray-900_01 border-solid flex flex-col items-center justify-start md:px-5 rounded-br-[25px] rounded-tr-[25px] shadow-bs">
+    <div className="bg-gray-900_01 relative h-full py-24 border border-blue_gray-900_01 border-solid flex flex-col items-center justify-start md:px-5 rounded-bl-[25px] rounded-tl-[25px] shadow-bs">
       <div className="w-full flex flex-col h-full ">
         {naveItems.map((item) => (
           <NavItem
@@ -57,13 +57,13 @@ function SidePar() {
         ))}
       </div>
 
-      <div className="flex flex-col items-start justify-start  w-full ">
+      <button className="btn flex flex-col items-start justify-start  w-full ">
         <Img
-          className="h-6 md:ml-[0] ml-[31px] w-[25px]"
+          className="h-6 md:ml-[0] mr-[31px] rotate-180 w-[25px]"
           src="images/img_minimize.svg"
           alt="minimize"
         />
-      </div>
+      </button>
     </div>
   );
 }

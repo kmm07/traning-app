@@ -1,5 +1,4 @@
 import { Img, Text } from "components";
-import React from "react";
 import { NavLink } from "react-router-dom";
 
 type Props = {
@@ -13,13 +12,13 @@ function NavItem({ name, src, isActive, link }: Props) {
   return (
     <NavLink
       to={link}
-      className={`flex flex-row gap-[23px] items-center relative pl-8 py-[21px] justify-start w-full ${
+      className={`flex flex-row gap-[23px] items-center relative ps-8 py-[21px] justify-start w-full ${
         isActive ? "bg-[#201E35]" : ""
       } `}
     >
       {isActive && (
         <Img
-          className="h-[90px] mb-0.5 rounded-sm absolute -left-2"
+          className="h-[90px] mb-0.5 rounded-sm absolute rotate-180 -right-2.5"
           src="images/img_signal.svg"
           alt="signal"
         />
