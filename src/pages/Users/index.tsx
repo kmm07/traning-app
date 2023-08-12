@@ -125,7 +125,7 @@ function Users() {
         isForm={false}
         options={options}
         placeholder="الكل"
-        className="w-48"
+        className="!w-48"
         onChange={(e) => {
           console.log(e);
         }}
