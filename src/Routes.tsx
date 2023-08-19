@@ -33,9 +33,9 @@ const router = createBrowserRouter(
             loader={IngredientsLoader}
           />
         </Route>
-        <Route path="/training">
+        <Route path="/exercises">
           <Route
-            path="men"
+            path="table-men"
             element={<MenTraining />}
             loader={MenTrainingLoader}
           />
