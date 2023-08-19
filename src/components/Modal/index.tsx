@@ -23,7 +23,7 @@ function Modal({
       {/* The button to open modal */}
       <label
         htmlFor={id}
-        className={`${className} btn drawer-button rounded-full `}
+        className={`${className} btn !btn-primary !px-4 drawer-button rounded-full `}
       >
         {label}
       </label>

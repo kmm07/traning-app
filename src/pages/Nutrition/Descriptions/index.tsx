@@ -1,11 +1,11 @@
-import { Card, Select, SubState, Table, Text } from "components";
-import React from "react";
+import { Card, Img, Modal, SubState, Table, Text } from "components";
+import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
-import UsersSideBar from "./components/UsersSideBar";
 
 function Descriptions() {
+  const [level, setLevel] = useState(1);
   const data = useLoaderData() as {
     table: [];
   };
@@ -68,39 +68,26 @@ function Descriptions() {
     ],
     []
   );
-  const options = [{ value: "all", label: "الكل" }];
   const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
     console.log(e);
   };
 
   const cardData = [
     {
-      count: "٣٠٠٠",
-      label: "الكل",
+      label: "كيتو",
+      id: 1,
     },
     {
-      count: "٢٠٠٠",
-      label: "المشتركين",
+      label: "لو كارب",
+      id: 2,
     },
     {
-      count: "٥٠",
-      label: "الغاء الاشتراك",
+      label: "تقليدي",
+      id: 3,
     },
     {
-      count: "١٠",
-      label: "الخطة المجانية",
-    },
-    {
-      count: "١٠",
-      label: "خذف التطبيق",
-    },
-    {
-      count: "١٠",
-      label: "تجديد الاشتراك",
-    },
-    {
-      count: "١٠ ",
-      label: " متوسط استخدام التطبيق بالدقائق",
+      label: "تقليدي",
+      id: 3,
     },
   ];
   return (
@@ -108,44 +95,58 @@ function Descriptions() {
       <div className="flex gap-3 h-24 ">
         {cardData.map((item, index) => {
           return (
-            <Card key={index} className="p-4">
-              <div className="flex flex-col  justify-between">
-                <Text size="3xl" className=" font-bold">
-                  {item.count}
-                </Text>
-                <Text size="3xl" className="text-gray-500 text-sm">
+            <Card
+              key={index}
+              className={`p-4 w-[180px] cursor-pointer ${
+                level === item.id && "bg-[#00A4FA]"
+              }`}
+            >
+              <div
+                onClick={() => setLevel(item.id)}
+                className={`flex flex-col justify-between items-center relative `}
+              >
+                <Img
+                  className="w-4 absolute top-0 left-0"
+                  src="/images/img_customize2.png"
+                />
+                <Text size="3xl" className="mt-4">
                   {item.label}
                 </Text>
               </div>
             </Card>
           );
         })}
+        <Card className={`p-4 w-[180px] cursor-pointer `}>
+          <label
+            htmlFor="add-new-nutrition"
+            className={`flex flex-col justify-between items-center relative `}
+          >
+            <Img
+              className="w-16 absolute top-0 left-0"
+              src="/images/plus.svg"
+            />
+            <Text size="3xl" className="mt-4">
+              اضافة
+            </Text>
+          </label>
+        </Card>
       </div>
-      <Select
-        isForm={false}
-        options={options}
-        placeholder="الكل"
-        className="!w-48"
-        onChange={(e) => {
-          console.log(e);
-        }}
-      />
+
       <Table
         data={data.table}
         columns={columns}
         rowOnClick={rowOnClick}
-        title="جميع المستخدمين"
-        modalTitle="اضافة مستخدم"
+        modalTitle="اضافة وجبة"
       />
-
-      <Drawer>
-        <UsersSideBar />
-      </Drawer>
+      <Modal id="add-new-nutrition">add-new-nutrition</Modal>
+      <Drawer>ss</Drawer>
     </div>
   );
 }
 
-export const descriptionsLoader = async () => {
+export default Descriptions;
+
+export const DescriptionsLoader = async () => {
   return {
     table: [
       {
@@ -165,5 +166,3 @@ export const descriptionsLoader = async () => {
     ],
   };
 };
-
-export default Descriptions;

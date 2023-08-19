@@ -8,8 +8,10 @@ import SignInPage from "pages/SignIn";
 import Messages, { messagesLoader } from "pages/Messages";
 import Layout from "layout";
 import Users, { usersLoader } from "pages/Users";
-import Descriptions, { descriptionsLoader } from "pages/Nutrition/Descriptions";
-import Ingredients from "pages/Nutrition/Ingredients";
+import Descriptions, { DescriptionsLoader } from "pages/Nutrition/Descriptions";
+
+import MenTraining, { MenTrainingLoader } from "pages/Traning/Men";
+import Ingredients, { IngredientsLoader } from "pages/Nutrition/Ingredients";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,9 +25,20 @@ const router = createBrowserRouter(
           <Route
             path="descriptions"
             element={<Descriptions />}
-            loader={descriptionsLoader}
+            loader={DescriptionsLoader}
           />
-          <Route path="ingredients" element={<Ingredients />} />
+          <Route
+            path="ingredients"
+            element={<Ingredients />}
+            loader={IngredientsLoader}
+          />
+        </Route>
+        <Route path="/training">
+          <Route
+            path="men"
+            element={<MenTraining />}
+            loader={MenTrainingLoader}
+          />
         </Route>
       </Route>
 

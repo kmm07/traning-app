@@ -1,10 +1,10 @@
-import { Card, Img, Modal, SubState, Table, Text } from "components";
+import { Card, Img, SubState, Table, Text } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 
-function Ingredients() {
+function MenTraining() {
   const [level, setLevel] = useState(1);
   const data = useLoaderData() as {
     table: [];
@@ -74,19 +74,15 @@ function Ingredients() {
 
   const cardData = [
     {
-      label: "الكل",
+      label: "مبتدئ",
       id: 1,
     },
     {
-      label: "خضار",
+      label: "متوسط",
       id: 2,
     },
     {
-      label: "اسماك",
-      id: 3,
-    },
-    {
-      label: "حبوب",
+      label: "متقدم",
       id: 3,
     },
   ];
@@ -116,37 +112,23 @@ function Ingredients() {
             </Card>
           );
         })}
-        <Card className={`p-4 w-[180px] cursor-pointer `}>
-          <label
-            htmlFor="add-new-nutrition"
-            className={`flex flex-col justify-between items-center relative `}
-          >
-            <Img
-              className="w-16 absolute top-0 left-0"
-              src="/images/plus.svg"
-            />
-            <Text size="3xl" className="mt-4">
-              اضافة
-            </Text>
-          </label>
-        </Card>
       </div>
 
       <Table
         data={data.table}
         columns={columns}
         rowOnClick={rowOnClick}
-        modalTitle="اضافة مكون"
+        modalTitle="اضافة اسبوع"
       />
-      <Modal id="add-new-nutrition">add-new-nutrition</Modal>
+
       <Drawer>ss</Drawer>
     </div>
   );
 }
 
-export default Ingredients;
+export default MenTraining;
 
-export const IngredientsLoader = async () => {
+export const MenTrainingLoader = async () => {
   return {
     table: [
       {

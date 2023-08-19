@@ -3,7 +3,7 @@ import NutritionInfo from "./NutritionInfo";
 import HeathInfo from "./HeathInfo";
 import TrainingInfo from "./TrainingInfo";
 
-function UsersSideBar() {
+function SideBar() {
   return (
     <>
       <UsersInfo showUserInfo={false} />
@@ -14,4 +14,4 @@ function UsersSideBar() {
   );
 }
 
-export default UsersSideBar;
+export default SideBar;
