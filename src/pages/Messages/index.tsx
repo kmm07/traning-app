@@ -23,7 +23,7 @@ function Messages() {
                   2
                 </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="images/img_rectangle347.png" />
+                  <img src="/images/img_rectangle347.png" />
                 </div>
               </div>
               {row.original.name}

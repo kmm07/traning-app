@@ -95,9 +95,9 @@ const CustomInput = ({
       className="px-[4px] focus:outline-none absolute items-center justify-end ltr:right-1 rtl:right-1 block z-10 bottom-[8px]"
     >
       {!showPassword ? (
-        <Img src="images/eye.svg" className=" relative -top-2 sm:top-0" />
+        <Img src="/images/eye.svg" className=" relative -top-2 sm:top-0" />
       ) : (
-        <Img src="images/cross-eye.svg" className="relative -top-2 sm:top-0" />
+        <Img src="/images/cross-eye.svg" className="relative -top-2 sm:top-0" />
       )}
     </button>
   );
@@ -138,7 +138,7 @@ const CustomInput = ({
       {type === "password" && <PasswordEye />}
       {props.isSearch && (
         <Img
-          src="images/img_search.svg"
+          src="/images/img_search.svg"
           className="absolute left-5 top-[18px] cursor-pointer"
         />
       )}

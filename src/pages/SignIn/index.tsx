@@ -61,7 +61,7 @@ const SignInPage: React.FC = () => {
           <div className="h-full m-auto w-full">
             <Img
               className="h-full m-auto object-cover rounded-bl-[200px] w-full"
-              src="images/Background5.4.png"
+              src="/images/Background5.4.png"
               alt="backgroundFiftyFour"
             />
             <div className="absolute w-1/2 border-2 border-solid border-white-A700_33 bottom-[29%] flex flex-col inset-x-[0] items-center justify-end mx-auto p-8 sm:px-5 rounded-lg">
@@ -70,7 +70,7 @@ const SignInPage: React.FC = () => {
           </div>
           <Img
             className="absolute h-[393px] inset-x-[0] mx-auto object-cover top-[16%] w-[66%]"
-            src="images/img_imageedit2816.png"
+            src="/images/img_imageedit2816.png"
             alt="imageedit2816"
           />
         </div>

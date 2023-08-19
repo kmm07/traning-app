@@ -6,7 +6,7 @@ function Info() {
     <div className="flex h-full gap-[13px] w-full">
       <Img
         className="h-[107px] md:h-auto mt-[7px] object-cover rounded-[12px]"
-        src="images/img_rectangle347.png"
+        src="/images/img_rectangle347.png"
         alt="rectangle347"
       />
       <div className="flex flex-col gap-[5px] items-start justify-start">
@@ -31,7 +31,7 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
           <div className="flex flex-row gap-2 items-start justify-between m-2  md:w-full">
             <Img
               className="h-[31px] md:h-auto object-cover"
-              src="images/img_coin1.png"
+              src="/images/img_coin1.png"
               alt="coinOne"
             />
             <Text size="2xl" className="mt-1  tracking-[0.14px]">
@@ -46,7 +46,7 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
           <div className="flex flex-row gap-2 items-start justify-between m-2  md:w-full border-b-2 pb-2">
             <Img
               className="h-[31px] md:h-auto object-cover"
-              src="images/img_checkmark.svg"
+              src="/images/img_checkmark.svg"
               alt="coinOne"
             />
             <Text bold size="2xl">
@@ -94,7 +94,7 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
           <button>
             <Img
               className="h-6 md:h-auto mb-[17px] md:ml-[0] object-cover"
-              src="images/img_group_white_a700.png"
+              src="/images/img_group_white_a700.png"
               alt="group_Two"
             />
           </button>

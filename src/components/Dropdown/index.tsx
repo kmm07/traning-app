@@ -18,7 +18,7 @@ function Dropdown({ children, ntNumber, list = [] }: Props) {
           {children}{" "}
           <Img
             className="h-[9px] my-3"
-            src="images/img_arrowdown.svg"
+            src="/images/img_arrowdown.svg"
             alt="arrowdown"
           />
           {ntNumber && (

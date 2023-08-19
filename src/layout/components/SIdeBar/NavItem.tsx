@@ -19,7 +19,7 @@ function NavItem({ name, src, isActive, link }: Props) {
       {isActive && (
         <Img
           className="h-[90px] mb-0.5 rounded-sm absolute rotate-180 -right-2.5"
-          src="images/img_signal.svg"
+          src="/images/img_signal.svg"
           alt="signal"
         />
       )}

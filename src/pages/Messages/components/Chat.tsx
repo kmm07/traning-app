@@ -28,7 +28,7 @@ function Chat({ messages }: Props) {
         </div>
 
         <div className="flex px-6 py-5 bg-stone-900  gap-1 items-center justify-start   w-full">
-          <Img className="h-[41px]" src="images/img_send.svg" alt="send" />
+          <Img className="h-[41px]" src="/images/img_send.svg" alt="send" />
           <Input
             name="frameEighteen"
             placeholder="Type your message"
@@ -36,7 +36,7 @@ function Chat({ messages }: Props) {
           />
           <Img
             className="h-[41px]"
-            src="images/img_microphone.svg"
+            src="/images/img_microphone.svg"
             alt="microphone"
           />
         </div>
@@ -78,7 +78,7 @@ function Msg({
     <div dir="ltr">
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -87,7 +87,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -96,7 +96,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -105,7 +105,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -114,7 +114,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -123,7 +123,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -132,7 +132,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -141,7 +141,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -150,7 +150,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">
@@ -159,7 +159,7 @@ function Msg({
       </div>
       <div className="chat chat-start">
         <div className="chat-image avatar w-10 overflow-hidden rounded-full">
-          <img src="images/img_rectangle347.png" />
+          <img src="/images/img_rectangle347.png" />
         </div>
 
         <div className="h-12 px-5 py-2 bg-neutral-800 rounded-lg flex items-center">

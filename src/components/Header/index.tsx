@@ -25,13 +25,13 @@ const Header: React.FC<HeaderProps> = (props) => {
       <div className="flex flex-row items-center mx-10 gap-10">
         <Img
           className="h-10 object-cover "
-          src="images/img_group.png"
+          src="/images/img_group.png"
           alt="group"
         />
-        <Img className="h-[71px]" src="images/img_folder.svg" alt="folder" />
+        <Img className="h-[71px]" src="/images/img_folder.svg" alt="folder" />
         <Img
           className="h-[30px] md:h-auto mb-1 ml-1.5 object-cover "
-          src="images/img_image.png"
+          src="/images/img_image.png"
           alt="image_One"
         />
         <Dropdown

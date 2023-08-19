@@ -3,9 +3,9 @@ import React from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
-import UsersSideBar from "../Nutrition/Descriptions/components/UsersSideBar";
+import UsersSideBar from "./components/UsersSideBar";
 
-function Users() {
+function Descriptions() {
   const data = useLoaderData() as {
     table: [];
   };
@@ -145,7 +145,7 @@ function Users() {
   );
 }
 
-export const usersLoader = async () => {
+export const descriptionsLoader = async () => {
   return {
     table: [
       {
@@ -166,4 +166,4 @@ export const usersLoader = async () => {
   };
 };
 
-export default Users;
+export default Descriptions;

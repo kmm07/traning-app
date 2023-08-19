@@ -7,19 +7,19 @@ type Props = {
 function SubState({ state }: Props) {
   const stateObj = {
     subscriber: {
-      src: "images/img_checkmark.svg",
+      src: "/images/img_checkmark.svg",
       name: "مشترك (سنة)",
     },
     free: {
-      src: "images/img_clock5.png",
+      src: "/images/img_clock5.png",
       name: "مجاني",
     },
     cancel: {
-      src: "images/img_arrowright.svg",
+      src: "/images/img_arrowright.svg",
       name: "ملغي",
     },
     trail: {
-      src: "images/img_error.svg",
+      src: "/images/img_error.svg",
       name: "تجريبي",
     },
   };

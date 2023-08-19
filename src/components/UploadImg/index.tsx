@@ -54,7 +54,7 @@ function UploadImg({ className = "", name }: Props) {
             >
               <div className="flex justify-center flex-col items-center gap-3">
                 <Img
-                  src="images/img-upload.svg"
+                  src="/images/img-upload.svg"
                   className="w-20 h-20 object-contain"
                   alt="upload"
                 />
@@ -92,7 +92,7 @@ function UploadImg({ className = "", name }: Props) {
           }
           onClick={deleteImg}
         >
-          <Img src="images/trash.svg" alt="delete" />
+          <Img src="/images/trash.svg" alt="delete" />
         </button>
       </div>
       {Boolean(touched[name]) && Boolean(errors[name]) && (
