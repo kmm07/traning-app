@@ -33,15 +33,15 @@ function Descriptions() {
       },
       {
         Header: " السعرات",
-        accessor: "mail",
+        accessor: "provider",
       },
       {
         Header: "البروتين",
-        accessor: "gender", // accessor is the "key" in the data
+        accessor: "gender",
       },
       {
         Header: "الكاروبهيدرات",
-        accessor: "phone",
+        accessor: "mail",
       },
       {
         Header: "الدهون",

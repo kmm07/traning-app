@@ -37,15 +37,15 @@ function Ingredients() {
       },
       {
         Header: "الكاربوهيدات",
-        accessor: "gender", // accessor is the "key" in the data
+        accessor: "phone",
       },
       {
         Header: "البروتين",
-        accessor: "gender",
+        accessor: "",
       },
       {
         Header: "الدهون",
-        accessor: "phone",
+        accessor: "gender",
       },
       {
         Header: "السكريات",
