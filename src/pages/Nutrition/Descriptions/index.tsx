@@ -1,4 +1,4 @@
-import { Card, Img, Modal, SubState, Table, Text } from "components";
+import { Card, Img, Modal, Table, Text } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
@@ -32,38 +32,28 @@ function Descriptions() {
         },
       },
       {
-        Header: "بريد إلكتروني",
+        Header: " السعرات",
         accessor: "mail",
       },
       {
-        Header: "جنس",
+        Header: "البروتين",
         accessor: "gender", // accessor is the "key" in the data
       },
       {
-        Header: "الخطة",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
-        },
-      },
-      {
-        Header: "الهاتف",
+        Header: "الكاروبهيدرات",
         accessor: "phone",
       },
       {
-        Header: "الدولة",
+        Header: "الدهون",
+        accessor: "phone",
+      },
+      {
+        Header: "الدهون المتحولة",
         accessor: "country",
       },
       {
-        Header: "الجهاز",
+        Header: "السكريات",
         accessor: "device",
-      },
-      {
-        Header: "آخر ظهور",
-        accessor: "lastSeen",
-      },
-      {
-        Header: "مزود الدخول",
-        accessor: "provider",
       },
     ],
     []

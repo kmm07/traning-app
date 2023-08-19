@@ -1,4 +1,4 @@
-import { Card, Img, Modal, SubState, Table, Text } from "components";
+import { Card, Img, Modal, Table, Text } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
@@ -32,37 +32,35 @@ function Ingredients() {
         },
       },
       {
-        Header: "بريد إلكتروني",
+        Header: " السعرات",
         accessor: "mail",
       },
       {
-        Header: "جنس",
+        Header: "الكاربوهيدات",
         accessor: "gender", // accessor is the "key" in the data
       },
       {
-        Header: "الخطة",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
-        },
+        Header: "البروتين",
+        accessor: "gender",
       },
       {
-        Header: "الهاتف",
+        Header: "الدهون",
         accessor: "phone",
       },
       {
-        Header: "الدولة",
+        Header: "السكريات",
         accessor: "country",
       },
       {
-        Header: "الجهاز",
+        Header: "الدهون التحولة",
         accessor: "device",
       },
       {
-        Header: "آخر ظهور",
+        Header: "القياس",
         accessor: "lastSeen",
       },
       {
-        Header: "مزود الدخول",
+        Header: "الحجم",
         accessor: "provider",
       },
     ],
