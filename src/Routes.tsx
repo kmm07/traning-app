@@ -46,7 +46,7 @@ const router = createBrowserRouter(
             loader={MenTrainingLoader}
           />
           <Route
-            path="table-table-women"
+            path="table-women"
             element={<WomenTraining />}
             loader={WomenTrainingLoader}
           />
