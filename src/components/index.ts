@@ -13,3 +13,4 @@ export { Card } from "./Card";
 export { Select } from "./Select";
 export { UploadImg } from "./UploadImg";
 export { RadialProgress } from "./RadialProgress";
+export { SettingCard } from "./SettingCard";

@@ -4,7 +4,7 @@ import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 
-function MenTraining() {
+function WomenTraining() {
   const [level, setLevel] = useState(1);
   const data = useLoaderData() as {
     table: [];
@@ -120,9 +120,9 @@ function MenTraining() {
   );
 }
 
-export default MenTraining;
+export default WomenTraining;
 
-export const MenTrainingLoader = async () => {
+export const WomenTrainingLoader = async () => {
   return {
     table: [
       {

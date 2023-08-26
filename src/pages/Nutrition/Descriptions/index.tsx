@@ -1,7 +1,6 @@
-import { Card, Img, Modal, Table, Text } from "components";
+import { Card, Img, SettingCard, Table, Text } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 
 function Descriptions() {
@@ -80,32 +79,26 @@ function Descriptions() {
       id: 3,
     },
   ];
+  const onDelete = (id: number) => {
+    console.log(id);
+  };
+  const onEdit = (id: number) => {
+    console.log(id);
+  };
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
-        {cardData.map((item, index) => {
-          return (
-            <Card
-              key={index}
-              className={`p-4 w-[180px] cursor-pointer ${
-                level === item.id && "bg-[#00A4FA]"
-              }`}
-            >
-              <div
-                onClick={() => setLevel(item.id)}
-                className={`flex flex-col justify-between items-center relative `}
-              >
-                <Img
-                  className="w-4 absolute top-0 left-0"
-                  src="/images/img_customize2.png"
-                />
-                <Text size="3xl" className="mt-4">
-                  {item.label}
-                </Text>
-              </div>
-            </Card>
-          );
-        })}
+        {cardData.map((item, index) => (
+          <SettingCard
+            onDelete={onDelete}
+            onEdit={onEdit}
+            id={item.id}
+            key={index}
+            label={item.label}
+            active={level === item.id}
+            onClick={() => setLevel(item.id)}
+          />
+        ))}
         <Card className={`p-4 w-[180px] cursor-pointer `}>
           <label
             htmlFor="add-new-nutrition"
@@ -127,9 +120,8 @@ function Descriptions() {
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة وجبة"
+        modalContent={<>dd</>}
       />
-      <Modal id="add-new-nutrition">add-new-nutrition</Modal>
-      <Drawer>ss</Drawer>
     </div>
   );
 }

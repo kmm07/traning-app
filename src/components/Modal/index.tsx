@@ -21,12 +21,14 @@ function Modal({
   return (
     <>
       {/* The button to open modal */}
-      <label
-        htmlFor={id}
-        className={`${className} btn !btn-primary !px-4 drawer-button rounded-full `}
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={id}
+          className={`${className} btn !btn-primary !px-4 drawer-button rounded-full `}
+        >
+          {label}
+        </label>
+      )}
 
       {/* Put this part before </body> tag */}
       <input type="checkbox" id={id} className="modal-toggle" />
@@ -44,6 +46,7 @@ function Modal({
             {modalOnDelete && (
               <label
                 htmlFor={id}
+                onClick={modalOnDelete}
                 className="btn !px-10 bg-gradient-to-tr from-sky-500 to-red-600 rounded-xl"
               >
                 حذف
@@ -52,6 +55,7 @@ function Modal({
             {onSave && (
               <label
                 htmlFor={id}
+                onClick={onSave}
                 className="btn !px-10 bg-gradient-to-tr from-green-300 to-green-700 text-white rounded-xl"
               >
                 حفظ

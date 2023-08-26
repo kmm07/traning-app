@@ -1,10 +1,11 @@
-import { SettingCard, SubState, Table } from "components";
+import { SettingCard, Table } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
+import AddCard from "shared/AddCard";
 
-function MenTraining() {
+function ExercisesGym() {
   const [level, setLevel] = useState(1);
   const data = useLoaderData() as {
     table: [];
@@ -13,8 +14,7 @@ function MenTraining() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "الاسم",
-        accessor: "name",
+        Header: "التمرين",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -30,40 +30,6 @@ function MenTraining() {
             </div>
           );
         },
-      },
-      {
-        Header: "بريد إلكتروني",
-        accessor: "mail",
-      },
-      {
-        Header: "جنس",
-        accessor: "gender", // accessor is the "key" in the data
-      },
-      {
-        Header: "الخطة",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
-        },
-      },
-      {
-        Header: "الهاتف",
-        accessor: "phone",
-      },
-      {
-        Header: "الدولة",
-        accessor: "country",
-      },
-      {
-        Header: "الجهاز",
-        accessor: "device",
-      },
-      {
-        Header: "آخر ظهور",
-        accessor: "lastSeen",
-      },
-      {
-        Header: "مزود الدخول",
-        accessor: "provider",
       },
     ],
     []
@@ -86,11 +52,15 @@ function MenTraining() {
       id: 3,
     },
   ];
+
   const onDelete = (id: number) => {
     console.log(id);
   };
   const onEdit = (id: number) => {
     console.log(id);
+  };
+  const onSave = () => {
+    console.log("save");
   };
   return (
     <div className="w-full space-y-4">
@@ -106,6 +76,11 @@ function MenTraining() {
             onClick={() => setLevel(item.id)}
           />
         ))}
+        <AddCard
+          modalContent={<>dd</>}
+          onSave={onSave}
+          modalLabel="اضافة مستوى"
+        />
       </div>
 
       <Table
@@ -120,24 +95,14 @@ function MenTraining() {
   );
 }
 
-export default MenTraining;
+export default ExercisesGym;
 
-export const MenTrainingLoader = async () => {
+export const ExercisesGymLoader = async () => {
   return {
     table: [
       {
-        name: "Tanner Linsley",
-        mail: "example@gmail.com",
-        gender: "ذكر",
         phone: "01000000000",
-        country: "مصر",
-        device: "ios",
-        lastSeen: "منذ 5 دقائق",
-        provider: "google",
-        subscribe: {
-          type: "free",
-          age: "شهر",
-        },
+        name: "مصر",
       },
     ],
   };
