@@ -35,7 +35,7 @@ export default {
           A700: "#006bf2",
           A700_87: "#0082f587",
         },
-        lime: { A400: "#cfff0f" },
+        lime: { 100: "#cfff0f" },
         teal: { 500: "#00b574", A400_01: "#00e8a2", A400: "#00ddc5" },
         blue_gray: {
           100: "#d9d9d9",

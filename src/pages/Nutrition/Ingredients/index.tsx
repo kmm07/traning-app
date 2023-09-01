@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
+import SideBar from "./components/SideBar";
 
 function Ingredients() {
   const [level, setLevel] = useState(1);
+  const [ingredients, setIngredients] = useState<any>();
   const data = useLoaderData() as {
     table: [];
   };
@@ -66,10 +68,9 @@ function Ingredients() {
     ],
     []
   );
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+  const rowOnClick = (item: any) => {
+    setIngredients([item]);
   };
-
   const cardData = [
     {
       label: "الكل",
@@ -137,7 +138,9 @@ function Ingredients() {
         modalTitle="اضافة مكون"
       />
       <Modal id="add-new-nutrition">add-new-nutrition</Modal>
-      <Drawer>ss</Drawer>
+      <Drawer>
+        <SideBar ingredients={ingredients} />
+      </Drawer>
     </div>
   );
 }

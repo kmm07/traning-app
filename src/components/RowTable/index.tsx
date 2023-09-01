@@ -7,17 +7,30 @@ type RowTableProps = {
 };
 
 function RowTable({ data, title }: RowTableProps) {
-  const length = data.header.length + 1;
   return (
-    <Card className="flex flex-col gap-[13px]  mb-[15px] mt-3 p-4 w-full ">
+    <Card className="flex gris flex-col gap-[13px]  mb-[15px] mt-3 p-4 w-full ">
       <Text size="3xl">{title}</Text>
-      <div className={`grid grid-cols-${7} text-start w-full`}>
+      <div
+        style={{
+          gridTemplateColumns: `repeat(${
+            data.header.length + 1
+          }, minmax(0, 1fr))`,
+        }}
+        className={`grid text-center w-full`}
+      >
         {data.header.map((item, index) => (
           <Text key={index}>{item}</Text>
         ))}
       </div>
       <div className="bg-indigo-500 h-[3px]" />
-      <div className={`grid grid-cols-${7} w-full`}>
+      <div
+        style={{
+          gridTemplateColumns: `repeat(${
+            data.header.length + 1
+          }, minmax(0, 1fr))`,
+        }}
+        className={`grid text-center`}
+      >
         {data.columns.map((item, index) => (
           <Text key={index}>{item}</Text>
         ))}

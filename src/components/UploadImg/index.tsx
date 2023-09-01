@@ -48,7 +48,7 @@ function UploadImg({ className = "", name }: Props) {
         {values[name] === "" && (
           <div className="flex flex-col gap-4 w-full h-full">
             <button
-              className="!border-[1px] border-dashed border-primary-100 flex justify-center items-center w-full flex-1"
+              className="!border-[1px] border-dashed border-deep_purple-A200 flex justify-center items-center w-full flex-1"
               onClick={uploadFun}
               type="button"
             >
@@ -61,7 +61,7 @@ function UploadImg({ className = "", name }: Props) {
                 <div className="dark:text-white text-dark-100">
                   <p>
                     اسحب صورك أو
-                    <span className="text-primary-100">تصفح</span>
+                    <span className="text-deep_purple-A200">تصفح</span>
                   </p>
                 </div>
               </div>

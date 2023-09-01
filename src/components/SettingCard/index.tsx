@@ -1,5 +1,4 @@
 import { Card, Dropdown, Img, Text } from "components";
-import React from "react";
 
 type Props = {
   active: boolean;

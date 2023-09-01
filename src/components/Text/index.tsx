@@ -8,6 +8,9 @@ const text = cva("text-[#fff] whitespace-nowrap", {
     white: {
       true: "!text-white",
     },
+    lime: {
+      true: "!text-lime-100",
+    },
     dark: {
       true: "!text-dark-100",
     },

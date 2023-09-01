@@ -26,12 +26,12 @@ export interface TableProps<ColumnsType> {
   modalContent?: React.ReactNode;
   modalOnDelete?: () => void;
   onSave?: () => void;
+  search?: boolean;
 }
 
 const Table = <ColumnsType,>({
   columns,
   data,
-  // searchValue,
   title,
   setPage,
   modalTitle,
@@ -40,6 +40,7 @@ const Table = <ColumnsType,>({
   modalContent,
   modalOnDelete,
   onSave,
+  search = true,
   pagination = { current_page: 1, per_page: 1, total: 1, total_pages: 0 },
 }: TableProps<ColumnsType>) => {
   const {
@@ -58,19 +59,21 @@ const Table = <ColumnsType,>({
     useGlobalFilter
   );
   return data.length !== 0 ? (
-    <div className="flex flex-col p-5 items-end gap-9 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
+    <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
       <div className=" flex gap-7 w-full justify-between items-center">
         <div className="flex-1 flex items-center gap-7">
           <Text size="2xl">{title}</Text>
-          <div className="w-1/2">
-            <Input
-              name=""
-              isForm={false}
-              inputSize="large"
-              className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </div>
+          {search && (
+            <div className="w-1/2">
+              <Input
+                name=""
+                isForm={false}
+                inputSize="large"
+                className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
+                onChange={(e) => setGlobalFilter(e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex me-auto gap-4 items-center">
@@ -147,10 +150,6 @@ const Table = <ColumnsType,>({
       </table>
       {!noPagination && (
         <div className="p-2 flex justify-between w-full">
-          {/* <div className="text-[#1B4865] text-sm">
-            {t('showing')} {pagination.current_page} {t('to')}{' '}
-            {pagination?.per_page} {t('of')} {pagination?.total} {t('results')}
-          </div> */}
           <Pagination
             currentPage={pagination?.current_page}
             limit={pagination?.per_page}

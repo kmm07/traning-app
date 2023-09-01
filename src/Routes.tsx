@@ -10,13 +10,15 @@ import Layout from "layout";
 import Users, { usersLoader } from "pages/Users";
 import Descriptions, { DescriptionsLoader } from "pages/Nutrition/Descriptions";
 
-import MenTraining, { MenTrainingLoader } from "pages/Traning/Men";
+import MenTraining, { MenTrainingLoader } from "pages/Exercises/Men";
 import Ingredients, { IngredientsLoader } from "pages/Nutrition/Ingredients";
-import ExercisesGym, { ExercisesGymLoader } from "pages/Traning/Exercises-Gym";
+import ExercisesGym, {
+  ExercisesGymLoader,
+} from "pages/Exercises/Exercises-Gym";
 import ExercisesHome, {
   ExercisesHomeLoader,
-} from "pages/Traning/Exercises-Home";
-import WomenTraining, { WomenTrainingLoader } from "pages/Traning/Women";
+} from "pages/Exercises/Exercises-Home";
+import WomenTraining, { WomenTrainingLoader } from "pages/Exercises/Women";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

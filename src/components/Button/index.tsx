@@ -2,22 +2,20 @@ import React from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const button = cva(
-  "p-3 text-white px-7 btn text-center flex justify-center gap-3 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
+  "text-white btn text-center flex justify-center gap-3 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
   {
     variants: {
       primary: {
         true: "!bg-deep_purple-A200 !text-white  disabled:!opacity-25",
       },
       primaryBorder: {
-        true: "!border-primary-100 border !bg-transparent !text-primary-100",
+        true: "!border-deep_purple-A200 border !bg-transparent !text-deep_purple-A200",
       },
       secondary: {
-        true: "dark:!bg-secondary-100 !bg-secondary-100 border-2  dark:!border-secondary-100 !border-secondary-100 !text-white",
-        light:
-          "bg-secondary-100 border-2  dark:!border-secondary-100 !border-secondary-100 !text-white",
+        true: "!bg-secondary-100 border-2 !border-secondary-100 !text-white",
       },
       secondaryBorder: {
-        true: "!border-secondary-100 border-2 text-black hover:!bg-secondary-100  !bg-transparent",
+        true: "!border-[#CFFF0F] !border-solid !border-2 text-white ",
       },
       fullWidth: {
         true: "w-full flex-1",
@@ -27,9 +25,9 @@ const button = cva(
         full: "!rounded-full",
       },
       size: {
-        xSmall: ["text-sm", "!px-2", "py-1", "h-fit"],
-        small: ["!text-sm", "!px-2", "!py-2", "!h-fit"],
-        medium: ["text-md", "h-10", "px-3"],
+        xSmall: ["text-sm", "py-1"],
+        small: ["!text-sm", "!py-2"],
+        medium: ["text-md", "btn-sm", "!py-1", "!px-3"],
         large: "py-3 px-10 font-bold",
       },
     },
@@ -52,38 +50,17 @@ interface Props {
   id?: string;
 }
 
-function Button({
-  onClick,
-  primary,
-  primaryBorder,
-  className,
-  children,
-  secondary,
-  fullWidth,
-  size,
-  rounded,
-  type = "button",
-  isLoading,
-  secondaryBorder,
-  disabled = false,
-}: Props & ButtonProps) {
+function Button({ onClick, type = "button", ...props }: Props & ButtonProps) {
   return (
     <button
       className={button({
-        className,
-        primary,
-        primaryBorder,
-        rounded,
-        secondary,
-        fullWidth,
-        secondaryBorder,
-        size,
+        ...props,
       })}
-      disabled={disabled || isLoading}
+      disabled={props.disabled || props.isLoading}
       type={type}
       onClick={onClick}
     >
-      {children}
+      {props.children}
     </button>
   );
 }

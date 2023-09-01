@@ -3,9 +3,11 @@ import { Drawer } from "components/Drawer";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Row } from "react-table";
+import SideBar from "./components/SideBar";
 
 function Descriptions() {
   const [level, setLevel] = useState(1);
+  const [ingredients, setIngredients] = useState<any>();
   const data = useLoaderData() as {
     table: [];
   };
@@ -58,8 +60,8 @@ function Descriptions() {
     ],
     []
   );
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+  const rowOnClick = (item: any) => {
+    setIngredients([item]);
   };
 
   const cardData = [
@@ -123,7 +125,9 @@ function Descriptions() {
         modalTitle="اضافة وجبة"
         modalContent={<>dd</>}
       />
-      <Drawer>ss</Drawer>
+      <Drawer>
+        <SideBar ingredients={ingredients} />
+      </Drawer>
     </div>
   );
 }
@@ -142,10 +146,7 @@ export const DescriptionsLoader = async () => {
         device: "ios",
         lastSeen: "منذ 5 دقائق",
         provider: "google",
-        subscribe: {
-          type: "free",
-          age: "شهر",
-        },
+        size: "1",
       },
     ],
   };

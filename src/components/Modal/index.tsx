@@ -24,7 +24,7 @@ function Modal({
       {label && (
         <label
           htmlFor={id}
-          className={`${className} btn !btn-primary !px-4 drawer-button rounded-full `}
+          className={`${className} btn btn-sm !btn-primary !px-4 drawer-button rounded-full `}
         >
           {label}
         </label>
