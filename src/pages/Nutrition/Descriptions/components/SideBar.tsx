@@ -1,15 +1,23 @@
-import UsersInfo from "shared/UserInfo";
-import NutritionInfo from "./NutritionInfo";
-import HeathInfo from "./HeathInfo";
-import TrainingInfo from "./TrainingInfo";
+import { RowTable } from "components/RowTable";
 
 function SideBar() {
   return (
     <>
-      <UsersInfo showUserInfo={false} />
-      <HeathInfo />
-      <NutritionInfo />
-      <TrainingInfo />
+      <RowTable
+        data={{
+          columns: ["1", "2", "3", "4", "5", "6", "7"],
+          header: [
+            "السعرات",
+            "البروتين",
+            "الكاربوهيدرات",
+            "الدهون",
+            "الدهون المتحولة",
+            "السكريات",
+            "الحجم",
+          ],
+        }}
+        title="القيمة الغذائية"
+      />
     </>
   );
 }

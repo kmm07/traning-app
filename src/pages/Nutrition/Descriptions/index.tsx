@@ -1,7 +1,9 @@
 import { Card, Img, SettingCard, Table, Text } from "components";
+import { Drawer } from "components/Drawer";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Row } from "react-table";
+import SideBar from "./components/SideBar";
 
 function Descriptions() {
   const [level, setLevel] = useState(1);
@@ -122,6 +124,9 @@ function Descriptions() {
         modalTitle="اضافة وجبة"
         modalContent={<>dd</>}
       />
+      <Drawer>
+        <SideBar />
+      </Drawer>
     </div>
   );
 }
