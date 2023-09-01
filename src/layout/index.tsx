@@ -4,13 +4,13 @@ import Header from "./components/Header";
 
 function Layout() {
   return (
-    <div className="bg-[#121220] flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative">
       <Header />
-      <div className="bg-white-A700 font-roboto h-full grid grid-cols-11 w-full ">
-        <div className="col-span-2">
+      <div className="font-roboto h-full grid grid-cols-11">
+        <div className="col-span-2 bg-gray-900_01">
           <SidePar />
         </div>
-        <div className="p-8 col-span-9">
+        <div className="p-8 col-span-9 h-full bg-gray-900_01">
           <Outlet />
         </div>
       </div>

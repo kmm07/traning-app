@@ -4,7 +4,7 @@
 }
 html,
 body {
-  @apply h-full scroll-smooth;
+  @apply h-full scroll-smooth bg-gray-900_01;
 }
 #root {
   @apply h-full;

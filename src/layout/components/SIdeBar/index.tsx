@@ -58,11 +58,11 @@ function SidePar() {
         },
       ],
     },
-    // {
-    //   name: "الاشعارات",
-    //   link: "/exercises/notifications",
-    //   src: "/images/img_notification3.png",
-    // },
+    {
+      name: "الاشعارات",
+      link: "/exercises/notifications",
+      src: "/images/img_notification3.png",
+    },
     {
       name: "الكوبونات",
       link: "/coupons",
