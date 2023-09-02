@@ -19,6 +19,7 @@ import TableHome, { ExercisesHomeLoader } from "pages/Exercises/Table-Home";
 import WomenTraining, { WomenTrainingLoader } from "pages/Exercises/Women";
 import ExercisesHome from "pages/Exercises/Exercises-Home";
 import Notifications, { NotificationsLoader } from "pages/Notifications";
+import Cardio, { CardioLoader } from "pages/Exercises/Cardio";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -67,6 +68,7 @@ const router = createBrowserRouter(
             element={<TableHome />}
             loader={ExercisesHomeLoader}
           />
+          <Route path="cardio" element={<Cardio />} loader={CardioLoader} />
         </Route>
 
         <Route

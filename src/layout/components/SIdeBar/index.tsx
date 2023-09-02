@@ -56,6 +56,10 @@ function SidePar() {
           name: "جدول المنزل",
           link: "/exercises/table-home",
         },
+        {
+          name: "الكارديو",
+          link: "/exercises/cardio",
+        },
       ],
     },
     {
