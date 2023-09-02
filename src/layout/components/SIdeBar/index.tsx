@@ -60,7 +60,7 @@ function SidePar() {
     },
     {
       name: "الاشعارات",
-      link: "/exercises/notifications",
+      link: "/notifications",
       src: "/images/img_notification3.png",
     },
     {

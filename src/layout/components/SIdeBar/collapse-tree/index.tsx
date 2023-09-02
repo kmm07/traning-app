@@ -48,7 +48,7 @@ const CollapseTree = ({
             src="/images/img_arrowdown_white_a700.svg"
             className={`duration-200 ${toggle ? "" : "-rotate-90"} `}
           />
-          <Text className="text-center text-white-A700 text-xl tracking-[0.14px]">
+          <Text className="text-center cursor-pointer text-white-A700 text-xl tracking-[0.14px]">
             {name}
           </Text>
         </div>

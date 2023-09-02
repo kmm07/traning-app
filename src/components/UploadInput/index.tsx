@@ -2,14 +2,16 @@ import React, { useRef, useState, useEffect } from "react";
 import { useFormikContext } from "formik";
 import { useDispatch } from "react-redux";
 import { setImageDelete } from "redux/slices/imageDelete";
-import { Img } from "components";
+import { Img, Text } from "components";
 
 interface Props {
   className?: string;
   name: string;
+  video?: boolean;
+  label?: string;
 }
 
-function UploadImg({ className = "", name }: Props) {
+function UploadInput({ className = "", name, video, label }: Props) {
   const { setFieldValue, values, errors, touched }: any = useFormikContext();
 
   const [image, setImage] = useState<string>("");
@@ -41,27 +43,20 @@ function UploadImg({ className = "", name }: Props) {
   }, [values[name]]);
 
   return (
-    <div
-      className={`relative rounded-lg overflow-hidden flex flex-col items-center  ${className}`}
-    >
-      <div className="h-[200px] sm:w-60 w-full max-w-full">
+    <div className={`relative   flex flex-col items-center  ${className}`}>
+      <div className="gap-4 w-full max-w-full flex items-center">
+        <Text size="3xl">{label}</Text>
         {values[name] === "" && (
-          <div className="flex flex-col gap-4 w-full h-full">
+          <div className="flex  flex-col gap-4 w-full h-full">
             <button
-              className="!border-[1px] border-dashed border-deep_purple-A200 flex justify-center items-center w-full flex-1"
+              className="border rounded-lg border-dashed px-10 overflow-hidden border-deep_purple-A200 flex justify-center items-center w-full flex-1"
               onClick={uploadFun}
               type="button"
             >
               <div className="flex justify-center flex-col items-center gap-3">
-                <Img
-                  src="/images/img-upload.svg"
-                  className="w-20 h-20 object-contain"
-                  alt="upload"
-                />
                 <div className="dark:text-white text-dark-100">
                   <p>
-                    اسحب صورك أو
-                    <span className="text-deep_purple-A200">تصفح</span>
+                    <span className="text-deep_purple-A200">ارفع</span>
                   </p>
                 </div>
               </div>
@@ -77,23 +72,31 @@ function UploadImg({ className = "", name }: Props) {
             </button>
           </div>
         )}
-        {values[name] !== "" && (
-          <Img
-            src={image}
-            className={`w-full h-full ${
-              values[name] === "" ? "hidden" : "block"
-            }`}
-          />
-        )}
-        <button
-          type="button"
-          className={
-            values[name] === "" ? "hidden" : "block absolute top-3 right-3"
-          }
-          onClick={deleteImg}
-        >
-          <Img src="/images/trash.svg" alt="delete" />
-        </button>
+        <div className="relative">
+          {values[name] !== "" &&
+            (video ? (
+              <video
+                src={image}
+                className={`w-20 ${values[name] === "" ? "hidden" : "block"}`}
+              />
+            ) : (
+              <Img
+                src={image}
+                className={`w-24 h-24 ${
+                  values[name] === "" ? "hidden" : "block"
+                }`}
+              />
+            ))}
+          <button
+            type="button"
+            className={
+              values[name] === "" ? "hidden" : "block absolute bottom-0 left-0"
+            }
+            onClick={deleteImg}
+          >
+            <Img src="/images/trash.svg" className="w-4" alt="delete" />
+          </button>
+        </div>
       </div>
       {Boolean(touched[name]) && Boolean(errors[name]) && (
         <div className="text-error-100 text-sm text-start">
@@ -103,4 +106,5 @@ function UploadImg({ className = "", name }: Props) {
     </div>
   );
 }
-export { UploadImg };
+
+export { UploadInput };

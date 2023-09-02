@@ -1,6 +1,6 @@
 import { cva, VariantProps } from "class-variance-authority";
 import React from "react";
-const text = cva("text-[#fff] whitespace-nowrap", {
+const text = cva("text-[#fff] whitespace-nowrap w-fit", {
   variants: {
     primary: {
       true: "!text-[#A3AED0]",
@@ -22,6 +22,12 @@ const text = cva("text-[#fff] whitespace-nowrap", {
     },
     bold: {
       true: "!font-bold",
+    },
+    border: {
+      primary:
+        "border-lime-100 border rounded-full px-4 flex items-center text-white",
+      white:
+        "border-white border rounded-full px-4 flex items-center text-white",
     },
     size: {
       xs: "text-xs",

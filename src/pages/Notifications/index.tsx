@@ -3,12 +3,11 @@ import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
-import AddCard from "shared/AddCard";
 import SideBar from "./components/SideBar";
 import AddExercise from "./components/AddExercise";
 
-function ExercisesGym() {
-  const [level, setLevel] = useState(1);
+function Notifications() {
+  const [active, setActive] = useState(1);
   const data = useLoaderData() as {
     table: [];
   };
@@ -16,7 +15,7 @@ function ExercisesGym() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "التمرين",
+        Header: "الاسم",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -33,6 +32,10 @@ function ExercisesGym() {
           );
         },
       },
+      {
+        Header: "التاريخ",
+        accessor: "date",
+      },
     ],
     []
   );
@@ -42,47 +45,27 @@ function ExercisesGym() {
 
   const cardData = [
     {
-      label: "مبتدئ",
+      label: "الاشعارات العامه",
       id: 1,
     },
     {
-      label: "متوسط",
+      label: "الاشعارات المخصصة",
       id: 2,
-    },
-    {
-      label: "متقدم",
-      id: 3,
     },
   ];
 
-  const onDelete = (id: number) => {
-    console.log(id);
-  };
-  const onEdit = (id: number) => {
-    console.log(id);
-  };
-  const onSave = () => {
-    console.log("save");
-  };
   return (
     <div className="w-full space-y-4">
-      <div className="flex gap-3 h-24 ">
+      <div className="grid grid-cols-5 gap-3">
         {cardData.map((item, index) => (
           <SettingCard
-            onDelete={onDelete}
-            onEdit={onEdit}
             id={item.id}
             key={index}
             label={item.label}
-            active={level === item.id}
-            onClick={() => setLevel(item.id)}
+            active={active === item.id}
+            onClick={() => setActive(item.id)}
           />
         ))}
-        <AddCard
-          modalContent={<>dd</>}
-          onSave={onSave}
-          modalLabel="اضافة مستوى"
-        />
       </div>
 
       <Table
@@ -100,13 +83,13 @@ function ExercisesGym() {
   );
 }
 
-export default ExercisesGym;
+export default Notifications;
 
-export const ExercisesGymLoader = async () => {
+export const NotificationsLoader = async () => {
   return {
     table: [
       {
-        phone: "01000000000",
+        date: "010000",
         name: "مصر",
       },
     ],

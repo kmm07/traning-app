@@ -1,8 +1,9 @@
-import { SettingCard, SubState, Table } from "components";
+import { Button, Img, SettingCard, SubState, Table } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
+import SideBar from "./components/SideBar";
 
 function WomenTraining() {
   const [level, setLevel] = useState(1);
@@ -107,7 +108,14 @@ function WomenTraining() {
           />
         ))}
       </div>
-
+      <div className="flex gap-4">
+        <Button secondaryBorder>يومين في الاسبوع</Button>
+        <Button primary>يومين في الاسبوع</Button>
+        <span className="text-indigo-500">
+          <Img src="/images/plus.svg" />
+          اضافة
+        </span>
+      </div>
       <Table
         data={data.table}
         columns={columns}
@@ -115,7 +123,9 @@ function WomenTraining() {
         modalTitle="اضافة اسبوع"
       />
 
-      <Drawer>ss</Drawer>
+      <Drawer>
+        <SideBar />
+      </Drawer>
     </div>
   );
 }

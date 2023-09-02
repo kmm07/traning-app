@@ -4,6 +4,7 @@ import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import AddCard from "shared/AddCard";
+import SideBar from "./components/SideBar";
 
 function ExercisesHome() {
   const [level, setLevel] = useState(1);
@@ -90,7 +91,9 @@ function ExercisesHome() {
         modalTitle="اضافة اسبوع"
       />
 
-      <Drawer>ss</Drawer>
+      <Drawer>
+        <SideBar />
+      </Drawer>
     </div>
   );
 }

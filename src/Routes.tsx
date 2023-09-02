@@ -15,10 +15,10 @@ import Ingredients, { IngredientsLoader } from "pages/Nutrition/Ingredients";
 import ExercisesGym, {
   ExercisesGymLoader,
 } from "pages/Exercises/Exercises-Gym";
-import ExercisesHome, {
-  ExercisesHomeLoader,
-} from "pages/Exercises/Exercises-Home";
+import TableHome, { ExercisesHomeLoader } from "pages/Exercises/Table-Home";
 import WomenTraining, { WomenTrainingLoader } from "pages/Exercises/Women";
+import ExercisesHome from "pages/Exercises/Exercises-Home";
+import Notifications, { NotificationsLoader } from "pages/Notifications";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -62,7 +62,18 @@ const router = createBrowserRouter(
             element={<ExercisesHome />}
             loader={ExercisesHomeLoader}
           />
+          <Route
+            path="table-home"
+            element={<TableHome />}
+            loader={ExercisesHomeLoader}
+          />
         </Route>
+
+        <Route
+          path="notifications"
+          element={<Notifications />}
+          loader={NotificationsLoader}
+        />
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -46,14 +46,7 @@ function SideBar() {
     []
   );
   return (
-    <Formik
-      initialValues={{
-        restTime: 0,
-      }}
-      onSubmit={(values) => {
-        console.log(values);
-      }}
-    >
+    <Formik>
       <Form className="flex flex-col gap-10">
         <div className="flex gap-5">
           <Img className="w-24 rounded-2xl" src="/images/Background5.4.png" />

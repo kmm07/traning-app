@@ -5,7 +5,7 @@ import {
   RadialProgress,
   Select,
   Text,
-  UploadImg,
+  UploadInput,
 } from "components";
 import { Form, Formik } from "formik";
 
@@ -104,7 +104,7 @@ function NutritionModal() {
         <div>
           <Text size="2xl">اشعار مخصص</Text>
         </div>
-        <UploadImg name="image" />
+        <UploadInput name="image" />
         <Input name="title" label="عنوان" />
         <Input name="url" label="ارفاق رابط" />
       </Form>

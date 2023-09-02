@@ -22,7 +22,7 @@ function Drawer({ label, children, id = "my-drawer" }: Props) {
       )}
       <div className="drawer-side">
         <label htmlFor={id} className="drawer-overlay"></label>
-        <div className="drawer-style p-5 w-1/2 h-[85%] mt-auto">
+        <div className="drawer-style p-5 w-1/2 h-[85%] overflow-y-auto mt-auto">
           {/* Sidebar content here */}
           {children}
         </div>

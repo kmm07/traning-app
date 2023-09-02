@@ -2,7 +2,7 @@ import React from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const button = cva(
-  "text-white btn text-center flex justify-center gap-3 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
+  "text-white btn text-center flex justify-center gap-1 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
   {
     variants: {
       primary: {
@@ -10,6 +10,9 @@ const button = cva(
       },
       primaryBorder: {
         true: "!border-deep_purple-A200 border !bg-transparent !text-deep_purple-A200",
+      },
+      danger: {
+        true: "!bg-red-500 !text-white  disabled:!opacity-25",
       },
       secondary: {
         true: "!bg-secondary-100 border-2 !border-secondary-100 !text-white",
@@ -28,7 +31,7 @@ const button = cva(
         xSmall: ["text-sm", "py-1"],
         small: ["!text-sm", "!py-2"],
         medium: ["text-md", "btn-sm", "!py-1", "!px-3"],
-        large: "py-3 px-10 font-bold",
+        large: "btn-md !px-10 font-bold",
       },
     },
     defaultVariants: {

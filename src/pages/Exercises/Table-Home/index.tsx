@@ -1,13 +1,12 @@
-import { SettingCard, Table } from "components";
+import { SettingCard, Table, Tabs } from "components";
 import React, { useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import AddCard from "shared/AddCard";
 import SideBar from "./components/SideBar";
-import AddExercise from "./components/AddExercise";
 
-function ExercisesGym() {
+function TableHome() {
   const [level, setLevel] = useState(1);
   const data = useLoaderData() as {
     table: [];
@@ -16,7 +15,7 @@ function ExercisesGym() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "التمرين",
+        Header: "الاسم",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -32,6 +31,9 @@ function ExercisesGym() {
             </div>
           );
         },
+      },
+      {
+        Header: " هدف الاسبوع",
       },
     ],
     []
@@ -84,13 +86,20 @@ function ExercisesGym() {
           modalLabel="اضافة مستوى"
         />
       </div>
-
+      <Tabs
+        tabs={[
+          {
+            name: "الاسبوع الاول",
+            isActive: true,
+          },
+        ]}
+        onClick={() => {}}
+      />
       <Table
         data={data.table}
         columns={columns}
         rowOnClick={rowOnClick}
-        modalTitle="اضافة تمرين"
-        modalContent={<AddExercise />}
+        modalTitle="اضافة اسبوع"
       />
 
       <Drawer>
@@ -100,9 +109,9 @@ function ExercisesGym() {
   );
 }
 
-export default ExercisesGym;
+export default TableHome;
 
-export const ExercisesGymLoader = async () => {
+export const ExercisesHomeLoader = async () => {
   return {
     table: [
       {

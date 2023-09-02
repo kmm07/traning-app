@@ -187,3 +187,6 @@ ul li a {
   box-shadow: 6px 6px 12px 0px #121120, -5px -5px 12px 0px #232239,
     0px 0px 3px 0px #202124 inset !important;
 }
+hr {
+  border: 2px solid #2c2c2e;
+}
