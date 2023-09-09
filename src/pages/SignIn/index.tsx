@@ -1,12 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, CheckBox, Img, Input, Text } from "components";
-import { Form, Formik } from "formik";
-import { Link } from "react-router-dom";
+import { Form, Formik, FormikHelpers } from "formik";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "hooks/useRedux";
+import { setCredentials } from "redux/slices/auth";
+import customAxios from "util/axios";
+import setFieldsError from "util/setFieldsError";
+import { toast } from "react-toastify";
+
+export interface FormValue {
+  email: string;
+  password: string;
+  remember: boolean;
+}
 
 const SignInPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const push = useNavigate();
+  const URL = "/login";
+  const onSubmit = async (
+    values: FormValue,
+    helpers: FormikHelpers<FormValue>
+  ) => {
+    setIsLoading(true);
+
+    try {
+      const { data } = await customAxios().post(URL, values);
+      await dispatch(setCredentials(data));
+
+      localStorage.removeItem("phone_after_reset");
+
+      if (values.remember) {
+        localStorage.setItem("userLogin", JSON.stringify(values));
+      } else {
+        localStorage.setItem("userLogin", JSON.stringify({}));
+      }
+
+      setIsLoading(true);
+
+      push("/dashboard");
+    } catch (error: any) {
+      if (error.response.status === 400) {
+        console.log(error.response.data.message);
+      } else if (error.response.status === 412) {
+        void push("/unauthenticated");
+      } else {
+        console.log("Login Failed");
+      }
+      setIsLoading(false);
+      toast.error(error.response.data.message);
+      setFieldsError(error, helpers);
+    }
+  };
+
   return (
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form className="bg-gray-900_09 h-screen flex sm:flex-col md:flex-col flex-row   sm:gap-10 md:gap-10 items-center justify-between w-full">
+    <Formik
+      initialValues={{
+        email: "",
+        password: "",
+        remember: false,
+      }}
+      onSubmit={onSubmit}
+    >
+      <Form
+        dir="ltr"
+        className="bg-gray-900_09 h-screen flex sm:flex-col md:flex-col flex-row   sm:gap-10 md:gap-10 items-center justify-between w-full"
+      >
         <div className="flex flex-col justify-center h-full w-1/2">
           <div className="w-1/2 mx-auto flex flex-col gap-14">
             <div className="flex flex-col gap-[10px] items-start justify-start md:ml-[0] ml-[7px]">
@@ -47,6 +107,8 @@ const SignInPage: React.FC = () => {
               </div>
               <div className="flex flex-col items-center justify-start mt-[31px] w-full">
                 <Button
+                  type="submit"
+                  isLoading={isLoading}
                   primary
                   className="cursor-pointer font-bold h-[54px] py-[17px]    tracking-[-0.28px] w-[410px]"
                 >

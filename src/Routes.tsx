@@ -27,7 +27,11 @@ const router = createBrowserRouter(
       <Route path="signin" element={<SignInPage />} />
 
       <Route path="/" element={<Layout />}>
-        <Route index element={<Messages />} loader={messagesLoader} />
+        <Route
+          path="/dashboard"
+          element={<Messages />}
+          loader={messagesLoader}
+        />
         <Route path="users" index element={<Users />} loader={usersLoader} />
         <Route path="/nutrition">
           <Route

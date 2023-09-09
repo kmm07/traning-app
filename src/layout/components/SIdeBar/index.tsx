@@ -8,7 +8,7 @@ function SidePar() {
   const naveItems = [
     {
       name: "الرسائل",
-      link: "/",
+      link: "/dashboard",
       src: "/images/img_mail11.png",
     },
     {
