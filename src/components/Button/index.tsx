@@ -2,7 +2,7 @@ import React from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const button = cva(
-  "text-white btn text-center flex justify-center gap-1 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
+  "text-white btn  text-center flex justify-center gap-1 duration-300 items-center disabled:opacity-25 rounded-[16px] whitespace-nowrap",
   {
     variants: {
       primary: {
@@ -20,8 +20,11 @@ const button = cva(
       secondaryBorder: {
         true: "!border-[#CFFF0F] !border-solid !border-2 text-white ",
       },
+      tertiary: {
+        true: "bg-gradient-to-tr from-sky-500 to-blue-600 text-white",
+      },
       fullWidth: {
-        true: "w-full flex-1",
+        true: " !flex-1",
       },
 
       rounded: {
@@ -29,8 +32,8 @@ const button = cva(
       },
       size: {
         xSmall: ["text-sm", "py-1"],
-        small: ["!text-sm", "!py-2"],
-        medium: ["text-md", "btn-sm", "!py-1", "!px-3"],
+        small: ["!text-sm", "!btn-sm"],
+        medium: ["text-md", "!btn-md"],
         large: "btn-md !px-10 font-bold",
       },
     },
@@ -51,9 +54,15 @@ interface Props {
   children?: React.ReactNode | any;
   disabled?: boolean;
   id?: string;
+  htmlFor?: string;
 }
 
-function Button({ onClick, type = "button", ...props }: Props & ButtonProps) {
+function Button({
+  htmlFor,
+  onClick,
+  type = "button",
+  ...props
+}: Props & ButtonProps) {
   return (
     <button
       className={button({
@@ -61,7 +70,10 @@ function Button({ onClick, type = "button", ...props }: Props & ButtonProps) {
       })}
       disabled={props.disabled || props.isLoading}
       type={type}
-      onClick={onClick}
+      onClick={() => {
+        onClick && onClick();
+        htmlFor && document.getElementById(htmlFor)?.click();
+      }}
     >
       {props.children}
     </button>

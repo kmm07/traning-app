@@ -8,6 +8,7 @@ type Props = {
   modalOnDelete?: () => void;
   onSave?: () => void;
   className?: string;
+  cancel?: boolean;
 };
 
 function Modal({
@@ -17,6 +18,7 @@ function Modal({
   id = "my_modal",
   modalOnDelete,
   onSave,
+  cancel,
 }: Props) {
   return (
     <>
@@ -37,12 +39,14 @@ function Modal({
           {children}
           <div className="modal-action flex gap-4 justify-start">
             {/* if there is a button in form, it will close the modal */}
-            <label
-              htmlFor={id}
-              className="btn !px-10 bg-gradient-to-tr from-sky-500 to-blue-600 text-white rounded-xl"
-            >
-              الغاء
-            </label>
+            {cancel && (
+              <label
+                htmlFor={id}
+                className="btn !px-10 bg-gradient-to-tr from-sky-500 to-blue-600 text-white rounded-xl"
+              >
+                الغاء
+              </label>
+            )}
             {modalOnDelete && (
               <label
                 htmlFor={id}

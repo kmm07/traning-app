@@ -5,21 +5,19 @@ import {
 } from "react-router-dom";
 import NotFound from "pages/NotFound";
 import SignInPage from "pages/SignIn";
-import Messages, { messagesLoader } from "pages/Messages";
+import Messages from "pages/Messages";
 import Layout from "layout";
-import Users, { usersLoader } from "pages/Users";
-import Descriptions, { DescriptionsLoader } from "pages/Nutrition/Descriptions";
+import Users from "pages/Users";
+import Descriptions from "pages/Nutrition/Descriptions";
 
-import MenTraining, { MenTrainingLoader } from "pages/Exercises/Men";
-import Ingredients, { IngredientsLoader } from "pages/Nutrition/Ingredients";
-import ExercisesGym, {
-  ExercisesGymLoader,
-} from "pages/Exercises/Exercises-Gym";
-import TableHome, { ExercisesHomeLoader } from "pages/Exercises/Table-Home";
-import WomenTraining, { WomenTrainingLoader } from "pages/Exercises/Women";
+import MenTraining from "pages/Exercises/Men";
+import Ingredients from "pages/Nutrition/Ingredients";
+import ExercisesGym from "pages/Exercises/Exercises-Gym";
+import TableHome from "pages/Exercises/Table-Home";
+import WomenTraining from "pages/Exercises/Women";
 import ExercisesHome from "pages/Exercises/Exercises-Home";
-import Notifications, { NotificationsLoader } from "pages/Notifications";
-import Cardio, { CardioLoader } from "pages/Exercises/Cardio";
+import Notifications from "pages/Notifications";
+import Cardio from "pages/Exercises/Cardio";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,59 +25,23 @@ const router = createBrowserRouter(
       <Route path="signin" element={<SignInPage />} />
 
       <Route path="/" element={<Layout />}>
-        <Route
-          path="/dashboard"
-          element={<Messages />}
-          loader={messagesLoader}
-        />
-        <Route path="users" index element={<Users />} loader={usersLoader} />
+        <Route path="/dashboard" element={<Messages />} />
+        <Route path="users" index element={<Users />} />
         <Route path="/nutrition">
-          <Route
-            path="descriptions"
-            element={<Descriptions />}
-            loader={DescriptionsLoader}
-          />
-          <Route
-            path="ingredients"
-            element={<Ingredients />}
-            loader={IngredientsLoader}
-          />
+          <Route path="descriptions" element={<Descriptions />} />
+          <Route path="ingredients" element={<Ingredients />} />
         </Route>
 
         <Route path="/exercises">
-          <Route
-            path="table-men"
-            element={<MenTraining />}
-            loader={MenTrainingLoader}
-          />
-          <Route
-            path="table-women"
-            element={<WomenTraining />}
-            loader={WomenTrainingLoader}
-          />
-          <Route
-            path="exercises-gym"
-            element={<ExercisesGym />}
-            loader={ExercisesGymLoader}
-          />
-          <Route
-            path="exercises-home"
-            element={<ExercisesHome />}
-            loader={ExercisesHomeLoader}
-          />
-          <Route
-            path="table-home"
-            element={<TableHome />}
-            loader={ExercisesHomeLoader}
-          />
-          <Route path="cardio" element={<Cardio />} loader={CardioLoader} />
+          <Route path="table-men" element={<MenTraining />} />
+          <Route path="table-women" element={<WomenTraining />} />
+          <Route path="exercises-gym" element={<ExercisesGym />} />
+          <Route path="exercises-home" element={<ExercisesHome />} />
+          <Route path="table-home" element={<TableHome />} />
+          <Route path="cardio" element={<Cardio />} />
         </Route>
 
-        <Route
-          path="notifications"
-          element={<Notifications />}
-          loader={NotificationsLoader}
-        />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -37,13 +37,11 @@ function Dropdown({ children, ntNumber, list = [], showArrow = true }: Props) {
 
       <ul
         tabIndex={0}
-        className="menu  menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-blue_gray-900 rounded-box w-52"
+        className="menu  menu-sm dropdown-content mt-3 z-[1] shadow bg-blue_gray-900 rounded-box w-52"
       >
         {list.map((item, index) => (
-          <li key={index}>
-            <span onClick={item.onClick} className="justify-between">
-              {item.label}
-            </span>
+          <li onClick={item.onClick} key={index}>
+            <span className="justify-between p-2 ">{item.label}</span>
           </li>
         ))}
       </ul>

@@ -17,7 +17,7 @@ const useAxios = ({ contentType = "application/json" }: Props) => {
     useAppSelector(selectCurrentToken);
 
   return axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
+    baseURL: "/api",
     headers: {
       "Content-Type": contentType as string,
       accept: "application/json",

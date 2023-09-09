@@ -99,7 +99,7 @@ function UploadInput({ className = "", name, video, label }: Props) {
         </div>
       </div>
       {Boolean(touched[name]) && Boolean(errors[name]) && (
-        <div className="text-error-100 text-sm text-start">
+        <div className="text-red-500 text-sm text-start">
           <>{errors[name]}</>
         </div>
       )}

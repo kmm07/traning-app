@@ -3,17 +3,24 @@ import React, { FC } from "react";
 
 const CheckBox: FC<CheckBoxProps & { isForm?: boolean }> = ({
   name,
-  isForm = false,
+  isForm = true,
   ...props
 }: CheckBoxProps & { isForm?: boolean }) => {
   return isForm ? (
     <Field name={name}>
-      {({ field, form: { errors, touched } }: FieldProps) => {
+      {({ form: { errors, touched, setFieldValue, values } }: FieldProps) => {
         return (
           <div>
-            <CustomCheckBox {...props} {...field} name={name} />
+            <CustomCheckBox
+              onClick={(e: any) => {
+                setFieldValue(name, e.target.checked ? 1 : 0);
+              }}
+              value={Boolean(values[name])}
+              label={props.label}
+              name={name}
+            />
             {Boolean(touched[name]) && Boolean(errors[name]) && (
-              <div className="text-error-100 text-sm text-start">
+              <div className="text-red-500 text-sm text-start">
                 <>{errors[name]}</>
               </div>
             )}
@@ -36,7 +43,6 @@ interface CheckBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 function CustomCheckBox({
-  name,
   label,
   value,
   labelStyling = "",
@@ -44,14 +50,10 @@ function CustomCheckBox({
 }: CheckBoxProps) {
   return (
     <div className="form-control">
-      <label className={`label cursor-pointer justify-center ${labelStyling}`}>
-        <input
-          type="checkbox"
-          className="checkbox rtl:rotate-y-180 checkbox-primary"
-          {...props}
-          name={name}
-          checked={value}
-        />
+      <label
+        className={`label cursor-pointer justify-center w-fit ${labelStyling}`}
+      >
+        <input type="checkbox" checked={value} {...props} />
         {Boolean(label) && (
           <span className="label-text dark:text-white text-dark-200 px-3">
             {label}

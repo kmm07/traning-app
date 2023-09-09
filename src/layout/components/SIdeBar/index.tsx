@@ -1,9 +1,13 @@
 import { Img } from "components";
 import NavItem from "./NavItem";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CollapseTree from "./collapse-tree";
+import { useAppDispatch } from "hooks/useRedux";
+import { logOut } from "redux/slices/auth";
 
 function SidePar() {
+  const dispatch = useAppDispatch();
+  const push = useNavigate();
   const { pathname } = useLocation();
   const naveItems = [
     {
@@ -101,7 +105,14 @@ function SidePar() {
         )}
       </div>
 
-      <button className="btn flex flex-col items-start justify-start w-full ">
+      <button
+        onClick={() => {
+          dispatch(logOut());
+
+          push("/signin");
+        }}
+        className="btn flex flex-col items-start justify-start w-full "
+      >
         <Img
           className="h-24 md:ml-[0] mr-[31px] rotate-180 w-[25px]"
           src="/images/img_minimize.svg"

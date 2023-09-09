@@ -1,16 +1,16 @@
-import { Card, Img, SettingCard, Table, Text } from "components";
+import { Card, Img, Modal, SettingCard, Table, Text } from "components";
 import { Drawer } from "components/Drawer";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
+import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult } from "react-query";
+import AddDietCategories from "./components/AddDietCategories";
 
 function Descriptions() {
   const [level, setLevel] = useState(1);
+  const [valuesItem, setValuesItem] = useState();
   const [ingredients, setIngredients] = useState<any>();
-  const data = useLoaderData() as {
-    table: [];
-  };
 
   const columns = React.useMemo(
     () => [
@@ -60,52 +60,48 @@ function Descriptions() {
     ],
     []
   );
+  const { data: cardData }: UseQueryResult<any> = useGetQuery(
+    "diet-categories",
+    "diet-categories",
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
+
+  const { mutateAsync } = useDeleteQuery();
   const rowOnClick = (item: any) => {
     setIngredients([item]);
   };
 
-  const cardData = [
-    {
-      label: "كيتو",
-      id: 1,
-    },
-    {
-      label: "لو كارب",
-      id: 2,
-    },
-    {
-      label: "تقليدي",
-      id: 3,
-    },
-    {
-      label: "تقليدي",
-      id: 3,
-    },
-  ];
   const onDelete = (id: number) => {
-    console.log(id);
+    mutateAsync(`diet-categories/${id}`);
   };
-  const onEdit = (id: number) => {
-    console.log(id);
+  const onEdit = (value: any) => {
+    setValuesItem(value);
+    document.getElementById("add-new-nutrition")?.click();
   };
+
+  if (!cardData) {
+    return <>loading...</>;
+  }
   return (
     <div className="w-full space-y-4">
-      <div className="flex gap-3 h-24 ">
-        {cardData.map((item, index) => (
+      <div className="grid grid-cols-4 gap-3">
+        {cardData?.map((item: { name: string; id: number }) => (
           <SettingCard
             onDelete={onDelete}
-            onEdit={onEdit}
+            onEdit={() => onEdit(item)}
             id={item.id}
-            key={index}
-            label={item.label}
+            key={item.id}
+            label={item.name}
             active={level === item.id}
             onClick={() => setLevel(item.id)}
           />
         ))}
-        <Card className={`p-4 w-[180px] cursor-pointer `}>
+        <Card className={`p-4 w-[180px]  `}>
           <label
             htmlFor="add-new-nutrition"
-            className={`flex flex-col justify-between items-center relative `}
+            className={`flex flex-col cursor-pointer justify-between items-center relative `}
           >
             <Img
               className="w-16 absolute top-0 left-0"
@@ -119,12 +115,15 @@ function Descriptions() {
       </div>
 
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة وجبة"
         modalContent={<>dd</>}
       />
+      <Modal id="add-new-nutrition">
+        <AddDietCategories values={valuesItem} />
+      </Modal>
       <Drawer>
         <SideBar ingredients={ingredients} />
       </Drawer>
@@ -133,21 +132,3 @@ function Descriptions() {
 }
 
 export default Descriptions;
-
-export const DescriptionsLoader = async () => {
-  return {
-    table: [
-      {
-        name: "Tanner Linsley",
-        mail: "example@gmail.com",
-        gender: "ذكر",
-        phone: "01000000000",
-        country: "مصر",
-        device: "ios",
-        lastSeen: "منذ 5 دقائق",
-        provider: "google",
-        size: "1",
-      },
-    ],
-  };
-};

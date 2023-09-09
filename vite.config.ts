@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+const target = "https://personaltrainerkmm.com/api/admin";
 // https://vitejs.dev/config/
 export default defineConfig({
   // This changes the out put dir from dist to build
@@ -9,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: process.env.VITE_BASE_URL,
+        target,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

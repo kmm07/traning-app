@@ -4,6 +4,7 @@ import { useAppDispatch } from "./useRedux";
 import { logOut } from "redux/slices/auth";
 import { setImageDelete } from "redux/slices/imageDelete";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface UrlContentType {
   url: string;
@@ -22,7 +23,7 @@ export function useGetQuery(name: string | any, url: string, options: any) {
 
   const dispatch = useAppDispatch();
   const push = useNavigate();
-  const queryOptions = { retry: 1, ...options };
+  const queryOptions = { retry: 1, cacheTime: 0, ...options };
   return useQuery(name, async () => await axios.get(url), {
     onError: (error: any) => {
       if (error?.response?.status === 412) {
@@ -51,14 +52,20 @@ export function usePostQuery({ url, contentType }: UrlContentType) {
     onSuccess: async () => {
       const pageUrl = "?page=1";
       const astricsUrl = "?page=*";
+      await queryClient.invalidateQueries(url.split("/")[0]);
       await queryClient.invalidateQueries(url + pageUrl);
       await queryClient.invalidateQueries(url + astricsUrl);
       await queryClient.invalidateQueries(url);
+      toast.success("تم الاضافة بنجاح");
     },
     onError: (error: any) => {
       if (error?.response?.status === 401) {
         dispatch(logOut());
         void push("/login");
+        toast.error("تم تسجيل الخروج بنجاح");
+      } else {
+        toast.error("حدث خطأ ما");
+        toast.error(error.response.data.message);
       }
     },
   });
@@ -112,17 +119,14 @@ export function useDeleteQuery() {
       await axios.delete(url);
       const pageUrl = "?page=1";
       const astricsUrl = "?page=*";
+      await queryClient.invalidateQueries(url.split("/")[0]);
       await queryClient.invalidateQueries(url.split("/")[0] + pageUrl);
       await queryClient.invalidateQueries(url.split("/")[0] + astricsUrl);
     },
     {
-      // onSuccess: () => {
-      //   Swal.fire({
-      //     icon: 'success',
-      //     title: t('enums:delete_title'),
-      //     text: t('enums:delete')
-      //   })
-      // }
+      onSuccess: () => {
+        toast.success("تم الحذف بنجاح");
+      },
     }
   );
 }

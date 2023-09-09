@@ -21,7 +21,7 @@ const TextArea: FC<TextAreaProps> = ({ name, isForm = true, ...props }) => {
               name={name}
               error={Boolean(Boolean(touched[name]) && errors[name])}
             />
-            <div className="text-error-100 text-sm text-start">
+            <div className="text-red-500 text-sm text-start">
               <ErrorMessage name={name} />
             </div>
           </div>

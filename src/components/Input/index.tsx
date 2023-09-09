@@ -19,7 +19,7 @@ const input = cva(
         true: "w-full flex-1",
       },
       error: {
-        true: "!border-error-100 !text-error-100",
+        true: "!border-error-100 !text-red-500",
       },
       type: {
         password: "pe-10",
@@ -63,7 +63,7 @@ const Input = ({
               name={name}
               error={touched[name] && errors[name]}
             />
-            <div className="text-error-100 text-sm text-start">
+            <div className="text-red-500 text-sm text-start">
               <ErrorMessage name={name} />
             </div>
           </div>
