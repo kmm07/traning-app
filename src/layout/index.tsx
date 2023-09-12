@@ -18,13 +18,13 @@ function Layout() {
     const userParse =
       userLocalStorage !== null
         ? JSON.parse(userLocalStorage ?? "")
-        : { token: null, data: null };
+        : { token: null, user: null };
 
     dispatch(setCredentials(userParse));
+
     // redirect to Home
     if (
-      (userParse?.data?.token === null ||
-        userParse?.data?.token === undefined) &&
+      (userParse?.token === null || userParse?.token === undefined) &&
       isPublic(pathname)
     ) {
       void push("/signin");
@@ -32,6 +32,7 @@ function Layout() {
   }, [pathname, token]);
 
   axios.defaults.headers.common.Authorization = `Bearer ${token as string}`;
+
   return (
     <div className="flex flex-col h-full relative">
       <Header />

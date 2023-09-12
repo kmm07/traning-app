@@ -6,9 +6,9 @@ import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 
 function Messages() {
-  const data = useLoaderData() as {
-    table: [];
-  };
+  // const data = useLoaderData() as {
+  //   table: [];
+  // };
 
   const columns = React.useMemo(
     () => [
@@ -51,10 +51,11 @@ function Messages() {
   const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
     console.log(e);
   };
+
   return (
     <div className="w-full">
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"
@@ -67,21 +68,5 @@ function Messages() {
     </div>
   );
 }
-
-export const messagesLoader = async () => {
-  return {
-    table: [
-      {
-        name: "Tanner Linsley",
-        mail: "example@gmail.com",
-        gender: "ذكر",
-        subscribe: {
-          type: "free",
-          age: "شهر",
-        },
-      },
-    ],
-  };
-};
 
 export default Messages;

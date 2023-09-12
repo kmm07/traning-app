@@ -27,9 +27,8 @@ const SignInPage: React.FC = () => {
 
     try {
       const { data } = await customAxios().post(URL, values);
-      await dispatch(setCredentials(data));
 
-      localStorage.removeItem("phone_after_reset");
+      await dispatch(setCredentials(data.data));
 
       if (values.remember) {
         localStorage.setItem("userLogin", JSON.stringify(values));

@@ -4,11 +4,14 @@ import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import UsersSideBar from "./components/UsersSideBar";
+import { useAppSelector } from "hooks/useRedux";
+import { selectCurrentToken } from "redux/slices/auth";
 
 function Users() {
-  const data = useLoaderData() as {
-    table: [];
-  };
+  const access_token: string | null | undefined =
+    useAppSelector(selectCurrentToken);
+
+  console.log({ token: access_token });
 
   const columns = React.useMemo(
     () => [
@@ -131,7 +134,7 @@ function Users() {
         }}
       />
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"
