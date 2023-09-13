@@ -56,7 +56,7 @@ function Users() {
       },
       {
         Header: "بريد إلكتروني",
-        accessor: "mail",
+        accessor: "email",
       },
 
       {

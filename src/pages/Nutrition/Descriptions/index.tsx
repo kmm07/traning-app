@@ -43,24 +43,21 @@ function Descriptions() {
     data: descriptionsList = [],
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: DescriptionType[] } }) => data.data,
+    select: ({ data }: { data: { data: DescriptionType[] } }) =>
+      data.data.map((item: DescriptionType) => ({
+        id: item.id,
+        name: item.name,
+        calories: item.calories,
+        fat: item.fat,
+        protein: item.protein,
+        sugar: item.sugar,
+        trans_fat: item.trans_fat,
+        carbohydrate: item.carbohydrate,
+        ingredients: item.ingredients,
+        prepare: item.prepare,
+      })),
     refetchOnWindowFocus: false,
   });
-
-  const formmatedDescriptionstData = useMemo(() => {
-    return descriptionsList?.map((item: DescriptionType) => ({
-      id: item.id,
-      name: item.name,
-      calories: item.calories,
-      fat: item.fat,
-      protein: item.protein,
-      sugar: item.sugar,
-      trans_fat: item.trans_fat,
-      carbohydrate: item.carbohydrate,
-      ingredients: item.ingredients,
-      prepare: item.prepare,
-    }));
-  }, [descriptionsList]);
 
   // categories actions ======================>
   const { mutateAsync } = useDeleteQuery();
@@ -210,7 +207,7 @@ function Descriptions() {
       </div>
 
       <Table
-        data={formmatedDescriptionstData ?? []}
+        data={descriptionsList ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة وجبة"

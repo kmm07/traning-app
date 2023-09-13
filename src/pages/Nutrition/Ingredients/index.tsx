@@ -47,24 +47,22 @@ function Ingredients() {
     data: ingredientsList = [],
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: any[] } }) => data.data,
+    select: ({ data }: { data: { data: any[] } }) =>
+      data.data.slice(0, 20).map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        calories: item.calories,
+        fat: item.fat,
+        protein: item.protein,
+        sugar: item.sugar,
+        trans_fat: item.trans_fat,
+        carbohydrate: item.carbohydrate,
+        size: item.size,
+        measure: item.measure,
+      })),
+
     refetchOnWindowFocus: false,
   });
-
-  const formattedIngredientsList = useMemo(() => {
-    return ingredientsList?.slice(0, 20).map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      calories: item.calories,
-      fat: item.fat,
-      protein: item.protein,
-      sugar: item.sugar,
-      trans_fat: item.trans_fat,
-      carbohydrate: item.carbohydrate,
-      size: item.size,
-      measure: item.measure,
-    }));
-  }, [ingredientsList]);
 
   const columns = React.useMemo(
     () => [
@@ -179,7 +177,7 @@ function Ingredients() {
       </div>
 
       <Table
-        data={formattedIngredientsList ?? []}
+        data={ingredientsList ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة مكون"

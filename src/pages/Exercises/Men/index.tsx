@@ -1,4 +1,4 @@
-import { Button, Img, SettingCard, SubState, Table } from "components";
+import { Button, SettingCard, SubState, Table } from "components";
 import React, { useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -9,33 +9,23 @@ import { UseQueryResult } from "react-query";
 function MenTraining() {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("junior");
 
-  const [daysNum, setDaysNum] = useState<number>(2);
+  const [daysNum, setDaysNum] = useState<number>(3);
 
   const [home, setHome] = useState<number>(0);
+
+  const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
   // get training categories ======================>
   const url = `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`;
 
-  const { data: trainingCategories = [] }: UseQueryResult<any> = useGetQuery(
-    url,
-    url,
-    {
-      select: ({ data }: { data: { data: [] } }) => data.data,
-    }
-  );
-
-  // get exercises categories ======================>
-  const exrciseURL = `/exercise-categories`;
-
-  const { data: traningExercises = [] }: UseQueryResult<any> = useGetQuery(
-    exrciseURL,
-    exrciseURL,
-    {
-      select: ({ data }: { data: { data: [] } }) => data.data,
-    }
-  );
-
-  console.log(traningExercises);
+  const { data: trainingCategories = [], isLoading }: UseQueryResult<any> =
+    useGetQuery(url, url, {
+      select: ({ data }: { data: { data: [] } }) =>
+        data.data.map(({ id, name }: { id: number; name: string }) => ({
+          id,
+          name,
+        })),
+    });
 
   const columns = React.useMemo(
     () => [
@@ -124,7 +114,8 @@ function MenTraining() {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex gap-3 h-24 ">
+      <h2>مستوي المتمرن</h2>
+      <div className="flex gap-3 h-24">
         {cardData.map((item, index) => (
           <SettingCard
             onDelete={onDelete}
@@ -137,14 +128,9 @@ function MenTraining() {
           />
         ))}
       </div>
+
+      <h2>عدد أيام التمرين</h2>
       <div className="flex gap-4">
-        <Button
-          onClick={() => setDaysNum(2)}
-          primary={daysNum === 2}
-          secondaryBorder={daysNum !== 2}
-        >
-          يومين في الاسبوع
-        </Button>
         <Button
           onClick={() => setDaysNum(3)}
           primary={daysNum === 3}
@@ -174,6 +160,24 @@ function MenTraining() {
           6 أيام في الاسبوع
         </Button>
       </div>
+      {/* exercise categories */}
+      <h2>أقسام التمرينات</h2>
+      <div className="flex items-center gap-3 flex-wrap">
+        {!isLoading
+          ? trainingCategories.length > 0
+            ? trainingCategories.map((category) => (
+                <Button
+                  onClick={() => setExerciseCategory(category.id)}
+                  primary={exerciesCategory === category.id}
+                  secondaryBorder={exerciesCategory !== category.id}
+                >
+                  {category?.name}
+                </Button>
+              ))
+            : "لا يوجد أقسام"
+          : "loading..."}
+      </div>
+
       <Table
         data={[]}
         columns={columns}

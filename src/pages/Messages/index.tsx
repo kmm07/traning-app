@@ -1,14 +1,22 @@
 import { SubState, Table } from "components";
-import React from "react";
-import { useLoaderData } from "react-router-dom";
+import React, { useState } from "react";
 import MessagesSideBAr from "./components/SideBar";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
+import { useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult } from "react-query";
+import { toast } from "react-toastify";
+import useAxios from "hooks/useAxios";
 
 function Messages() {
-  // const data = useLoaderData() as {
-  //   table: [];
-  // };
+  const [activeUser, setActiveUser] = useState<any>(null);
+
+  // get users list ======================>
+  const url = "/users";
+
+  const { data: users = [] }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: [] } }) => data.data,
+  });
 
   const columns = React.useMemo(
     () => [
@@ -33,33 +41,64 @@ function Messages() {
       },
       {
         Header: "بريد إلكتروني",
-        accessor: "mail",
+        accessor: "email",
       },
+
+      {
+        Header: "الهاتف",
+        accessor: "phone",
+      },
+
       {
         Header: "جنس",
         accessor: "gender", // accessor is the "key" in the data
       },
       {
-        Header: "الخطة",
+        Header: "نوع الإشتراك",
         Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
+          return <SubState state={row.original.subscription_status as any} />;
         },
+      },
+      {
+        Header: "الدولة",
+        accessor: "country",
+      },
+      {
+        Header: "الجهاز",
+        accessor: "phone_model",
+      },
+      {
+        Header: "آخر ظهور",
+        accessor: "last_viewed",
+      },
+      {
+        Header: "مزود الدخول",
+        accessor: "provider",
       },
     ],
     []
   );
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+
+  // on view user data ============================>
+  const axios = useAxios({});
+
+  const rowOnClick = async (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+  ) => {
+    try {
+      const { data } = await axios.get(`/users/${e.original.id}`);
+      console.log(data.data);
+    } catch (error: any) {
+      toast.error(`${error.response.data.message}`);
+    }
   };
 
   return (
     <div className="w-full">
       <Table
-        data={[]}
+        data={users.users ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
-        title="جميع المستخدمين"
-        modalTitle="اضافة مستخدم"
       />
 
       <Drawer>
