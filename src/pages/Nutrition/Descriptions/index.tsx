@@ -1,6 +1,6 @@
 import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
 import { Drawer } from "components/Drawer";
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
@@ -22,7 +22,7 @@ interface DescriptionType {
 }
 
 function Descriptions() {
-  const [categoryId, setCategoryId] = useState(1);
+  const [categoryId, setCategoryId] = useState();
 
   const [meal, setMeal] = useState("Lunch");
 
@@ -57,6 +57,7 @@ function Descriptions() {
         prepare: item.prepare,
       })),
     refetchOnWindowFocus: false,
+    enabeld: categoryId !== undefined,
   });
 
   // categories actions ======================>
@@ -141,24 +142,28 @@ function Descriptions() {
     []
   );
 
-  if (isCardsLoading || isListLoading) {
-    return <>loading...</>;
-  }
+  useEffect(() => {
+    setCategoryId(cardData?.[0]?.id);
+  }, [cardData]);
 
   return (
     <div className="w-full space-y-4">
       <div className="grid grid-cols-4 gap-3">
-        {cardData?.map((item: { name: string; id: number }) => (
-          <SettingCard
-            onDelete={onDelete}
-            onEdit={() => onEdit(item)}
-            id={item.id}
-            key={item.id}
-            label={item.name}
-            active={categoryId === item.id}
-            onClick={() => setCategoryId(item.id)}
-          />
-        ))}
+        {!isCardsLoading ? (
+          cardData?.map((item: { name: string; id: number }) => (
+            <SettingCard
+              onDelete={onDelete}
+              onEdit={() => onEdit(item)}
+              id={item.id}
+              key={item.id}
+              label={item.name}
+              active={categoryId === item.id}
+              onClick={() => setCategoryId(item.id)}
+            />
+          ))
+        ) : (
+          <>laoding...</>
+        )}
         <Card className={"p-4 w-[180px]"}>
           <label
             htmlFor="add-new-nutrition"
@@ -205,14 +210,17 @@ function Descriptions() {
           عشاء{" "}
         </Button>
       </div>
-
-      <Table
-        data={descriptionsList ?? []}
-        columns={columns}
-        rowOnClick={rowOnClick}
-        modalTitle="اضافة وجبة"
-        // modalContent={<SideBar mealData={{}} />}
-      />
+      {!isListLoading ? (
+        <Table
+          data={descriptionsList ?? []}
+          columns={columns}
+          rowOnClick={rowOnClick}
+          modalTitle="اضافة وجبة"
+          // modalContent={<SideBar mealData={{}} />}
+        />
+      ) : (
+        <>loading...</>
+      )}
 
       <Modal id="add-new-nutrition">
         <AddDietCategories values={valuesItem} />

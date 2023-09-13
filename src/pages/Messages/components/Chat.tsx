@@ -1,6 +1,8 @@
-import { Img, Input } from "components";
+import { Button, Img, Input } from "components";
 import { Form, Formik } from "formik";
+import { usePostQuery } from "hooks/useQueryHooks";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 type Props = {
   messages: Array<{
@@ -12,27 +14,41 @@ type Props = {
 };
 
 function Chat({ messages }: Props) {
+  const url = `/send-message/1`;
+
+  const { mutateAsync, isLoading } = usePostQuery({ url });
+
+  const onSubmit = async (values, { resetForm }: any) => {
+    try {
+      await mutateAsync(values as any);
+      resetForm();
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
-        frameEighteen: "",
+        message: "",
       }}
-      onSubmit={(values, { resetForm }) => {
-        console.log("values >>>> ", values);
-        resetForm();
-      }}
+      onSubmit={onSubmit}
     >
       <Form className="flex flex-col font-gilroy gap-[35px] h-[585px] p-[18px] rounded-3xl overflow-hidden w-full shadow-bs">
         <div className="h-full pt-3 px-3 relative overflow-y-scroll">
           <Msg messages={messages} />
         </div>
 
-        <div className="flex px-6 py-5 bg-stone-900  gap-1 items-center justify-start   w-full">
-          <Img className="h-[41px]" src="/images/img_send.svg" alt="send" />
+        <div className="flex px-6 py-5 bg-stone-900  gap-1 items-center justify-start w-full">
+          <Button type="submit" isLoading={isLoading}>
+            <Img className="h-[41px]" src="/images/img_send.svg" alt="send" />
+          </Button>
+
           <Input
-            name="frameEighteen"
+            name="message"
             placeholder="Type your message"
             className="h-12 px-5 py-2 bg-neutral-800 rounded-lg"
+            isForm
           />
           <Img
             className="h-[41px]"
@@ -56,6 +72,7 @@ function Msg({
   }>;
 }) {
   const messagesEndRef = useRef(null);
+
   const [open, setOpen] = useState(false);
   // const scrollToBottom = () => {
   //   if (

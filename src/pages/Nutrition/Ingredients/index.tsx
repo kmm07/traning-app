@@ -6,6 +6,7 @@ import SideBar from "./components/SideBar";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
+import EditIngredient from "./components/editIngredient";
 
 function Ingredients() {
   const [categoryId, setCategoryId] = useState(1);
@@ -139,26 +140,26 @@ function Ingredients() {
     setCategoryId(cardData?.[0]?.id);
   }, [cardData]);
 
-  if (isCardsLoading || isListLoading) {
-    return <>...loading</>;
-  }
-
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
-        {cardData?.map((item, index) => {
-          return (
-            <SettingCard
-              onDelete={onDelete}
-              onEdit={() => onEdit(item)}
-              id={item.id}
-              key={item.id}
-              label={item.name}
-              active={categoryId === item.id}
-              onClick={() => setCategoryId(item.id)}
-            />
-          );
-        })}
+        {!isCardsLoading ? (
+          cardData?.map((item: any, index: any) => {
+            return (
+              <SettingCard
+                onDelete={onDelete}
+                onEdit={() => onEdit(item)}
+                id={item.id}
+                key={item.id}
+                label={item.name}
+                active={categoryId === item.id}
+                onClick={() => setCategoryId(item.id)}
+              />
+            );
+          })
+        ) : (
+          <>loading...</>
+        )}
 
         <Card className={`p-4 w-[180px] cursor-pointer`}>
           <label
@@ -176,12 +177,17 @@ function Ingredients() {
         </Card>
       </div>
 
-      <Table
-        data={ingredientsList ?? []}
-        columns={columns}
-        rowOnClick={rowOnClick}
-        modalTitle="اضافة مكون"
-      />
+      {!isListLoading ? (
+        <Table
+          data={ingredientsList ?? []}
+          columns={columns}
+          rowOnClick={rowOnClick}
+          modalTitle="اضافة مكون"
+          modalContent={<EditIngredient values={null} categories={cardData} />}
+        />
+      ) : (
+        <>loading...</>
+      )}
 
       <Modal id="add-new-nutrition">
         <AddIngredientCategories values={valuesItem} />
