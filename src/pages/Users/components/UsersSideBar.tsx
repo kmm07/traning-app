@@ -7,8 +7,11 @@ function UsersSideBar() {
   return (
     <>
       <UsersInfo showUserInfo={false} />
+
       <HeathInfo />
+
       <NutritionInfo />
+
       <TrainingInfo />
     </>
   );

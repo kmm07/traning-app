@@ -1,15 +1,41 @@
 import { Button, Img, SettingCard, SubState, Table } from "components";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
+import { useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult } from "react-query";
 
 function MenTraining() {
-  const [level, setLevel] = useState(1);
-  const data = useLoaderData() as {
-    table: [];
-  };
+  const [level, setLevel] = useState<"junior" | "mid" | "senior">("junior");
+
+  const [daysNum, setDaysNum] = useState<number>(2);
+
+  const [home, setHome] = useState<number>(0);
+
+  // get training categories ======================>
+  const url = `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`;
+
+  const { data: trainingCategories = [] }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
+
+  // get exercises categories ======================>
+  const exrciseURL = `/exercise-categories`;
+
+  const { data: traningExercises = [] }: UseQueryResult<any> = useGetQuery(
+    exrciseURL,
+    exrciseURL,
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
+
+  console.log(traningExercises);
 
   const columns = React.useMemo(
     () => [
@@ -76,23 +102,26 @@ function MenTraining() {
   const cardData = [
     {
       label: "مبتدئ",
-      id: 1,
+      id: "junior",
     },
     {
       label: "متوسط",
-      id: 2,
+      id: "mid",
     },
     {
       label: "متقدم",
-      id: 3,
+      id: "senior",
     },
   ];
+
   const onDelete = (id: number) => {
     console.log(id);
   };
+
   const onEdit = (id: number) => {
     console.log(id);
   };
+
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
@@ -109,15 +138,44 @@ function MenTraining() {
         ))}
       </div>
       <div className="flex gap-4">
-        <Button secondaryBorder>يومين في الاسبوع</Button>
-        <Button primary>يومين في الاسبوع</Button>
-        <span className="text-indigo-500">
-          <Img src="/images/plus.svg" />
-          اضافة
-        </span>
+        <Button
+          onClick={() => setDaysNum(2)}
+          primary={daysNum === 2}
+          secondaryBorder={daysNum !== 2}
+        >
+          يومين في الاسبوع
+        </Button>
+        <Button
+          onClick={() => setDaysNum(3)}
+          primary={daysNum === 3}
+          secondaryBorder={daysNum !== 3}
+        >
+          3 أيام في الاسبوع
+        </Button>
+        <Button
+          onClick={() => setDaysNum(4)}
+          primary={daysNum === 4}
+          secondaryBorder={daysNum !== 4}
+        >
+          4 أيام في الاسبوع
+        </Button>
+        <Button
+          onClick={() => setDaysNum(5)}
+          primary={daysNum === 5}
+          secondaryBorder={daysNum !== 5}
+        >
+          5 أيام في الاسبوع
+        </Button>
+        <Button
+          onClick={() => setDaysNum(6)}
+          primary={daysNum === 6}
+          secondaryBorder={daysNum !== 6}
+        >
+          6 أيام في الاسبوع
+        </Button>
       </div>
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة اسبوع"
@@ -131,24 +189,3 @@ function MenTraining() {
 }
 
 export default MenTraining;
-
-export const MenTrainingLoader = async () => {
-  return {
-    table: [
-      {
-        name: "Tanner Linsley",
-        mail: "example@gmail.com",
-        gender: "ذكر",
-        phone: "01000000000",
-        country: "مصر",
-        device: "ios",
-        lastSeen: "منذ 5 دقائق",
-        provider: "google",
-        subscribe: {
-          type: "free",
-          age: "شهر",
-        },
-      },
-    ],
-  };
-};

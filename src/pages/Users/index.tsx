@@ -1,24 +1,44 @@
 import { Card, Select, SubState, Table, Text } from "components";
-import React from "react";
-import { useLoaderData } from "react-router-dom";
+import React, { useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import UsersSideBar from "./components/UsersSideBar";
-import { useAppSelector } from "hooks/useRedux";
-import { selectCurrentToken } from "redux/slices/auth";
+import { UseQueryResult } from "react-query";
+import { useGetQuery } from "hooks/useQueryHooks";
+import useAxios from "hooks/useAxios";
+import { toast } from "react-toastify";
+
+interface UserType {
+  country: string;
+  email: string;
+  gender: string;
+  have_subscription: boolean;
+  id: number;
+  last_viewed: string;
+  name: string;
+  phone: string;
+  phone_model: string;
+  provider: string;
+  subscription: string;
+  subscription_status: string;
+}
 
 function Users() {
-  const access_token: string | null | undefined =
-    useAppSelector(selectCurrentToken);
+  const [activeUser, setActiveUser] = useState<any>(null);
 
-  console.log({ token: access_token });
+  // get users list ======================>
+  const url = "/users";
+
+  const { data: users = [] }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: [] } }) => data.data,
+  });
 
   const columns = React.useMemo(
     () => [
       {
         Header: "الاسم",
         accessor: "name",
-        Cell: ({ row }: { row: Row<any> }) => {
+        Cell: ({ row }: { row: Row<UserType> }) => {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
@@ -38,19 +58,21 @@ function Users() {
         Header: "بريد إلكتروني",
         accessor: "mail",
       },
+
+      {
+        Header: "الهاتف",
+        accessor: "phone",
+      },
+
       {
         Header: "جنس",
         accessor: "gender", // accessor is the "key" in the data
       },
       {
-        Header: "الخطة",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
+        Header: "نوع الإشتراك",
+        Cell: ({ row }: { row: Row<UserType> }) => {
+          return <SubState state={row.original.subscription_status as any} />;
         },
-      },
-      {
-        Header: "الهاتف",
-        accessor: "phone",
       },
       {
         Header: "الدولة",
@@ -58,11 +80,11 @@ function Users() {
       },
       {
         Header: "الجهاز",
-        accessor: "device",
+        accessor: "phone_model",
       },
       {
         Header: "آخر ظهور",
-        accessor: "lastSeen",
+        accessor: "last_viewed",
       },
       {
         Header: "مزود الدخول",
@@ -71,59 +93,45 @@ function Users() {
     ],
     []
   );
+
   const options = [{ value: "all", label: "الكل" }];
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+
+  // on view user data ============================>
+  const axios = useAxios({});
+
+  const rowOnClick = async (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+  ) => {
+    try {
+      const { data } = await axios.get(`/users/${e.original.id}`);
+
+      console.log(data.data);
+    } catch (error: any) {
+      toast.error(`${error.response.data.message}`);
+    }
   };
 
-  const cardData = [
-    {
-      count: "٣٠٠٠",
-      label: "الكل",
-    },
-    {
-      count: "٢٠٠٠",
-      label: "المشتركين",
-    },
-    {
-      count: "٥٠",
-      label: "الغاء الاشتراك",
-    },
-    {
-      count: "١٠",
-      label: "الخطة المجانية",
-    },
-    {
-      count: "١٠",
-      label: "خذف التطبيق",
-    },
-    {
-      count: "١٠",
-      label: "تجديد الاشتراك",
-    },
-    {
-      count: "١٠ ",
-      label: " متوسط استخدام التطبيق بالدقائق",
-    },
-  ];
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
-        {cardData.map((item, index) => {
-          return (
-            <Card key={index} className="p-4">
-              <div className="flex flex-col  justify-between">
-                <Text size="3xl" className=" font-bold">
-                  {item.count}
-                </Text>
-                <Text size="3xl" className="text-gray-500 text-sm">
-                  {item.label}
-                </Text>
-              </div>
-            </Card>
-          );
-        })}
+        {Object.entries(users?.cards ?? {})?.map(
+          (item: UserType, index: number) => {
+            return (
+              <Card key={index} className="p-4">
+                <div className="flex flex-col  justify-between">
+                  <Text size="3xl" className=" font-bold capitalize">
+                    {item[1]}
+                  </Text>
+                  <Text size="3xl" className="text-gray-500 text-sm">
+                    {item[0]}
+                  </Text>
+                </div>
+              </Card>
+            );
+          }
+        )}
       </div>
+
       <Select
         isForm={false}
         options={options}
@@ -134,7 +142,7 @@ function Users() {
         }}
       />
       <Table
-        data={[]}
+        data={users.users ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"
@@ -147,26 +155,5 @@ function Users() {
     </div>
   );
 }
-
-export const usersLoader = async () => {
-  return {
-    table: [
-      {
-        name: "Tanner Linsley",
-        mail: "example@gmail.com",
-        gender: "ذكر",
-        phone: "01000000000",
-        country: "مصر",
-        device: "ios",
-        lastSeen: "منذ 5 دقائق",
-        provider: "google",
-        subscribe: {
-          type: "free",
-          age: "شهر",
-        },
-      },
-    ],
-  };
-};
 
 export default Users;

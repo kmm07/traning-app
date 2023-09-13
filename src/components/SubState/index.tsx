@@ -18,6 +18,10 @@ function SubState({ state }: Props) {
       src: "/images/img_arrowright.svg",
       name: "ملغي",
     },
+    not_subscriped: {
+      src: "/images/img_arrowright.svg",
+      name: "ملغي",
+    },
     trail: {
       src: "/images/img_error.svg",
       name: "تجريبي",

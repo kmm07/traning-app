@@ -1,18 +1,45 @@
-import { Button, Card, Table, Text } from "components";
+import { Button, Card, Modal, Table, Text } from "components";
 import { RowTable } from "components/RowTable";
 import TableActions from "components/Table/actions";
+import { useDeleteQuery } from "hooks/useQueryHooks";
 import React from "react";
 import { Row } from "react-table";
+import { toast } from "react-toastify";
 
 interface SideBarProps {
-  ingredients: any;
+  mealData: any;
+  setMealData: any;
+  categoryId: number;
+  meal: string;
 }
 
-function SideBar({ ingredients = [] }: SideBarProps) {
-  console.log(
-    "🚀 ~ file: SideBar.tsx:11 ~ SideBar ~ ingredients:",
-    ingredients
-  );
+function SideBar({ mealData, setMealData, categoryId, meal }: SideBarProps) {
+  // list actions ======================>
+  const { mutateAsync, isLoading } = useDeleteQuery();
+
+  const onDeleteItem = async () => {
+    try {
+      await mutateAsync(`/diet-meals/${mealData.id}`);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  // ingredients actions =====================>
+  const onDeleteIngredient = (item: any) => {
+    const filteredArray = mealData.ingredients?.filter(
+      (ingredient: any) => ingredient.id != item.id
+    );
+
+    // setMealData({ ...mealData, ingredients: filteredArray });
+  };
+
+  const onEditIngredient = (item: any) => {
+    console.log(item);
+  };
+
+  const onAddIngredient = () => {};
+
   const columnsIngredients = React.useMemo(
     () => [
       {
@@ -31,43 +58,33 @@ function SideBar({ ingredients = [] }: SideBarProps) {
       },
       {
         Header: "السعرات",
-        accessor: "",
+        accessor: "calories",
       },
       {
         Header: " الكاربوهيدرات",
-        accessor: "provider",
+        accessor: "carbohydrate",
       },
       {
         Header: "البروتين",
-        accessor: "gender",
+        accessor: "protein",
       },
 
       {
         Header: "الدهون",
-        accessor: "phone",
+        accessor: "fat",
       },
-      {
-        Header: "الدهون المتحولة",
-        accessor: "country",
-      },
+
       {
         Header: "السكريات",
-        accessor: "device",
+        accessor: "sugar",
       },
-      {
-        Header: "الحجم",
-        accessor: "size",
-      },
+
       {
         Header: " ",
         Cell: ({ row }: { row: Row<any> }) => (
           <TableActions
-            onEdit={() => {
-              console.log("🚀 ~ file: SideBar.tsx:89 ~ SideBar ~ row", row);
-            }}
-            onDelete={() => {
-              console.log("🚀 ~ file: SideBar.tsx:93 ~ SideBar ~ row", row);
-            }}
+            onEdit={() => onEditIngredient(row.original)}
+            onDelete={() => onDeleteIngredient(row.original)}
           />
         ),
       },
@@ -79,7 +96,14 @@ function SideBar({ ingredients = [] }: SideBarProps) {
     <>
       <RowTable
         data={{
-          columns: ["1", "2", "3", "4", "5", "6", "7"],
+          columns: [
+            Number(mealData?.calories).toFixed(2),
+            Number(mealData?.protein).toFixed(2),
+            Number(mealData?.carbohydrate).toFixed(2),
+            Number(mealData?.fat).toFixed(2),
+            Number(mealData?.trans_fat).toFixed(2),
+            Number(mealData?.sugar).toFixed(2),
+          ],
           header: [
             "السعرات",
             "البروتين",
@@ -87,61 +111,62 @@ function SideBar({ ingredients = [] }: SideBarProps) {
             "الدهون",
             "الدهون المتحولة",
             "السكريات",
-            "الحجم",
           ],
         }}
         title="القيمة الغذائية"
       />
+
       <Card className="px-4 pb-4">
         <div className="flex justify-between py-3">
           <Text size="3xl">المكونات</Text>
-          <Button rounded="full" primary>
-            اضافة مكون
-          </Button>
         </div>
         <Table
           noPagination
           search={false}
-          data={ingredients}
+          data={mealData?.ingredients ?? []}
           columns={columnsIngredients}
           modalTitle="اضافة مكون"
           modalContent={<>dd</>}
         />
       </Card>
+
       <Card className="px-4 pb-4">
         <div className="flex justify-between py-3">
           <Text size="3xl">طريقة التحضير</Text>
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2">
+              <label htmlFor="internal" className="mb-2">
+                رفع من الجهاز
+              </label>
+              <input id="internal" name="video-url" type="radio" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label htmlFor="external" className="mb-2">
+                ادخال رابط
+              </label>
+              <input id="external" name="video-url" type="radio" />
+            </div>
+          </div>
         </div>
+
         <Table
           noPagination
           search={false}
-          data={[
-            {
-              description: "ahmedddd",
-            },
-          ]}
+          data={mealData?.prepare?.steps ?? []}
           columns={[
             {
-              Header: " ",
+              Header: "",
               accessor: "description",
               className: "w-full",
+              Cell: ({ row }: { row: Row<any> }) => <span>{row.original}</span>,
             },
             {
               Header: " ",
               Cell: ({ row }: { row: Row<any> }) => (
                 <TableActions
-                  onEdit={() => {
-                    console.log(
-                      "🚀 ~ file: SideBar.tsx:89 ~ SideBar ~ row",
-                      row
-                    );
-                  }}
-                  onDelete={() => {
-                    console.log(
-                      "🚀 ~ file: SideBar.tsx:93 ~ SideBar ~ row",
-                      row
-                    );
-                  }}
+                  onEdit={() => onEditIngredient(row.original)}
+                  onDelete={() => onDeleteIngredient(row.original.id)}
                 />
               ),
             },
@@ -150,6 +175,29 @@ function SideBar({ ingredients = [] }: SideBarProps) {
           modalContent={<>dd</>}
         />
       </Card>
+
+      <div className="flex items-center justify-evenly mt-6">
+        <Button className="w-[100px]" primary>
+          حفظ
+        </Button>
+        <Button
+          className="w-[100px]"
+          primary
+          onClick={() => document.getElementById("my-drawer")?.click()}
+        >
+          إلغاء
+        </Button>
+        <Button
+          className="w-[100px]"
+          danger
+          onClick={onDeleteItem}
+          isLoading={isLoading}
+        >
+          حذف
+        </Button>
+      </div>
+
+      <Modal>safasdf</Modal>
     </>
   );
 }

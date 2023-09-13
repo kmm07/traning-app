@@ -1,16 +1,81 @@
-import { Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
 import { Drawer } from "components/Drawer";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import AddDietCategories from "./components/AddDietCategories";
 
+interface DescriptionType {
+  calories: number;
+  carbohydrate: number;
+  fat: number;
+  id: number;
+  image: string;
+  name: string;
+  protein: number;
+  sugar: number;
+  trans_fat: number;
+  ingredients: { name: string };
+  prepare: any;
+}
+
 function Descriptions() {
-  const [level, setLevel] = useState(1);
+  const [categoryId, setCategoryId] = useState(1);
+
+  const [meal, setMeal] = useState("Lunch");
+
   const [valuesItem, setValuesItem] = useState();
-  const [ingredients, setIngredients] = useState<any>();
+
+  const [mealData, setMealData] = useState<any>();
+
+  // get cards data =================>
+  const { data: cardData, isLoading: isCardsLoading }: UseQueryResult<any> =
+    useGetQuery("diet-categories", "diet-categories", {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+      refetchOnWindowFocus: false,
+    });
+  // get descriptions data list =================>
+  const url = `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`;
+
+  const {
+    data: descriptionsList = [],
+    isLoading: isListLoading,
+  }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: DescriptionType[] } }) => data.data,
+    refetchOnWindowFocus: false,
+  });
+
+  const formmatedDescriptionstData = useMemo(() => {
+    return descriptionsList?.map((item: DescriptionType) => ({
+      id: item.id,
+      name: item.name,
+      calories: item.calories,
+      fat: item.fat,
+      protein: item.protein,
+      sugar: item.sugar,
+      trans_fat: item.trans_fat,
+      carbohydrate: item.carbohydrate,
+      ingredients: item.ingredients,
+      prepare: item.prepare,
+    }));
+  }, [descriptionsList]);
+
+  // categories actions ======================>
+  const { mutateAsync } = useDeleteQuery();
+
+  const rowOnClick = (item: any) => {
+    setMealData(item.original);
+  };
+
+  const onDelete = (id: number) => {
+    mutateAsync(`diet-categories/${id}`);
+  };
+  const onEdit = (value: any) => {
+    setValuesItem(value);
+    document.getElementById("add-new-nutrition")?.click();
+  };
 
   const columns = React.useMemo(
     () => [
@@ -35,55 +100,54 @@ function Descriptions() {
       },
       {
         Header: " السعرات",
-        accessor: "provider",
+        accessor: "calories",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.calories).toFixed(2)}</span>
+        ),
       },
       {
         Header: "البروتين",
-        accessor: "gender",
+        accessor: "protein",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.protein).toFixed(2)}</span>
+        ),
       },
       {
         Header: "الكاروبهيدرات",
-        accessor: "mail",
+        accessor: "carbohydrate",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.carbohydrate).toFixed(2)}</span>
+        ),
       },
       {
         Header: "الدهون",
-        accessor: "phone",
+        accessor: "fat",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.fat).toFixed(2)}</span>
+        ),
       },
       {
         Header: "الدهون المتحولة",
-        accessor: "country",
+        accessor: "trans_fat",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.trans_fat).toFixed(2)}</span>
+        ),
       },
       {
         Header: "السكريات",
-        accessor: "device",
+        accessor: "sugar",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.sugar).toFixed(2)}</span>
+        ),
       },
     ],
     []
   );
-  const { data: cardData }: UseQueryResult<any> = useGetQuery(
-    "diet-categories",
-    "diet-categories",
-    {
-      select: ({ data }: { data: { data: [] } }) => data.data,
-    }
-  );
 
-  const { mutateAsync } = useDeleteQuery();
-  const rowOnClick = (item: any) => {
-    setIngredients([item]);
-  };
-
-  const onDelete = (id: number) => {
-    mutateAsync(`diet-categories/${id}`);
-  };
-  const onEdit = (value: any) => {
-    setValuesItem(value);
-    document.getElementById("add-new-nutrition")?.click();
-  };
-
-  if (!cardData) {
+  if (isCardsLoading || isListLoading) {
     return <>loading...</>;
   }
+
   return (
     <div className="w-full space-y-4">
       <div className="grid grid-cols-4 gap-3">
@@ -94,11 +158,11 @@ function Descriptions() {
             id={item.id}
             key={item.id}
             label={item.name}
-            active={level === item.id}
-            onClick={() => setLevel(item.id)}
+            active={categoryId === item.id}
+            onClick={() => setCategoryId(item.id)}
           />
         ))}
-        <Card className={`p-4 w-[180px]  `}>
+        <Card className={"p-4 w-[180px]"}>
           <label
             htmlFor="add-new-nutrition"
             className={`flex flex-col cursor-pointer justify-between items-center relative `}
@@ -114,18 +178,58 @@ function Descriptions() {
         </Card>
       </div>
 
+      <div className="flex flex-col lg:flex-row items-center gap-4">
+        <Button
+          primary={meal === "breakfast"}
+          secondaryBorder={meal !== "breakfast"}
+          onClick={() => setMeal("breakfast")}
+        >
+          فطور
+        </Button>
+        <Button
+          primary={meal === "Lunch"}
+          secondaryBorder={meal !== "Lunch"}
+          onClick={() => setMeal("Lunch")}
+        >
+          غداء
+        </Button>
+        <Button
+          primary={meal === "snacks"}
+          secondaryBorder={meal !== "snacks"}
+          onClick={() => setMeal("snacks")}
+        >
+          سناكس{" "}
+        </Button>
+        <Button
+          primary={meal === "dinner"}
+          secondaryBorder={meal !== "dinner"}
+          onClick={() => setMeal("dinner")}
+        >
+          عشاء{" "}
+        </Button>
+      </div>
+
       <Table
-        data={[]}
+        data={formmatedDescriptionstData ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة وجبة"
-        modalContent={<>dd</>}
+        // modalContent={<SideBar mealData={{}} />}
       />
+
       <Modal id="add-new-nutrition">
         <AddDietCategories values={valuesItem} />
       </Modal>
+
       <Drawer>
-        <SideBar ingredients={ingredients} />
+        {
+          <SideBar
+            setMealData={setMealData}
+            mealData={mealData ?? {}}
+            categoryId={categoryId}
+            meal={meal}
+          />
+        }
       </Drawer>
     </div>
   );
