@@ -40,7 +40,7 @@ export default function EditIngredient({
 
   const onSaveIngredient = () => {
     if (editData !== null) {
-      let filteredArray = values.ingredients.filter(
+      const filteredArray = values.ingredients.filter(
         (ingredient: ingredientData) => ingredient?.name !== editData?.name
       );
 

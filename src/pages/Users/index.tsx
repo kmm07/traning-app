@@ -99,11 +99,9 @@ function Users() {
   // on view user data ============================>
   const axios = useAxios({});
 
-  const rowOnClick = async (
-    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
-  ) => {
+  const rowOnClick = async (e: any) => {
     try {
-      const { data } = await axios.get(`/users/${e.original.id}`);
+      const { data } = await axios.get(`/users/${e.original.id as any}`);
 
       setActiveUser(data.data);
     } catch (error: any) {
@@ -114,22 +112,20 @@ function Users() {
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
-        {Object.entries(users?.cards ?? {})?.map(
-          (item: UserType, index: number) => {
-            return (
-              <Card key={index} className="p-4">
-                <div className="flex flex-col  justify-between">
-                  <Text size="3xl" className=" font-bold capitalize">
-                    {item[1]}
-                  </Text>
-                  <Text size="3xl" className="text-gray-500 text-sm">
-                    {item[0]}
-                  </Text>
-                </div>
-              </Card>
-            );
-          }
-        )}
+        {Object.entries(users?.cards ?? {})?.map((item: any, index: number) => {
+          return (
+            <Card key={index} className="p-4">
+              <div className="flex flex-col  justify-between">
+                <Text size="3xl" className=" font-bold capitalize">
+                  {item[1]}
+                </Text>
+                <Text size="3xl" className="text-gray-500 text-sm">
+                  {item[0]}
+                </Text>
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       <Select

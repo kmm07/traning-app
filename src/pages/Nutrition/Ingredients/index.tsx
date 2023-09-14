@@ -1,5 +1,5 @@
 import { Card, Img, Modal, SettingCard, Table, Text } from "components";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
@@ -7,6 +7,7 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
 import EditIngredient from "./components/editIngredient";
+import { toast } from "react-toastify";
 
 function Ingredients() {
   const [categoryId, setCategoryId] = useState(1);
@@ -34,7 +35,9 @@ function Ingredients() {
       await mutateAsync(`meal-ingredient-categories/${id}`);
 
       await queryClient.invalidateQueries("/meal-ingredient-categories");
-    } catch (error: any) {}
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
   };
 
   const onEdit = (value: any) => {
@@ -145,7 +148,7 @@ function Ingredients() {
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
         {!isCardsLoading ? (
-          cardData?.map((item: any, index: any) => {
+          cardData?.map((item: any) => {
             return (
               <SettingCard
                 onDelete={onDelete}

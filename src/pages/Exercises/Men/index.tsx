@@ -15,7 +15,7 @@ function MenTraining() {
 
   const [daysNum, setDaysNum] = useState<number>(3);
 
-  const [home, setHome] = useState<number>(0);
+  const home = 0;
 
   const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
@@ -172,7 +172,7 @@ function MenTraining() {
             key={index}
             label={item.label}
             active={level === item.id}
-            onClick={() => setLevel(item.id)}
+            onClick={() => setLevel(item.id as any)}
           />
         ))}
       </div>
@@ -213,7 +213,7 @@ function MenTraining() {
 
       <div className="grid grid-cols-4 gap-3">
         {!isLoading ? (
-          trainingCategories?.map((category) => (
+          trainingCategories?.map((category: any) => (
             <SettingCard
               onDelete={onDelete}
               onEdit={() => onEdit(category)}

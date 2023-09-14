@@ -1,6 +1,5 @@
 import { SettingCard, Table } from "components";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";

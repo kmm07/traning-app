@@ -1,12 +1,10 @@
 import { Input, UploadInput } from "components";
 import { Form, Formik } from "formik";
-import React from "react";
 
-type Props = {};
-
-function AddExercise({}: Props) {
+function AddExercise() {
   return (
     <Formik
+      onSubmit={() => {}}
       initialValues={{
         image: "",
         name: "",

@@ -1,6 +1,6 @@
 import { Button, Input, Select, UploadInput } from "components";
 import { Form, Formik } from "formik";
-import { usePostQuery, usePutQuery } from "hooks/useQueryHooks";
+import { usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
 import { toast } from "react-toastify";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
@@ -50,7 +50,7 @@ export default function EditIngredient({
     }
   };
 
-  const onSubmit = async (values: any, helpers: any) => {
+  const onSubmit = async (values: any) => {
     try {
       if (isEditing) {
         !isImageDelete && delete values.image;

@@ -4,32 +4,31 @@ import { useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 
-type Props = {};
-
-export default function AddIngredient({}: Props) {
+export default function AddIngredient() {
   const [ingredients, setIngredients] = useState([]);
 
   // get descriptions data list =================>
   const url = `/meal-ingredients?meal_ingredient_category_id=${1}`;
 
-  const {
-    data: ingredientsList = [],
-    isLoading: isListLoading,
-  }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: any[] } }) =>
-      data.data.slice(0, 20).map((item: any) => ({
-        value: item.id,
-        label: item.name,
-        calories: item.calories,
-        fat: item.fat,
-        protein: item.protein,
-        sugar: item.sugar,
-        trans_fat: item.trans_fat,
-        carbohydrate: item.carbohydrate,
-        size: item.size,
-        measure: item.measure,
-      })),
-  });
+  const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
+      select: ({ data }: { data: { data: any[] } }) =>
+        data.data.slice(0, 20).map((item: any) => ({
+          value: item.id,
+          label: item.name,
+          calories: item.calories,
+          fat: item.fat,
+          protein: item.protein,
+          sugar: item.sugar,
+          trans_fat: item.trans_fat,
+          carbohydrate: item.carbohydrate,
+          size: item.size,
+          measure: item.measure,
+        })),
+    }
+  );
 
   const { setFieldValue, values } = useFormikContext<{ ingredients: any }>();
 

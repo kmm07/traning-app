@@ -22,19 +22,19 @@ const initialValues = {
 };
 
 export default function AddDescription() {
-  // get descriptions data list =================>
   const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${1}`;
 
-  const {
-    data: ingredientsList = [],
-    isLoading: isListLoading,
-  }: UseQueryResult<any> = useGetQuery(ingredientsURL, ingredientsURL, {
-    select: ({ data }: { data: { data: any[] } }) =>
-      data.data.slice(0, 20).map((item: any) => ({
-        value: item.id,
-        label: item.name,
-      })),
-  });
+  const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
+    ingredientsURL,
+    ingredientsURL,
+    {
+      select: ({ data }: { data: { data: any[] } }) =>
+        data.data.slice(0, 20).map((item: any) => ({
+          value: item.id,
+          label: item.name,
+        })),
+    }
+  );
 
   // get diet categories ================>
   const { data: categories }: UseQueryResult<any> = useGetQuery(
@@ -85,7 +85,7 @@ export default function AddDescription() {
     contentType: "multipart/form-data",
   });
 
-  const onSubmit = async (values: any, Helpers: any) => {
+  const onSubmit = async (values: any) => {
     const formData = new FormData();
 
     values.prepare.video_type === "external"

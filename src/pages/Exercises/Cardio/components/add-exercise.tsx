@@ -2,18 +2,13 @@ import { Button, Input } from "components";
 import { useFormikContext } from "formik";
 import React, { useState } from "react";
 
-interface Props {
-  setCardioData: any;
-  cardioData: any;
-}
-
-export default function AddCardio({}: Props) {
+export default function AddCardio() {
   const [exercise, setExercise] = useState({ name: "", met: "", is_new: 1 });
 
-  const { setFieldValue, values } = useFormikContext<{ cardios: any }>();
+  const { setFieldValue, values } = useFormikContext<any>();
 
   const onAddExercise = () => {
-    setFieldValue("cardios", [...values?.cardios, exercise]);
+    setFieldValue("cardios", [...(values?.cardios as any), exercise]);
 
     setExercise({ name: "", met: "", is_new: 1 });
 

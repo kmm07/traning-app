@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import axios from "axios";
 
 const customAxios = () =>

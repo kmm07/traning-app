@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import axios from "axios";
 import { useAppSelector } from "./useRedux";
 import { selectCurrentToken } from "redux/slices/auth";

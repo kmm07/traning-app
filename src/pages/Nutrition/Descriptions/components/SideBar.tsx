@@ -196,7 +196,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       }
 
       if (value[0] === "ingredients") {
-        (value[1] as any).forEach((subValue, index) =>
+        (value[1] as any).forEach((subValue: any, index: any) =>
           formData.append(
             `meal_ingredients[${index}]`,
             subValue.id ?? subValue.value

@@ -5,8 +5,8 @@ import { Row } from "react-table";
 import AddCard from "shared/AddCard";
 import SideBar from "./components/SideBar";
 import AddExercise from "./components/AddExercise";
-import { UseQueryResult, useQueryClient } from "react-query";
-import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
+import { useQueryClient } from "react-query";
+import { useDeleteQuery } from "hooks/useQueryHooks";
 import { toast } from "react-toastify";
 function ExercisesGym() {
   const [level, setLevel] = useState(1);
@@ -30,21 +30,23 @@ function ExercisesGym() {
   const { mutateAsync } = useDeleteQuery();
 
   const queryClient = useQueryClient();
-
+  const daysNum = 1;
+  const home = 1;
   const onDelete = async (id: number) => {
     try {
       await mutateAsync(`/training-categories/${id}`);
 
       await queryClient.invalidateQueries(
-        `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`
+        `/training-categories?lvl=${level}&gender=male&days_num=${
+          daysNum as any
+        }&home=${home}`
       );
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
   };
 
-  const onEdit = (value: any) => {
-    // setCategoryData(value);
+  const onEdit = () => {
     document.getElementById("add-new-exercise-category")?.click();
   };
 
@@ -88,8 +90,8 @@ function ExercisesGym() {
             id={item.id}
             key={index}
             label={item.label}
-            active={level === item.id}
-            onClick={() => setLevel(item.id)}
+            active={level === (item.id as any)}
+            onClick={() => setLevel(item.id as any)}
           />
         ))}
         <AddCard

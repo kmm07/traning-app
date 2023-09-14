@@ -1,9 +1,7 @@
 import { Button, CheckBox, Input } from "components";
 import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { useAppSelector } from "hooks/useRedux";
 import { useQueryClient } from "react-query";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 import * as Yap from "yup";
 const initialValues = {

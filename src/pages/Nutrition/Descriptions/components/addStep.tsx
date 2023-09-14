@@ -28,7 +28,7 @@ export default function AddStep({
 
   const onSaveIngredient = () => {
     if (editData !== null) {
-      let filteredArray = values.prepare?.steps?.filter(
+      const filteredArray = values.prepare?.steps?.filter(
         (step: stepsData) => step !== editData
       );
 
@@ -39,7 +39,7 @@ export default function AddStep({
     } else
       setFieldValue("prepare", {
         ...values.prepare,
-        steps: [...values.prepare?.steps, stepsData.description],
+        steps: [...(values.prepare?.steps as any), stepsData.description],
       });
 
     onClose();

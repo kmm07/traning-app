@@ -4,9 +4,9 @@ type Props = {
   active: boolean;
   onClick: () => void;
   label: string;
-  onEdit?: () => void;
+  onEdit?: (value?: any) => void;
   onDelete?: (id: number) => void;
-  id: number;
+  id: number | string;
 };
 
 function SettingCard({ id, active, onClick, label, onEdit, onDelete }: Props) {
@@ -29,7 +29,7 @@ function SettingCard({ id, active, onClick, label, onEdit, onDelete }: Props) {
                 },
                 {
                   label: "حذف",
-                  onClick: () => onDelete && onDelete(id),
+                  onClick: () => onDelete && onDelete(id as any),
                 },
               ]}
             >
