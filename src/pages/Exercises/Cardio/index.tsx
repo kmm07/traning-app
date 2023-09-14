@@ -1,13 +1,25 @@
-import { SettingCard, Table } from "components";
+import { Table } from "components";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
-import AddCard from "shared/AddCard";
 import SideBar from "./components/SideBar";
+import { useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult } from "react-query";
+import CardioForm from "./add-cardio";
 
 function Cardio() {
-  const [level, setLevel] = useState(1);
+  const [cardioData, setCardioData] = useState<any>(null);
+
+  // get cards data =================>
+  const url = "/cardios";
+
+  const { data: cardioList, isLoading }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
 
   const columns = React.useMemo(
     () => [
@@ -29,67 +41,49 @@ function Cardio() {
           );
         },
       },
+
+      {
+        Header: "التمرين",
+        accessor: "cardios",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <div className="flex items-center gap-4">
+              {row.original.cardios?.map(({ name }: { name: string }) => name)}
+            </div>
+          );
+        },
+      },
     ],
     []
   );
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+  const rowOnClick = (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
+  ) => {
+    const formattedCardioData = e.original.cardios?.map((cardio) => ({
+      ...cardio,
+      is_new: 0,
+    }));
+
+    setCardioData({ ...e.original, cardios: formattedCardioData });
   };
 
-  const cardData = [
-    {
-      label: "مبتدئ",
-      id: 1,
-    },
-    {
-      label: "متوسط",
-      id: 2,
-    },
-    {
-      label: "متقدم",
-      id: 3,
-    },
-  ];
-
-  const onDelete = (id: number) => {
-    console.log(id);
-  };
-  const onEdit = (id: number) => {
-    console.log(id);
-  };
-  const onSave = () => {
-    console.log("save");
-  };
+  if (isLoading) {
+    return <>loading...</>;
+  }
   return (
     <div className="w-full space-y-4">
-      <div className="flex gap-3 h-24 ">
-        {cardData.map((item, index) => (
-          <SettingCard
-            onDelete={onDelete}
-            onEdit={onEdit}
-            id={item.id}
-            key={index}
-            label={item.label}
-            active={level === item.id}
-            onClick={() => setLevel(item.id)}
-          />
-        ))}
-        <AddCard
-          modalContent={<>dd</>}
-          onSave={onSave}
-          modalLabel="اضافة مستوى"
-        />
-      </div>
-
       <Table
-        data={[]}
+        data={cardioList ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
-        modalTitle="اضافة اسبوع"
+        modalTitle="اضافة كارديو"
+        modalContent={
+          <CardioForm cardioData={cardioData} setCardioData={setCardioData} />
+        }
       />
 
       <Drawer>
-        <SideBar />
+        <SideBar cardioData={cardioData} setCardioData={setCardioData} />
       </Drawer>
     </div>
   );

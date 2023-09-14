@@ -11,30 +11,30 @@ import { Form, Formik } from "formik";
 import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const initialValues = {
   name: "",
   meal: "",
   image: "",
   meal_ingredients: [],
-  prepare: { url: "", video_type: "", steps: [""], video: "" },
+  prepare: { url: "", video_type: "external", steps: [], video: "" },
 };
 
 export default function AddDescription() {
-  //   get ingredient data ====================>
-  //   const ingredientURL = "";
+  // get descriptions data list =================>
+  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${1}`;
 
-  //   const {
-  //     data: ingredients = [],
-  //     isLoading: isListLoading,
-  //   }: UseQueryResult<any> = useGetQuery(url, url, {
-  //     select: ({ data }: { data: { data: any[] } }) =>
-  //       data.data.map((item: any) => ({
-  //         value: item.id,
-  //         label: item.name,
-  //       })),
-  //   });
+  const {
+    data: ingredientsList = [],
+    isLoading: isListLoading,
+  }: UseQueryResult<any> = useGetQuery(ingredientsURL, ingredientsURL, {
+    select: ({ data }: { data: { data: any[] } }) =>
+      data.data.slice(0, 20).map((item: any) => ({
+        value: item.id,
+        label: item.name,
+      })),
+  });
 
   // get diet categories ================>
   const { data: categories }: UseQueryResult<any> = useGetQuery(
@@ -49,7 +49,12 @@ export default function AddDescription() {
     }
   );
 
-  const onClose = () => document.getElementById("my_modal")?.click();
+  const formRef = useRef<any>(null);
+
+  const onClose = () => {
+    formRef.current?.resetForm();
+    document.getElementById("my_modal")?.click();
+  };
 
   const mealsTypes = [
     { label: "وجبة فطار", value: "Breakfast" },
@@ -89,22 +94,36 @@ export default function AddDescription() {
 
     const formattedValues = Object.entries(values);
 
-    formattedValues.forEach((value) =>
-      value[0] !== "prepare"
-        ? formData.append(value[0], value[1] as any)
-        : Object.entries(value[1] as any).forEach((subValue) =>
-            subValue[0] !== "steps"
-              ? formData.append(`prepare[${subValue[0]}]`, subValue[1] as any)
-              : (subValue[1] as any).forEach((step: string, index: number) =>
-                  formData.append(`prepare[steps][${index}]`, step as any)
-                )
-          )
-    );
+    formattedValues.forEach((value) => {
+      if (!["prepare", "meal_ingredients"].includes(value[0])) {
+        formData.append(value[0], value[1] as any);
+        return;
+      }
 
+      if (value[0] === "prepare") {
+        Object.entries(value[1] as any).forEach((subValue) =>
+          subValue[0] !== "steps"
+            ? formData.append(`prepare[${subValue[0]}]`, subValue[1] as any)
+            : (subValue[1] as any).forEach((step: string, index: number) =>
+                formData.append(`prepare[steps][${index}]`, step as any)
+              )
+        );
+        return;
+      }
+
+      if (value[0] === "meal_ingredients") {
+        (value[1] as any).forEach((subValue: any, index: number) =>
+          formData.append(
+            `meal_ingredients[${index}]`,
+            subValue.id ?? subValue.value
+          )
+        );
+      }
+    });
     try {
       await mutateAsync(formData as any);
 
-      Helpers.resetForm();
+      await formRef.current?.resetForm();
 
       onClose();
     } catch (error: any) {
@@ -115,7 +134,11 @@ export default function AddDescription() {
   const [step, setStep] = useState<string>("");
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      innerRef={formRef}
+    >
       {({ values, setFieldValue }) => (
         <Form>
           <UploadInput name="image" />
@@ -137,9 +160,9 @@ export default function AddDescription() {
               مكونات الوجبة:
             </Text>
             <Select
-              options={[]}
+              options={ingredientsList ?? []}
               name="meal_ingredients"
-              isMulti
+              value={values.meal_ingredients}
               onChange={(val: any) =>
                 setFieldValue(
                   "meal_ingredients",
@@ -148,6 +171,8 @@ export default function AddDescription() {
                   )
                 )
               }
+              isMulti
+              isForm={false}
             />
           </div>
 
@@ -163,6 +188,7 @@ export default function AddDescription() {
                   id="internal"
                   name="video_type"
                   type="radio"
+                  checked={values.prepare?.video_type === "internal"}
                   onChange={() =>
                     setFieldValue("prepare.video_type", "internal")
                   }
@@ -177,6 +203,7 @@ export default function AddDescription() {
                   id="external"
                   name="video_type"
                   type="radio"
+                  checked={values.prepare?.video_type === "external"}
                   onChange={() =>
                     setFieldValue("prepare.video_type", "external")
                   }
@@ -201,6 +228,7 @@ export default function AddDescription() {
               />
             )}
           </div>
+
           <div className="flex items-center gap-4">
             <TextArea
               name={""}
@@ -212,16 +240,18 @@ export default function AddDescription() {
             />
             <Button
               secondaryBorder
-              onClick={() =>
+              onClick={() => {
                 setFieldValue("prepare", {
                   ...values.prepare,
                   steps: [...values.prepare.steps, step],
-                })
-              }
+                });
+                setStep("");
+              }}
             >
               إضافة خطوة
             </Button>
           </div>
+
           <div className="mt-6">
             <Text>خطوات التحضير:</Text>
             {values.prepare.steps.map((step: string, index: number) => (
