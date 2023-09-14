@@ -10,7 +10,7 @@ import {
 import { Form, Formik } from "formik";
 
 function NutritionInfo({ activeUser }: { activeUser: any }) {
-  const percentageCalc = (all, current) =>
+  const percentageCalc = (all: any, current: any) =>
     all === 0 && current === 0 ? 0 : Number((current / all) * 100).toFixed(1);
 
   const radial = [
@@ -79,7 +79,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
         {radial.map((item, index) => (
           <RadialProgress
             key={index}
-            percentage={item?.percentage}
+            percentage={item?.percentage as any}
             label={item?.body_number}
             className={item.className}
             body={

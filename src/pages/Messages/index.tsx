@@ -82,11 +82,9 @@ function Messages() {
   // on view user data ============================>
   const axios = useAxios({});
 
-  const rowOnClick = async (
-    e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
-  ) => {
+  const rowOnClick = async (e: any) => {
     try {
-      const { data } = await axios.get(`/users/${e.original.id}`);
+      const { data } = await axios.get(`/users/${e.original.id as any}`);
 
       setActiveUser(data.data);
     } catch (error: any) {

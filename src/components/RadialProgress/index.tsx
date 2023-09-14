@@ -2,10 +2,10 @@ import { Text } from "components";
 import React from "react";
 
 type Props = {
-  percentage: number;
+  percentage: number | number;
   className?: string;
   body?: React.ReactNode;
-  label?: string;
+  label?: string | number;
 };
 
 const RadialProgress = ({ percentage, className, body, label }: Props) => {

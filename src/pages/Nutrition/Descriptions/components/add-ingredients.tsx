@@ -1,7 +1,7 @@
 import { Button, Select } from "components";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
-import React, { useState } from "react";
+import { useState } from "react";
 import { UseQueryResult } from "react-query";
 
 export default function AddIngredient() {

@@ -1,6 +1,6 @@
 import { Button, Input } from "components";
 import { useFormikContext } from "formik";
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function AddCardio() {
   const [exercise, setExercise] = useState({ name: "", met: "", is_new: 1 });

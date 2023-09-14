@@ -18,7 +18,7 @@ function Chat({ messages }: Props) {
 
   const { mutateAsync, isLoading } = usePostQuery({ url });
 
-  const onSubmit = async (values, { resetForm }: any) => {
+  const onSubmit = async (values: any, { resetForm }: any) => {
     try {
       await mutateAsync(values as any);
       resetForm();

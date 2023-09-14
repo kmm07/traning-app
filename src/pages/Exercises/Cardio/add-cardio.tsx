@@ -1,7 +1,7 @@
 import { Button, Img, Input, Text, UploadInput } from "components";
 import { Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "react-query";
 import { Form } from "react-router-dom";
 

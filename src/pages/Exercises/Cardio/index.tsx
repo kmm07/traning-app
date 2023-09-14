@@ -59,7 +59,7 @@ function Cardio() {
   const rowOnClick = (
     e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
   ) => {
-    const formattedCardioData = e.original.cardios?.map((cardio) => ({
+    const formattedCardioData = e.original.cardios?.map((cardio: any) => ({
       ...cardio,
       is_new: 0,
     }));

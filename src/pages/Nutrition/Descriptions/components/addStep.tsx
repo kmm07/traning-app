@@ -1,6 +1,6 @@
 import { Button, Input } from "components";
 import { useFormikContext } from "formik";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 interface stepsData {
   description: string;

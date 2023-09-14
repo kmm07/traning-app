@@ -160,7 +160,7 @@ function Descriptions() {
               key={item.id}
               label={item.name}
               active={categoryId === item.id}
-              onClick={() => setCategoryId(item.id)}
+              onClick={() => setCategoryId(item.id as any)}
             />
           ))
         ) : (
