@@ -2,7 +2,7 @@ import { Card, Text } from "components";
 
 // type Props = {};
 
-function HeathInfo() {
+function HeathInfo({ activeUser }: { activeUser: any }) {
   return (
     <Card className="flex flex-col gap-[13px]  mb-[15px] mt-3 p-4 w-full">
       <Text size="3xl">المعلومات الصحية</Text>
@@ -16,12 +16,14 @@ function HeathInfo() {
       </div>
       <div className="bg-indigo-500 h-[3px]" />
       <div className="grid grid-cols-6 w-full">
-        <Text>2</Text>
-        <Text>10</Text>
-        <Text>9</Text>
-        <Text>20</Text>
-        <Text>90</Text>
-        <Text>انقاص الوزن</Text>
+        <Text>{activeUser?.weight}</Text>
+        <Text>{activeUser?.height}</Text>
+        <Text>{activeUser?.age}</Text>
+        <Text>{activeUser?.weekly_activity}</Text>
+        <Text>{activeUser?.target_weight}</Text>
+        <Text>
+          {activeUser?.target === "decrease" ? "إنقاص الوزن" : "زيادة الوزن"}
+        </Text>
       </div>
     </Card>
   );

@@ -8,9 +8,6 @@ import AddExercise from "./components/AddExercise";
 
 function Notifications() {
   const [active, setActive] = useState(1);
-  const data = useLoaderData() as {
-    table: [];
-  };
 
   const columns = React.useMemo(
     () => [
@@ -69,7 +66,7 @@ function Notifications() {
       </div>
 
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة تمرين"
@@ -84,14 +81,3 @@ function Notifications() {
 }
 
 export default Notifications;
-
-export const NotificationsLoader = async () => {
-  return {
-    table: [
-      {
-        date: "010000",
-        name: "مصر",
-      },
-    ],
-  };
-};

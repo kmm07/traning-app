@@ -1,7 +1,10 @@
 import { Button, Input, Select, UploadInput } from "components";
 import { Form, Formik } from "formik";
 import { usePostQuery, usePutQuery } from "hooks/useQueryHooks";
+import { useAppSelector } from "hooks/useRedux";
 import { toast } from "react-toastify";
+import { selectIsImageDelete } from "redux/slices/imageDelete";
+import formData from "util/formData";
 
 const initialValues = {
   name: "",
@@ -30,14 +33,12 @@ export default function EditIngredient({
 
   const url = isEditing ? `/meal-ingredients/${values.id}` : "meal-ingredients";
 
+  const isImageDelete = useAppSelector(selectIsImageDelete);
+
   const { mutateAsync: addIngredient, isLoading: isAddLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
   });
-
-  const { mutateAsync: editIngredient, isLoading: isEditLoading } = usePutQuery(
-    { url, contentType: "multipart/form-data" }
-  );
 
   const onClose = () => {
     if (isEditing) {
@@ -52,12 +53,18 @@ export default function EditIngredient({
   const onSubmit = async (values: any, helpers: any) => {
     try {
       if (isEditing) {
-        await editIngredient({
-          ...values,
-          meal_ingredient_category_id: categoryId,
-          _method: "PUT",
-        });
-      } else await addIngredient(values);
+        !isImageDelete && delete values.image;
+
+        await addIngredient(
+          formData({
+            ...values,
+            meal_ingredient_category_id: categoryId,
+            _method: "PUT",
+          }) as any
+        );
+      } else {
+        await addIngredient(formData(values) as any);
+      }
 
       onClose();
 
@@ -104,7 +111,7 @@ export default function EditIngredient({
             className="w-[100px]"
             primary
             type="submit"
-            isLoading={isAddLoading || isEditLoading}
+            isLoading={isAddLoading}
           >
             {isEditing ? "تعديل" : "حفظ"}
           </Button>

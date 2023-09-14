@@ -87,7 +87,8 @@ function Messages() {
   ) => {
     try {
       const { data } = await axios.get(`/users/${e.original.id}`);
-      console.log(data.data);
+
+      setActiveUser(data.data);
     } catch (error: any) {
       toast.error(`${error.response.data.message}`);
     }
@@ -102,7 +103,7 @@ function Messages() {
       />
 
       <Drawer>
-        <MessagesSideBAr />
+        <MessagesSideBAr userData={activeUser} />
       </Drawer>
     </div>
   );

@@ -6,6 +6,7 @@ import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import AddDietCategories from "./components/AddDietCategories";
+import AddDescription from "./add-description";
 
 interface DescriptionType {
   calories: number;
@@ -36,6 +37,7 @@ function Descriptions() {
       select: ({ data }: { data: { data: [] } }) => data.data,
       refetchOnWindowFocus: false,
     });
+
   // get descriptions data list =================>
   const url = `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`;
 
@@ -182,9 +184,9 @@ function Descriptions() {
 
       <div className="flex flex-col lg:flex-row items-center gap-4">
         <Button
-          primary={meal === "breakfast"}
-          secondaryBorder={meal !== "breakfast"}
-          onClick={() => setMeal("breakfast")}
+          primary={meal === "BreakFast"}
+          secondaryBorder={meal !== "BreakFast"}
+          onClick={() => setMeal("BreakFast")}
         >
           فطور
         </Button>
@@ -196,27 +198,28 @@ function Descriptions() {
           غداء
         </Button>
         <Button
-          primary={meal === "snacks"}
-          secondaryBorder={meal !== "snacks"}
-          onClick={() => setMeal("snacks")}
+          primary={meal === "Snack"}
+          secondaryBorder={meal !== "Snack"}
+          onClick={() => setMeal("Snack")}
         >
           سناكس{" "}
         </Button>
         <Button
-          primary={meal === "dinner"}
-          secondaryBorder={meal !== "dinner"}
-          onClick={() => setMeal("dinner")}
+          primary={meal === "Dinner"}
+          secondaryBorder={meal !== "Dinner"}
+          onClick={() => setMeal("Dinner")}
         >
           عشاء{" "}
         </Button>
       </div>
+
       {!isListLoading ? (
         <Table
           data={descriptionsList ?? []}
           columns={columns}
           rowOnClick={rowOnClick}
           modalTitle="اضافة وجبة"
-          // modalContent={<SideBar mealData={{}} />}
+          modalContent={<AddDescription />}
         />
       ) : (
         <>loading...</>
@@ -231,7 +234,7 @@ function Descriptions() {
           <SideBar
             setMealData={setMealData}
             mealData={mealData ?? {}}
-            categoryId={categoryId}
+            categoryId={categoryId as any}
             meal={meal}
           />
         }

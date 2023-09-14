@@ -36,6 +36,7 @@ function Ingredients() {
       await queryClient.invalidateQueries("/meal-ingredient-categories");
     } catch (error: any) {}
   };
+
   const onEdit = (value: any) => {
     setValuesItem(value);
     document.getElementById("add-new-nutrition")?.click();

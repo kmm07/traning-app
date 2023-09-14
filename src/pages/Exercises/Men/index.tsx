@@ -1,10 +1,14 @@
-import { Button, SettingCard, SubState, Table } from "components";
-import React, { useState } from "react";
+import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
+import React, { useState, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
-import { useGetQuery } from "hooks/useQueryHooks";
-import { UseQueryResult } from "react-query";
+import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult, useQueryClient } from "react-query";
+import ExerciseCategoryForm from "./exerciseCategoryForm";
+import WeekForm from "./createWeek";
+import TableActions from "components/Table/actions";
+import { toast } from "react-toastify";
 
 function MenTraining() {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("junior");
@@ -15,17 +19,84 @@ function MenTraining() {
 
   const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
+  const [categoryData, setCategoryData] = useState();
+
   // get training categories ======================>
   const url = `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`;
 
   const { data: trainingCategories = [], isLoading }: UseQueryResult<any> =
     useGetQuery(url, url, {
-      select: ({ data }: { data: { data: [] } }) =>
-        data.data.map(({ id, name }: { id: number; name: string }) => ({
-          id,
-          name,
-        })),
+      select: ({ data }: { data: { data: [] } }) => data.data,
     });
+
+  const cardData = [
+    {
+      label: "مبتدئ",
+      id: "junior",
+    },
+    {
+      label: "متوسط",
+      id: "mid",
+    },
+    {
+      label: "متقدم",
+      id: "senior",
+    },
+  ];
+
+  // categories actions ======================>
+  const { mutateAsync } = useDeleteQuery();
+
+  const queryClient = useQueryClient();
+
+  const onDelete = async (id: number) => {
+    try {
+      await mutateAsync(`/training-categories/${id}`);
+
+      await queryClient.invalidateQueries(
+        `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`
+      );
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const onEdit = (value: any) => {
+    setCategoryData(value);
+    document.getElementById("add-new-exercise-category")?.click();
+  };
+
+  // get training weeks ==================>
+  const weeksURL = `/training-weeks?category_id=${exerciesCategory}`;
+
+  const {
+    data: trainingWeeks = [],
+    isLoading: isWeeksLoading,
+  }: UseQueryResult<any> = useGetQuery(weeksURL, weeksURL, {
+    select: ({ data }: { data: { data: [] } }) => data.data,
+    enabled: ![null, undefined].includes(exerciesCategory as any),
+  });
+
+  const [weekData, setWeekData] = useState(null);
+
+  const { mutateAsync: deleteWeek } = useDeleteQuery();
+
+  const onDeleteWeek = async (id: number) => {
+    try {
+      await deleteWeek(`/training-weeks/${id}`);
+      queryClient.invalidateQueries(
+        `/training-weeks?category_id=${exerciesCategory}`
+      );
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const onEditWeek = (week: any) => {
+    setWeekData(week);
+
+    document.getElementById("my_modal")?.click();
+  };
 
   const columns = React.useMemo(
     () => [
@@ -49,68 +120,45 @@ function MenTraining() {
         },
       },
       {
-        Header: "بريد إلكتروني",
-        accessor: "mail",
+        Header: "عدد اسابيع التكرار",
+        accessor: "repeat_week_num",
       },
       {
-        Header: "جنس",
-        accessor: "gender", // accessor is the "key" in the data
-      },
-      {
-        Header: "الخطة",
+        Header: "نص الهدف",
+        accessor: "target_text",
         Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscribe.type} />;
+          return (
+            <div className="max-w-[500px] break-words">
+              {row.original.target_text}
+            </div>
+          );
         },
       },
+
       {
-        Header: "الهاتف",
-        accessor: "phone",
+        Header: "رقم الإسبوع",
+        accessor: "week_num",
       },
       {
-        Header: "الدولة",
-        accessor: "country",
+        Header: "نوع الإسبوع",
+        accessor: "week_type",
       },
       {
-        Header: "الجهاز",
-        accessor: "device",
-      },
-      {
-        Header: "آخر ظهور",
-        accessor: "lastSeen",
-      },
-      {
-        Header: "مزود الدخول",
-        accessor: "provider",
+        Header: "actions",
+        Cell: ({ row }: { row: any }) => (
+          <TableActions
+            onEdit={() => onEditWeek(row.original)}
+            onDelete={() => onDeleteWeek(row.original.id)}
+          />
+        ),
       },
     ],
     []
   );
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
-  };
 
-  const cardData = [
-    {
-      label: "مبتدئ",
-      id: "junior",
-    },
-    {
-      label: "متوسط",
-      id: "mid",
-    },
-    {
-      label: "متقدم",
-      id: "senior",
-    },
-  ];
-
-  const onDelete = (id: number) => {
-    console.log(id);
-  };
-
-  const onEdit = (id: number) => {
-    console.log(id);
-  };
+  useEffect(() => {
+    setExerciseCategory(trainingCategories?.[0]?.id);
+  }, [trainingCategories]);
 
   return (
     <div className="w-full space-y-4">
@@ -162,32 +210,66 @@ function MenTraining() {
       </div>
       {/* exercise categories */}
       <h2>أقسام التمرينات</h2>
-      <div className="flex items-center gap-3 flex-wrap">
-        {!isLoading
-          ? trainingCategories.length > 0
-            ? trainingCategories.map((category) => (
-                <Button
-                  onClick={() => setExerciseCategory(category.id)}
-                  primary={exerciesCategory === category.id}
-                  secondaryBorder={exerciesCategory !== category.id}
-                >
-                  {category?.name}
-                </Button>
-              ))
-            : "لا يوجد أقسام"
-          : "loading..."}
+
+      <div className="grid grid-cols-4 gap-3">
+        {!isLoading ? (
+          trainingCategories?.map((category) => (
+            <SettingCard
+              onDelete={onDelete}
+              onEdit={() => onEdit(category)}
+              id={category.id}
+              key={category.id}
+              label={category?.name}
+              active={exerciesCategory === category.id}
+              onClick={() => setExerciseCategory(category.id)}
+            />
+          ))
+        ) : (
+          <>laoding...</>
+        )}
+        <Card className={"p-4 w-[180px]"}>
+          <label
+            htmlFor="add-new-exercise-category"
+            className={`flex flex-col cursor-pointer justify-between items-center relative `}
+          >
+            <Img
+              className="w-16 absolute top-0 left-0"
+              src="/images/plus.svg"
+            />
+            <Text size="3xl" className="mt-4">
+              اضافة
+            </Text>
+          </label>
+        </Card>
       </div>
 
-      <Table
-        data={[]}
-        columns={columns}
-        rowOnClick={rowOnClick}
-        modalTitle="اضافة اسبوع"
-      />
+      {!isWeeksLoading ? (
+        <Table
+          data={trainingWeeks ?? []}
+          columns={columns}
+          modalTitle="اضافة اسبوع"
+          modalContent={
+            <WeekForm
+              weekData={weekData}
+              setWeekData={setWeekData}
+              exerciesCategory={exerciesCategory as any}
+            />
+          }
+        />
+      ) : (
+        <>loading....</>
+      )}
 
       <Drawer>
         <SideBar />
       </Drawer>
+
+      <Modal id="add-new-exercise-category">
+        <ExerciseCategoryForm
+          categoryData={categoryData}
+          setCategoryData={setCategoryData}
+        />
+      </Modal>
     </div>
   );
 }

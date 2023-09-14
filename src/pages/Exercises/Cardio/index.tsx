@@ -8,9 +8,6 @@ import SideBar from "./components/SideBar";
 
 function Cardio() {
   const [level, setLevel] = useState(1);
-  const data = useLoaderData() as {
-    table: [];
-  };
 
   const columns = React.useMemo(
     () => [
@@ -85,7 +82,7 @@ function Cardio() {
       </div>
 
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة اسبوع"
@@ -99,14 +96,3 @@ function Cardio() {
 }
 
 export default Cardio;
-
-export const CardioLoader = async () => {
-  return {
-    table: [
-      {
-        phone: "01000000000",
-        name: "مصر",
-      },
-    ],
-  };
-};

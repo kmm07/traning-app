@@ -3,16 +3,16 @@ import NutritionInfo from "./NutritionInfo";
 import HeathInfo from "./HeathInfo";
 import TrainingInfo from "./TrainingInfo";
 
-function UsersSideBar() {
+function UsersSideBar({ activeUser }: { activeUser: any }) {
   return (
     <>
-      <UsersInfo showUserInfo={false} />
+      <UsersInfo showUserInfo={false} activeUser={activeUser} />
 
-      <HeathInfo />
+      <HeathInfo activeUser={activeUser} />
 
-      <NutritionInfo />
+      <NutritionInfo activeUser={activeUser} />
 
-      <TrainingInfo />
+      <TrainingInfo activeUser={activeUser} />
     </>
   );
 }

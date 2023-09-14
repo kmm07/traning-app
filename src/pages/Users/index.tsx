@@ -105,7 +105,7 @@ function Users() {
     try {
       const { data } = await axios.get(`/users/${e.original.id}`);
 
-      console.log(data.data);
+      setActiveUser(data.data);
     } catch (error: any) {
       toast.error(`${error.response.data.message}`);
     }
@@ -146,11 +146,10 @@ function Users() {
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"
-        modalTitle="اضافة مستخدم"
       />
 
       <Drawer>
-        <UsersSideBar />
+        <UsersSideBar activeUser={activeUser} />
       </Drawer>
     </div>
   );

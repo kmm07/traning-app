@@ -27,6 +27,7 @@ export interface TableProps<ColumnsType> {
   modalOnDelete?: () => void;
   onSave?: () => void;
   search?: boolean;
+  id?: string;
 }
 
 const Table = <ColumnsType,>({
@@ -41,6 +42,7 @@ const Table = <ColumnsType,>({
   modalOnDelete,
   onSave,
   search = true,
+  id,
   pagination = { current_page: 1, per_page: 1, total: 1, total_pages: 0 },
 }: TableProps<ColumnsType>) => {
   const {
@@ -81,6 +83,7 @@ const Table = <ColumnsType,>({
             modalOnDelete={modalOnDelete}
             onSave={onSave}
             label={modalTitle}
+            id={id}
           >
             {modalContent}
           </Modal>

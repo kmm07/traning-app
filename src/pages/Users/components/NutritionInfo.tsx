@@ -9,33 +9,49 @@ import {
 } from "components";
 import { Form, Formik } from "formik";
 
-function NutritionInfo() {
+function NutritionInfo({ activeUser }: { activeUser: any }) {
+  const percentageCalc = (all, current) =>
+    all === 0 && current === 0 ? 0 : Number((current / all) * 100).toFixed(1);
+
   const radial = [
     {
-      percentage: 100,
       body_title: "البروتين",
-      body_number: "13",
+      percentage: percentageCalc(
+        activeUser?.protein?.all,
+        activeUser?.protein?.current
+      ),
+      body_number: Number(activeUser?.protein?.current).toFixed(2).toString(),
       className: "text-[#FFC300]",
     },
     {
-      percentage: 10,
       body_title: "الدهون",
-      body_number: "44",
+      percentage: percentageCalc(
+        activeUser?.fat?.all,
+        activeUser?.fat?.current
+      ),
+      body_number: Number(activeUser?.fat?.current).toFixed(2).toString(),
       className: "text-[#00E8A2]",
     },
     {
-      percentage: 30,
       body_title: "السعرات",
-      body_number: "99",
+      percentage: percentageCalc(
+        activeUser?.calories?.all,
+        activeUser?.calories?.current
+      ),
+      body_number: Number(activeUser?.calories?.current).toFixed(2).toString(),
       className: "text-[#E80054]",
     },
     {
-      percentage: 55,
       body_title: "الكارب",
-      body_number: "99",
+      percentage: percentageCalc(
+        activeUser?.carbs?.all,
+        activeUser?.carbs?.current
+      ),
+      body_number: Number(activeUser?.carbs?.current).toFixed(2).toString(),
       className: "text-[#00D4FF]",
     },
   ];
+
   return (
     <Card className="grid grid-cols-2 gap-10 p-4">
       <div className="space-y-4">
@@ -63,13 +79,13 @@ function NutritionInfo() {
         {radial.map((item, index) => (
           <RadialProgress
             key={index}
-            percentage={item.percentage}
-            label={item.body_number}
+            percentage={item?.percentage}
+            label={item?.body_number}
             className={item.className}
             body={
               <div className="flex flex-col gap-2 justify-center items-center">
-                <Text>{item.body_title}</Text>
-                <Text>{item.body_number}</Text>
+                <Text>{item?.body_title}</Text>
+                <Text>{item?.body_number}</Text>
               </div>
             }
           />

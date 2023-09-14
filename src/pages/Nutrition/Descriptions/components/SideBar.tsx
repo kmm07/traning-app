@@ -5,6 +5,8 @@ import { useDeleteQuery } from "hooks/useQueryHooks";
 import React from "react";
 import { Row } from "react-table";
 import { toast } from "react-toastify";
+import AddIngredient from "./addIngredient";
+import { useQueryClient } from "react-query";
 
 interface SideBarProps {
   mealData: any;
@@ -17,9 +19,16 @@ function SideBar({ mealData, setMealData, categoryId, meal }: SideBarProps) {
   // list actions ======================>
   const { mutateAsync, isLoading } = useDeleteQuery();
 
+  const queryClient = useQueryClient();
+
   const onDeleteItem = async () => {
     try {
       await mutateAsync(`/diet-meals/${mealData.id}`);
+      document.getElementById("my-drawer")?.click();
+
+      queryClient.invalidateQueries(
+        `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`
+      );
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -126,7 +135,8 @@ function SideBar({ mealData, setMealData, categoryId, meal }: SideBarProps) {
           data={mealData?.ingredients ?? []}
           columns={columnsIngredients}
           modalTitle="اضافة مكون"
-          modalContent={<>dd</>}
+          modalContent={<AddIngredient />}
+          id=""
         />
       </Card>
 

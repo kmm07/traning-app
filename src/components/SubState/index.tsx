@@ -2,9 +2,11 @@ import { Text } from "components";
 
 type Props = {
   state: "subscriber" | "free" | "cancel" | "trail";
+  className?: string;
+  textClassName?: string;
 };
 
-function SubState({ state }: Props) {
+function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
     subscriber: {
       src: "/images/img_checkmark.svg",
@@ -20,7 +22,7 @@ function SubState({ state }: Props) {
     },
     not_subscriped: {
       src: "/images/img_arrowright.svg",
-      name: "ملغي",
+      name: "غير مشترك",
     },
     trail: {
       src: "/images/img_error.svg",
@@ -28,13 +30,13 @@ function SubState({ state }: Props) {
     },
   };
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 items-center justify-between">
       <img
-        className="h-5"
+        className={`h-5 ${className}`}
         src={stateObj[state].src}
         alt={stateObj[state].name}
       />
-      <Text>{stateObj[state].name}</Text>
+      <Text className={textClassName}>{stateObj[state].name}</Text>
     </div>
   );
 }

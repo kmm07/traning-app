@@ -1,16 +1,51 @@
 import { SettingCard, Table } from "components";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import AddCard from "shared/AddCard";
 import SideBar from "./components/SideBar";
 import AddExercise from "./components/AddExercise";
-
+import { UseQueryResult, useQueryClient } from "react-query";
+import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
+import { toast } from "react-toastify";
 function ExercisesGym() {
   const [level, setLevel] = useState(1);
-  const data = useLoaderData() as {
-    table: [];
+
+  const cardData = [
+    {
+      label: "مبتدئ",
+      id: "junior",
+    },
+    {
+      label: "متوسط",
+      id: "mid",
+    },
+    {
+      label: "متقدم",
+      id: "senior",
+    },
+  ];
+
+  // categories actions ======================>
+  const { mutateAsync } = useDeleteQuery();
+
+  const queryClient = useQueryClient();
+
+  const onDelete = async (id: number) => {
+    try {
+      await mutateAsync(`/training-categories/${id}`);
+
+      await queryClient.invalidateQueries(
+        `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`
+      );
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const onEdit = (value: any) => {
+    // setCategoryData(value);
+    document.getElementById("add-new-exercise-category")?.click();
   };
 
   const columns = React.useMemo(
@@ -40,27 +75,6 @@ function ExercisesGym() {
     console.log(e);
   };
 
-  const cardData = [
-    {
-      label: "مبتدئ",
-      id: 1,
-    },
-    {
-      label: "متوسط",
-      id: 2,
-    },
-    {
-      label: "متقدم",
-      id: 3,
-    },
-  ];
-
-  const onDelete = (id: number) => {
-    console.log(id);
-  };
-  const onEdit = (id: number) => {
-    console.log(id);
-  };
   const onSave = () => {
     console.log("save");
   };
@@ -86,7 +100,7 @@ function ExercisesGym() {
       </div>
 
       <Table
-        data={data.table}
+        data={[]}
         columns={columns}
         rowOnClick={rowOnClick}
         modalTitle="اضافة تمرين"
@@ -101,14 +115,3 @@ function ExercisesGym() {
 }
 
 export default ExercisesGym;
-
-export const ExercisesGymLoader = async () => {
-  return {
-    table: [
-      {
-        phone: "01000000000",
-        name: "مصر",
-      },
-    ],
-  };
-};

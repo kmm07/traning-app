@@ -1,7 +1,8 @@
-import { Button, Card, Img, Text } from "components";
+import { Button, Card, Img, SubState, Text } from "components";
+import moment from "moment";
 import { useNavigate } from "react-router-dom";
 
-function Info() {
+function Info({ activeUser }: { activeUser: any }) {
   return (
     <div className="flex h-full gap-[13px] w-full">
       <Img
@@ -10,22 +11,30 @@ function Info() {
         alt="rectangle347"
       />
       <div className="flex flex-col gap-[5px] items-start justify-start">
-        <Text className="text-xl tracking-[-0.40px]">kmm</Text>
-        <Text className="text-xs tracking-[-0.24px]">@maddison_c21</Text>
-        <Text className="text-sm tracking-[-0.28px]">0502232</Text>
-        <Text className="text-sm tracking-[-0.28px]">انثى</Text>
+        <Text className="text-sm tracking-[-0.28px]">{activeUser?.name}</Text>
+        <Text className="text-xs tracking-[-0.24px]">{activeUser?.email}</Text>
+        <Text className="text-sm tracking-[-0.28px]">{activeUser?.phone}</Text>
+        <Text className="text-xl tracking-[-0.40px]">{activeUser?.gender}</Text>
       </div>
     </div>
   );
 }
 
-function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
+function UsersInfo({
+  activeUser,
+  showUserInfo = true,
+}: {
+  showUserInfo?: boolean;
+  activeUser: any;
+}) {
   const navigate = useNavigate();
+
+  console.log(activeUser);
 
   return (
     <div className="flex flex-col gap-2 mt-[5px] w-full">
       <div className="grid grid-cols-3 gap-[9px] justify-between w-full">
-        <Info />
+        <Info activeUser={activeUser} />
 
         <Card className="p-4 space-y-4">
           <div className="flex flex-row gap-2 items-start justify-between m-2  md:w-full">
@@ -39,19 +48,16 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
             </Text>
           </div>
           <div className="font-roboto text-center p-2 border-2 rounded-md border-blue_gray-400 border-solid">
-            <Text size="2xl">250</Text>
+            <Text size="2xl">{activeUser?.points} نقاط</Text>
           </div>
         </Card>
         <Card className="p-4 space-y-4">
-          <div className="flex flex-row gap-2 items-start justify-between m-2  md:w-full border-b-2 pb-2">
-            <Img
-              className="h-[31px] md:h-auto object-cover"
-              src="/images/img_checkmark.svg"
-              alt="coinOne"
+          <div className="m-2  md:w-full border-b-2 pb-2">
+            <SubState
+              state={activeUser?.subscription_status ?? "free"}
+              className="h-8"
+              textClassName="text-lg"
             />
-            <Text bold size="2xl">
-              مشترك
-            </Text>
           </div>
           <div dir="ltr" className=" flex text-center divide-x-2 ">
             <div className="flex-1 p-2">
@@ -59,7 +65,7 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
             </div>
             <div className="flex-1 flex px-2  flex-col">
               <Text>تاريخ الاشتراك</Text>
-              <Text>2023/5/15</Text>
+              <Text>{activeUser?.subscription_date}</Text>
             </div>
           </div>
         </Card>
@@ -72,12 +78,24 @@ function UsersInfo({ showUserInfo = true }: { showUserInfo?: boolean }) {
               className="p-4 gap-2 divide-x-2 divide-violet-500 flex"
             >
               <div className="px-2">
-                <Text size="xs">تاريخ اخر ظهور </Text>
-                <Text size="sm">2023/4/15</Text>
+                <Text size="xs">تاريخ اخر ظهور : </Text>
+                <Text size="sm">
+                  {activeUser?.last_attendance !== "No Attendance"
+                    ? moment(new Date(activeUser?.last_attendance)).format(
+                        "YYYY-MM-DD HH:mm"
+                      )
+                    : "لا يوجد حضور"}
+                </Text>
               </div>
               <div className="px-2">
-                <Text size="xs">تاريخ اول ظهور </Text>
-                <Text size="sm">2023/4/15</Text>
+                <Text size="xs">تاريخ اول ظهور : </Text>
+                <Text size="sm">
+                  {activeUser?.first_attendance !== "No Attendance"
+                    ? moment(new Date(activeUser?.first_attendance)).format(
+                        "YYYY-MM-DD HH:mm"
+                      )
+                    : "لا يوجد حضور"}
+                </Text>
               </div>
             </div>
           </Card>
