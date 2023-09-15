@@ -1,4 +1,4 @@
-import { Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
 import React, { useEffect, useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -7,6 +7,7 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { toast } from "react-toastify";
 import ExerciseCategoryForm from "./components/exerciseCategoryForm";
+import AddExercise from "./components/AddExercise";
 
 interface Props {
   home: number;
@@ -18,11 +19,14 @@ function ExercisesView({ home }: Props) {
   // get exercises categories ======================>
   const url = "/exercise-categories";
 
-  const { data: exerciseCategories = [] }: UseQueryResult<any> =
-    useGetQuery(url, url, {
+  const { data: exerciseCategories = [] }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
       select: ({ data }: { data: { data: [] } }) =>
         data.data.filter((category: any) => category.home === home),
-    });
+    }
+  );
 
   // categories actions ======================>
   const { mutateAsync } = useDeleteQuery();
@@ -45,14 +49,15 @@ function ExercisesView({ home }: Props) {
   };
 
   // list exercises =======================>
+  const [exerciseData, setExerciseData] = useState<any>();
+
   const exercisesListURL = `/exercises?exercise_category_id=${categoryData?.id}`;
 
   const {
     data: exerciseList = [],
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(exercisesListURL, exercisesListURL, {
-    select: ({ data }: { data: { data: [] } }) =>
-      data.data.filter((category: any) => category.home === home),
+    select: ({ data }: { data: { data: [] } }) => data.data,
     enabled: ![null, undefined].includes(categoryData?.id),
   });
 
@@ -76,12 +81,36 @@ function ExercisesView({ home }: Props) {
           );
         },
       },
+
+      {
+        Header: "فئة التمرين",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <span className="flex items-center gap-4">
+              {row.original.category_name}
+            </span>
+          );
+        },
+      },
+
+      {
+        Header: "ملاحظات التمرين",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <span className="flex items-center gap-4">
+              {row.original.notes}
+            </span>
+          );
+        },
+      },
     ],
     []
   );
 
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+  const rowOnClick = (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
+  ) => {
+    setExerciseData(e.original);
   };
 
   useEffect(() => {
@@ -91,7 +120,7 @@ function ExercisesView({ home }: Props) {
   return (
     <div className="w-full space-y-4">
       <div className="grid grid-cols-5 gap-3">
-        {exerciseCategories.map((item: any, ) => (
+        {exerciseCategories.map((item: any) => (
           <SettingCard
             onDelete={onDelete}
             onEdit={() => onEdit(item)}
@@ -121,19 +150,31 @@ function ExercisesView({ home }: Props) {
       </div>
 
       {!isListLoading ? (
-        <Table
-          data={exerciseList ?? []}
-          columns={columns}
-          rowOnClick={rowOnClick}
-          modalTitle="اضافة تمرين"
-          modalContent=""
-        />
+        exerciseList.length !== 0 ? (
+          <Table
+            data={exerciseList ?? []}
+            columns={columns}
+            rowOnClick={rowOnClick}
+            modalTitle="اضافة تمرين"
+            modalContent={
+              <AddExercise exercise_category_id={categoryData?.id} />
+            }
+            id="add-new-exercise"
+          />
+        ) : (
+          <div
+            className="flex justify-center"
+            onClick={() => document.getElementById("add-new-exercise")?.click()}
+          >
+            <Button secondaryBorder>إضافة تمرين جديد</Button>
+          </div>
+        )
       ) : (
         <>loading...</>
       )}
 
       <Drawer>
-        <SideBar />
+        <SideBar exerciseData={exerciseData} categoryData={categoryData} />
       </Drawer>
 
       <Modal id="new-exercise-category">
@@ -141,6 +182,10 @@ function ExercisesView({ home }: Props) {
           categoryData={categoryData}
           setCategoryData={setCategoryData}
         />
+      </Modal>
+
+      <Modal id="add-new-exercise">
+        <AddExercise exercise_category_id={categoryData?.id} />
       </Modal>
     </div>
   );

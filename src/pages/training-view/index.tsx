@@ -9,6 +9,7 @@ import ExerciseCategoryForm from "./exerciseCategoryForm";
 import WeekForm from "./createWeek";
 import TableActions from "components/Table/actions";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   home: number;
@@ -23,6 +24,8 @@ function TrainingView({ home, gender }: Props) {
   const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
   const [categoryData, setCategoryData] = useState();
+
+  const navigate = useNavigate();
 
   // get training categories ======================>
   const url = `/training-categories?lvl=${level}&gender=${gender}&days_num=${daysNum}&home=${home}`;
@@ -159,6 +162,9 @@ function TrainingView({ home, gender }: Props) {
     []
   );
 
+  const rowOnClick = (e: any) =>
+    navigate(`/exercises/week-days/${e.original?.id}`);
+
   useEffect(() => {
     setExerciseCategory(trainingCategories?.[0]?.id);
   }, [trainingCategories]);
@@ -251,6 +257,7 @@ function TrainingView({ home, gender }: Props) {
           data={trainingWeeks ?? []}
           columns={columns}
           modalTitle="اضافة اسبوع"
+          rowOnClick={rowOnClick}
           modalContent={
             <WeekForm
               weekData={weekData}

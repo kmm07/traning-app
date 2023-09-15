@@ -1,12 +1,21 @@
-import { SettingCard, Table } from "components";
+import {  Card, Img, Modal, SettingCard, Table, Text } from "components";
 import React, { useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
-import AddExercise from "./components/AddExercise";
+import { UseQueryResult } from "react-query";
+import { useGetQuery } from "hooks/useQueryHooks";
+import AddNotification from "./components/AddNotification";
 
 function Notifications() {
   const [active, setActive] = useState(1);
+
+  // get notifications data =================>
+  const url = "/notifications";
+
+  const { data }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: [] } }) => data.data,
+  });
 
   const columns = React.useMemo(
     () => [
@@ -35,6 +44,7 @@ function Notifications() {
     ],
     []
   );
+
   const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
     console.log(e);
   };
@@ -62,19 +72,33 @@ function Notifications() {
             onClick={() => setActive(item.id)}
           />
         ))}
-      </div>
 
-      <Table
-        data={[]}
-        columns={columns}
-        rowOnClick={rowOnClick}
-        modalTitle="اضافة تمرين"
-        modalContent={<AddExercise />}
-      />
+        <Card className={"p-4 w-[180px]"}>
+          <label
+            htmlFor="add-notification"
+            className={
+              "flex flex-col cursor-pointer justify-between items-center relative"
+            }
+          >
+            <Img
+              className="w-16 absolute top-0 left-0"
+              src="/images/plus.svg"
+            />
+            <Text size="3xl" className="mt-4">
+              اضافة
+            </Text>
+          </label>
+        </Card>
+      </div>
+      <Table data={data ?? []} columns={columns} rowOnClick={rowOnClick} />
 
       <Drawer>
         <SideBar />
       </Drawer>
+
+      <Modal id="add-notification">
+        <AddNotification />
+      </Modal>
     </div>
   );
 }

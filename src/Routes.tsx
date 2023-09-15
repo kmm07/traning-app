@@ -19,6 +19,9 @@ import GymMen from "pages/Exercises/gym-men";
 import GymWomen from "pages/Exercises/gym-women";
 import HomeMen from "pages/Exercises/home-men";
 import HomeWomen from "pages/Exercises/home-women";
+import Subscriptions from "pages/subscriptions";
+import UserSubscriptions from "pages/Users/subscriptions";
+import ViewWeekDay from "pages/view-week-days";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,6 +31,11 @@ const router = createBrowserRouter(
       <Route path="/" element={<Layout />}>
         <Route path="/dashboard" element={<Messages />} />
         <Route path="users" index element={<Users />} />
+        <Route
+          path="/users/:id/subscriptions"
+          element={<UserSubscriptions />}
+        />
+        <Route path="subscriptions" index element={<Subscriptions />} />
         <Route path="/nutrition">
           <Route path="descriptions" element={<Descriptions />} />
           <Route path="ingredients" element={<Ingredients />} />
@@ -41,6 +49,7 @@ const router = createBrowserRouter(
           <Route path="table-home-men" element={<HomeMen />} />
           <Route path="table-home-women" element={<HomeWomen />} />
           <Route path="cardio" element={<Cardio />} />
+          <Route path="week-days/:id" element={<ViewWeekDay />} />
         </Route>
 
         <Route path="notifications" element={<Notifications />} />

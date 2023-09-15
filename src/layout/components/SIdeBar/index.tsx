@@ -21,6 +21,11 @@ function SidePar() {
       src: "/images/img_group30copy9.svg",
     },
     {
+      name: "الإشتراكات",
+      link: "/subscriptions",
+      src: "/images/img_group30copy9.svg",
+    },
+    {
       name: "التغذية",
       src: "/images/img_fork3.png",
       link: "/nutrition",

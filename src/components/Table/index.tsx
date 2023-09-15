@@ -4,7 +4,7 @@ import NoDataFounded from "../NoData";
 import Pagination from "../Pagination";
 // import Search from "svg/search.svg";
 import PaginationType from "./paginationType";
-import { Button, Input, Modal, Text } from "components";
+import {  Input, Modal, Text } from "components";
 declare global {
   interface Window {
     my_modal_1: any;
@@ -167,9 +167,6 @@ const Table = <ColumnsType,>({
   ) : (
     <div className="mt-20 flex flex-col items-center gap-4">
       <NoDataFounded />
-      <Button secondaryBorder className="w-[150px]">
-        إضافة بيانات
-      </Button>
     </div>
   );
 };

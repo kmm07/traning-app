@@ -23,10 +23,7 @@ function Layout() {
     dispatch(setCredentials(userParse));
 
     // redirect to Home
-    if (
-      (userParse?.token === null || userParse?.token === undefined) &&
-      isPublic(pathname)
-    ) {
+    if (userParse?.token === null || userParse?.token === undefined) {
       void push("/signin");
     }
   }, [pathname, token]);
@@ -47,9 +44,5 @@ function Layout() {
     </div>
   );
 }
-const isPublic = (url: string) => {
-  const publicRoutes = [/^\/(\?.*)?$/, /^\/signup/];
 
-  return !publicRoutes.some((path) => path.test(url));
-};
 export default Layout;

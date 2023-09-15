@@ -22,8 +22,6 @@ export default function ExerciseCategoryForm({
   categoryData,
   setCategoryData,
 }: Props) {
-  console.log(categoryData);
-
   const isEditing = ![null, undefined].includes(categoryData);
 
   const url = isEditing
@@ -100,7 +98,7 @@ export default function ExerciseCategoryForm({
               isLoading={isAddLoading}
               onClick={submitForm}
             >
-              {isEditing ? "تعديل" : "حفظ"}
+              {"حفظ"}
             </Button>
             <Button className="w-[100px]" secondaryBorder onClick={onClose}>
               إلغاء

@@ -29,7 +29,8 @@ function UsersInfo({
 }) {
   const navigate = useNavigate();
 
-  console.log(activeUser);
+  const onShowUserSubscriptions = () =>
+    navigate(`/users/${activeUser?.id}/subscriptions`);
 
   return (
     <div className="flex flex-col gap-2 mt-[5px] w-full">
@@ -51,7 +52,10 @@ function UsersInfo({
             <Text size="2xl">{activeUser?.points} نقاط</Text>
           </div>
         </Card>
-        <Card className="p-4 space-y-4">
+        <Card
+          className="p-4 space-y-4 cursor-pointer"
+          onClick={onShowUserSubscriptions}
+        >
           <div className="m-2  md:w-full border-b-2 pb-2">
             <SubState
               state={activeUser?.subscription_status ?? "free"}
@@ -59,7 +63,7 @@ function UsersInfo({
               textClassName="text-lg"
             />
           </div>
-          <div dir="ltr" className=" flex text-center divide-x-2 ">
+          <div dir="ltr" className=" flex text-center divide-x-2">
             <div className="flex-1 p-2">
               <Text size="xl">جديد</Text>
             </div>
