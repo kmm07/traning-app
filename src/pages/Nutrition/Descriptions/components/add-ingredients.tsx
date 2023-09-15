@@ -8,7 +8,7 @@ export default function AddIngredient() {
   const [ingredients, setIngredients] = useState([]);
 
   // get descriptions data list =================>
-  const url = `/meal-ingredients?meal_ingredient_category_id=${1}`;
+  const url = `/meal-ingredients?meal_ingredient_category_id=${0}`;
 
   const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
     url,

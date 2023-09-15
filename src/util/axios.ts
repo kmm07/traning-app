@@ -7,7 +7,7 @@ const customAxios = () =>
       "Content-Type": "application/json",
       accept: "application/json",
     },
-    withCredentials: true,
+    withCredentials: false,
   });
 
 export default customAxios;

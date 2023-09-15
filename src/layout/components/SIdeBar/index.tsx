@@ -49,20 +49,24 @@ function SidePar() {
           link: "/exercises/table-women",
         },
         {
+          name: "جدول المنزل رجال",
+          link: "/exercises/table-home-men",
+        },
+        {
+          name: "جدول المنزل نساء",
+          link: "/exercises/table-home-women",
+        },
+        {
+          name: "الكارديو",
+          link: "/exercises/cardio",
+        },
+        {
           name: "تمارين الجيم",
           link: "/exercises/exercises-gym",
         },
         {
           name: "تمارين المنزل",
           link: "/exercises/exercises-home",
-        },
-        {
-          name: "جدول المنزل",
-          link: "/exercises/table-home",
-        },
-        {
-          name: "الكارديو",
-          link: "/exercises/cardio",
         },
       ],
     },

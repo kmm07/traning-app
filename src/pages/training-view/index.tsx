@@ -10,19 +10,22 @@ import WeekForm from "./createWeek";
 import TableActions from "components/Table/actions";
 import { toast } from "react-toastify";
 
-function MenTraining() {
+interface Props {
+  home: number;
+  gender: string;
+}
+
+function TrainingView({ home, gender }: Props) {
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("junior");
 
   const [daysNum, setDaysNum] = useState<number>(3);
-
-  const home = 0;
 
   const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
   const [categoryData, setCategoryData] = useState();
 
   // get training categories ======================>
-  const url = `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`;
+  const url = `/training-categories?lvl=${level}&gender=${gender}&days_num=${daysNum}&home=${home}`;
 
   const { data: trainingCategories = [], isLoading }: UseQueryResult<any> =
     useGetQuery(url, url, {
@@ -274,4 +277,4 @@ function MenTraining() {
   );
 }
 
-export default MenTraining;
+export default TrainingView;

@@ -22,7 +22,7 @@ const initialValues = {
 };
 
 export default function AddDescription() {
-  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${1}`;
+  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${0}`;
 
   const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
     ingredientsURL,

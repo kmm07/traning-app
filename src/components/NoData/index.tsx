@@ -10,11 +10,9 @@ const NoDataFounded = ({ className = "" }: Props) => {
     >
       <div className="flex flex-col items-center">
         <Text as="h1" className="!font-bold !text-xl">
-          "it's_empty"
+          عفوا لا يوجد بينات متاحة لعرضها
         </Text>
-        <Text as="p" className="!text-md">
-          'empty_message'
-        </Text>
+
         {/* <Image
           src="/images/empty.png"
           alt="image"
