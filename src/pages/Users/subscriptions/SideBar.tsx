@@ -60,8 +60,6 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
     }
   };
 
-  console.log(userData.subscription_status);
-
   return (
     <Formik
       initialValues={{ ...initialValues, ...subscriptionData }}

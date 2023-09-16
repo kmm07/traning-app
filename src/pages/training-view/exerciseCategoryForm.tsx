@@ -130,7 +130,7 @@ export default function ExerciseCategoryForm({
               isLoading={isAddLoading}
               onClick={submitForm}
             >
-              {isEditing ? "تعديل" : "حفظ"}
+              {"حفظ"}
             </Button>
             <Button className="w-[100px]" secondaryBorder onClick={onClose}>
               إلغاء

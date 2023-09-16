@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
 import { Row } from "react-table";
-import WeekDayForm from "./components";
+import WeekDayForm from "./components/weekdayForm";
 import WeekDaySideBar from "./components/sideBar";
 
 type Props = {};
@@ -82,7 +82,16 @@ export default function ViewWeekDay({}: Props) {
   const rowOnClick = (
     e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
   ) => {
-    setActive(e.original);
+    const exercises = e.original.exercises?.map((exercise: any) => ({
+      ...exercise,
+      is_new: 0,
+      sessions: exercise.sessions?.map((session: any) => ({
+        ...session,
+        is_new: 0,
+      })),
+    }));
+
+    setActive({ ...e.original, exercises });
   };
 
   return (

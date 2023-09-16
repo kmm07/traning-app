@@ -1,6 +1,7 @@
 import UsersInfo from "shared/UserInfo";
 import NutritionInfo from "./NutritionInfo";
 import HeathInfo from "./HeathInfo";
+import TrainingInfo from "./TrainingInfo";
 
 function UsersSideBar({ activeUser }: { activeUser: any }) {
   return (
@@ -11,7 +12,7 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
 
       <NutritionInfo activeUser={activeUser} />
 
-      {/* <TrainingInfo activeUser={activeUser} /> */}
+      <TrainingInfo />
     </>
   );
 }
