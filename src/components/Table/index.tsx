@@ -63,7 +63,7 @@ const Table = <ColumnsType,>({
 
   useEffect(() => {
     setCurrentItems(filterGlobal().slice(itemOffset, endOffset));
-  }, [data, itemOffset, endOffset, filterGlobal]);
+  }, [data, itemOffset, endOffset, searchValue]);
 
   const pageCount = Math.ceil(data.length / itemsPerPage);
 
