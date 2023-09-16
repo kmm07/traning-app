@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SidePar from "./components/SIdeBar";
-import Header from "./components/Header";
+// import Header from "./components/Header";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "hooks/useRedux";
 import { selectCurrentToken, setCredentials } from "redux/slices/auth";
@@ -24,7 +24,7 @@ function Layout() {
 
     // redirect to Home
     if (userParse?.token === null || userParse?.token === undefined) {
-      void push("/signin");
+      void push("/");
     }
   }, [pathname, token]);
 
@@ -32,8 +32,8 @@ function Layout() {
 
   return (
     <div className="flex flex-col h-full relative">
-      <Header />
-      <div className="font-roboto h-full grid grid-cols-11">
+      {/* <Header /> */}
+      <div className="font-roboto h-full grid grid-cols-11 pt-10">
         <div className="col-span-2 bg-gray-900_01">
           <SidePar />
         </div>

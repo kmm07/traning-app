@@ -26,7 +26,7 @@ import ViewWeekDay from "pages/view-week-days";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
-      <Route path="signin" element={<SignInPage />} />
+      <Route path="/" element={<SignInPage />} />
 
       <Route path="/" element={<Layout />}>
         <Route path="/dashboard" element={<Messages />} />
