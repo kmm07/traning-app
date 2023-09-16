@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTable, useFilters, useGlobalFilter, Column } from "react-table";
 import NoDataFounded from "../NoData";
-// import Search from "svg/search.svg";
 import PaginationType from "./paginationType";
 import { Input, Modal, Text } from "components";
 import ReactPaginate from "react-paginate";
@@ -45,38 +44,44 @@ const Table = <ColumnsType,>({
 }: TableProps<ColumnsType>) => {
   const itemsPerPage = 25;
   const [itemOffset, setItemOffset] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
+
+  const filterGlobal = () => {
+    return data.filter((row: any) => {
+      return Object.keys(row).some((key) => {
+        return String(row[key])
+          .toLowerCase()
+          .includes(String(searchValue).toLowerCase());
+      });
+    });
+  };
+
   const endOffset = itemOffset + itemsPerPage;
   const [currentItems, setCurrentItems] = useState(
     data.slice(itemOffset, endOffset)
   );
 
   useEffect(() => {
-    setCurrentItems(data.slice(itemOffset, endOffset));
-  }, [data]);
+    setCurrentItems(filterGlobal().slice(itemOffset, endOffset));
+  }, [data, itemOffset, endOffset, filterGlobal]);
 
   const pageCount = Math.ceil(data.length / itemsPerPage);
 
   const handlePageClick = (event: any) => {
     const newOffset = (event.selected * itemsPerPage) % data.length;
     setItemOffset(newOffset);
-    setCurrentItems(data.slice(newOffset, newOffset + itemsPerPage));
+    setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
   };
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    setGlobalFilter,
-  } = useTable(
-    {
-      columns,
-      data: currentItems,
-    },
-    useFilters,
-    useGlobalFilter
-  );
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data: currentItems,
+      },
+      useFilters,
+      useGlobalFilter
+    );
 
   return data.length !== 0 ? (
     <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
@@ -90,7 +95,7 @@ const Table = <ColumnsType,>({
                 isForm={false}
                 inputSize="large"
                 className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                onChange={(e) => setSearchValue(e.target.value)}
               />
             </div>
           )}
