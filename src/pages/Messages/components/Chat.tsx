@@ -30,11 +30,16 @@ function Chat({ userData }: { userData: any }) {
 
   useEffect(() => {
     seMessages(userData?.chat);
+    let timout: any = null;
+
     if (userData?.chat.length > 0) {
-      setTimeout(() => {
+      timout = setTimeout(() => {
         scrollToBottom();
       }, 100);
     }
+    return () => {
+      clearTimeout(timout);
+    };
   }, [userData?.chat, userData?.id]);
 
   useEffect(() => {
