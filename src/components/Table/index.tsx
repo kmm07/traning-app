@@ -58,9 +58,6 @@ const Table = <ColumnsType,>({
 
   const handlePageClick = (event: any) => {
     const newOffset = (event.selected * itemsPerPage) % data.length;
-    console.log(
-      `User requested page number ${event.selected}, which is offset ${newOffset}`
-    );
     setItemOffset(newOffset);
     setCurrentItems(data.slice(newOffset, newOffset + itemsPerPage));
   };
@@ -80,10 +77,6 @@ const Table = <ColumnsType,>({
     useFilters,
     useGlobalFilter
   );
-
-  // Simulate fetching items from another resources.
-  // (This could be items from props; or items loaded in a local state
-  // from an API endpoint with useEffect and useState)
 
   return data.length !== 0 ? (
     <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
