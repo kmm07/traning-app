@@ -1,10 +1,12 @@
-import { Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Table } from "components";
 import { Drawer } from "components/Drawer";
 import { useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
 import { Row } from "react-table";
+import WeekDayForm from "./components";
+import WeekDaySideBar from "./components/sideBar";
 
 type Props = {};
 
@@ -16,16 +18,14 @@ export default function ViewWeekDay({}: Props) {
   // get notifications data =================>
   const url = `/training-week-days?training_week_id=${id}`;
 
-  const { data }: UseQueryResult<any> = useGetQuery(url, url, {
+  const { data = [] }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: [] } }) => data.data,
   });
-
-  console.log(data);
 
   const columns = React.useMemo(
     () => [
       {
-        Header: "اسم التمرين",
+        Header: "اليوم",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -37,29 +37,40 @@ export default function ViewWeekDay({}: Props) {
                   <img src="/images/img_rectangle347.png" />
                 </div>
               </div>
-              {row.original.exercise_name}
+              اليوم رقم {row.original?.day_num}
             </div>
           );
         },
       },
       {
-        Header: "وقت الراحة",
-        accessor: "rest_sec",
+        Header: "id",
+        accessor: "day_num",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
-              {row.original.rest_sec} ثانية
+              {row.original?.day_num}
             </div>
           );
         },
       },
       {
-        Header: "عدد المجموعات",
+        Header: "عدد التمارين",
         accessor: "sessions",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
-              {row.original.sessions?.length} مجموعة
+              {row.original?.exercises?.length}
+            </div>
+          );
+        },
+      },
+      {
+        Header: "نوع التمارين",
+        accessor: "exercise_category",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <div className="flex items-center gap-4">
+              {row.original?.exercise_category}
             </div>
           );
         },
@@ -68,50 +79,26 @@ export default function ViewWeekDay({}: Props) {
     []
   );
 
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
+  const rowOnClick = (
+    e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
+  ) => {
+    setActive(e.original);
   };
 
   return (
     <div className="w-full space-y-4">
-      <div className="grid grid-cols-5 gap-4">
-        {data?.map((item: any, index: any) => (
-          <SettingCard
-            id={item.id}
-            key={index}
-            label={item.exercise_category}
-            active={active.id === item.id}
-            onClick={() => setActive(item as any)}
-          />
-        ))}
-
-        <Card className={"p-4 w-[180px]"}>
-          <label
-            htmlFor="add-new-exercise-category"
-            className={`flex flex-col cursor-pointer justify-between items-center relative `}
-          >
-            <Img
-              className="w-16 absolute top-0 left-0"
-              src="/images/plus.svg"
-            />
-            <Text size="3xl" className="mt-4">
-              اضافة
-            </Text>
-          </label>
-        </Card>
-      </div>
-
       <Table
-        data={active.exercises ?? []}
+        data={data ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
+        modalContent={<WeekDayForm />}
+        modalTitle="اضافة يوم"
+        id="add-week-day"
       />
 
-      <Drawer>asd</Drawer>
-
-      <Modal id="add-week-day">
-        <>asd</>
-      </Modal>
+      <Drawer>
+        <WeekDaySideBar weekDayData={active} />
+      </Drawer>
     </div>
   );
 }
