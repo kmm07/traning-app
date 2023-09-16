@@ -131,3 +131,7 @@ li:hover {
 .btn {
   @apply border-none bg-transparent hover:bg-transparent p-0 m-0 normal-case;
 }
+
+.navigation {
+  @apply !flex;
+}

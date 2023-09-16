@@ -53,7 +53,7 @@ function Ingredients() {
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: any[] } }) =>
-      data.data.slice(0, 20).map((item: any) => ({
+      data.data.map((item: any) => ({
         id: item.id,
         name: item.name,
         calories: item.calories,

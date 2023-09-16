@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTable, useFilters, useGlobalFilter, Column } from "react-table";
 import NoDataFounded from "../NoData";
-import Pagination from "../Pagination";
 // import Search from "svg/search.svg";
 import PaginationType from "./paginationType";
-import {  Input, Modal, Text } from "components";
+import { Input, Modal, Text } from "components";
+import ReactPaginate from "react-paginate";
+
 declare global {
   interface Window {
     my_modal_1: any;
@@ -34,17 +35,36 @@ const Table = <ColumnsType,>({
   columns,
   data,
   title,
-  setPage,
   modalTitle,
-  noPagination = false,
   rowOnClick,
   modalContent,
   modalOnDelete,
   onSave,
   search = true,
   id,
-  pagination = { current_page: 1, per_page: 1, total: 1, total_pages: 0 },
 }: TableProps<ColumnsType>) => {
+  const itemsPerPage = 25;
+  const [itemOffset, setItemOffset] = useState(0);
+  const endOffset = itemOffset + itemsPerPage;
+  const [currentItems, setCurrentItems] = useState(
+    data.slice(itemOffset, endOffset)
+  );
+
+  useEffect(() => {
+    setCurrentItems(data.slice(itemOffset, endOffset));
+  }, [data]);
+
+  const pageCount = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageClick = (event: any) => {
+    const newOffset = (event.selected * itemsPerPage) % data.length;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
+    setCurrentItems(data.slice(newOffset, newOffset + itemsPerPage));
+  };
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -55,11 +75,16 @@ const Table = <ColumnsType,>({
   } = useTable(
     {
       columns,
-      data,
+      data: currentItems,
     },
     useFilters,
     useGlobalFilter
   );
+
+  // Simulate fetching items from another resources.
+  // (This could be items from props; or items loaded in a local state
+  // from an API endpoint with useEffect and useState)
+
   return data.length !== 0 ? (
     <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
       <div className=" flex gap-7 w-full justify-between items-center">
@@ -151,18 +176,21 @@ const Table = <ColumnsType,>({
           })}
         </tbody>
       </table>
-      {!noPagination && (
-        <div className="p-2 flex justify-between w-full">
-          <Pagination
-            currentPage={pagination?.current_page}
-            limit={pagination?.per_page}
-            total={Math.ceil(pagination?.total_pages)}
-            onPageChange={(page) => {
-              setPage?.(page);
-            }}
-          />
-        </div>
-      )}
+
+      <div className="p-2 flex justify-between w-full">
+        <ReactPaginate
+          className="flex justify-center items-center gap-3"
+          activeClassName="bg-[#00A4FA] text-white rounded-full w-8 h-8 flex justify-center items-center"
+          disabledClassName="hidden"
+          breakLabel="..."
+          nextLabel="التالي >"
+          onPageChange={handlePageClick}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel="< سابق"
+          renderOnZeroPageCount={null}
+        />
+      </div>
     </div>
   ) : (
     <div className="mt-20 flex flex-col items-center gap-4">

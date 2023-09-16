@@ -29,7 +29,7 @@ export default function AddDescription() {
     ingredientsURL,
     {
       select: ({ data }: { data: { data: any[] } }) =>
-        data.data.slice(0, 20).map((item: any) => ({
+        data.data.map((item: any) => ({
           value: item.id,
           label: item.name,
         })),
