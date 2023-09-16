@@ -118,7 +118,7 @@ function SidePar() {
         onClick={() => {
           dispatch(logOut());
 
-          push("/signin");
+          push("/");
         }}
         className="btn flex flex-col items-start justify-start w-full "
       >
