@@ -31,7 +31,7 @@ function Cardio() {
               <div className="avatar indicator">
                 <div className="w-12 h-12 rounded-full">
                   <img
-                    src={row.original.image ?? "/images/img_rectangle347.png"}
+                    src={row.original.image || "/images/img_rectangle347.png"}
                   />
                 </div>
               </div>

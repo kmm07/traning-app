@@ -15,7 +15,7 @@ function SideBar() {
             <div className="flex text-white items-center gap-4">
               <div className="w-8 h-">
                 <img
-                  src={row.original.image ?? "/images/img_rectangle347.png"}
+                  src={row.original.image || "/images/img_rectangle347.png"}
                 />
               </div>
               {row.original.name}

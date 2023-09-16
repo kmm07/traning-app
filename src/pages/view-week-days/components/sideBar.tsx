@@ -36,7 +36,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         <div className="flex gap-4">
           <Img
             className="w-24"
-            src={weekDayData.image ?? "/images/img_rectangle347.png"}
+            src={weekDayData?.image || "/images/img_rectangle347.png"}
           />
           <Text size="3xl">asd</Text>
         </div>
