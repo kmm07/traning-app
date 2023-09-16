@@ -82,7 +82,7 @@ function SidePar() {
     },
     {
       name: "الكوبونات",
-      link: "/coupons",
+      link: "/coupones",
       src: "/images/img_coupon3.png",
     },
     // {

@@ -1,26 +1,22 @@
-import {  Card, Img, Modal, SettingCard, Table, Text } from "components";
-import React, { useState } from "react";
-import { Drawer } from "components/Drawer";
+import { Card, Img, Modal, Table, Text } from "components";
+import React from "react";
 import { Row } from "react-table";
-import SideBar from "./components/SideBar";
 import { UseQueryResult } from "react-query";
 import { useGetQuery } from "hooks/useQueryHooks";
 import AddNotification from "./components/AddNotification";
 
 function Notifications() {
-  const [active, setActive] = useState(1);
-
   // get notifications data =================>
   const url = "/notifications";
 
-  const { data }: UseQueryResult<any> = useGetQuery(url, url, {
+  const { data = [] }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: [] } }) => data.data,
   });
 
   const columns = React.useMemo(
     () => [
       {
-        Header: "الاسم",
+        Header: "عنوان الإشعار",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -32,47 +28,47 @@ function Notifications() {
                   <img src="/images/img_rectangle347.png" />
                 </div>
               </div>
-              {row.original.name}
+              {row.original.title}
             </div>
           );
         },
       },
+
       {
-        Header: "التاريخ",
-        accessor: "date",
+        Header: "وصف الإشعار",
+        accessor: "desctiption",
+      },
+      {
+        Header: "تفاصيل الإشعار",
+        accessor: "details",
+        Cell: ({ row }: any) => (
+          <div>
+            {row.original.details?.map((detail: any, index: number) => (
+              <span>
+                {index === row.original.details?.length - 1
+                  ? detail
+                  : ` ${detail}، `}
+              </span>
+            ))}
+          </div>
+        ),
       },
     ],
     []
   );
 
-  const rowOnClick = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
-    console.log(e);
-  };
-
-  const cardData = [
-    {
-      label: "الاشعارات العامه",
-      id: 1,
-    },
-    {
-      label: "الاشعارات المخصصة",
-      id: 2,
-    },
-  ];
-
   return (
     <div className="w-full space-y-4">
-      <div className="grid grid-cols-5 gap-3">
-        {cardData.map((item, index) => (
-          <SettingCard
-            id={item.id}
-            key={index}
-            label={item.label}
-            active={active === item.id}
-            onClick={() => setActive(item.id)}
-          />
-        ))}
-
+      <div className="grid grid-cols-5 gap-3"></div>
+      {data?.length > 0 ? (
+        <Table
+          data={data ?? []}
+          columns={columns}
+          modalContent={<AddNotification />}
+          id="add-notification"
+          modalTitle="إضافة إشعار"
+        />
+      ) : (
         <Card className={"p-4 w-[180px]"}>
           <label
             htmlFor="add-notification"
@@ -85,16 +81,11 @@ function Notifications() {
               src="/images/plus.svg"
             />
             <Text size="3xl" className="mt-4">
-              اضافة
+              إرسال إشعار
             </Text>
           </label>
         </Card>
-      </div>
-      <Table data={data ?? []} columns={columns} rowOnClick={rowOnClick} />
-
-      <Drawer>
-        <SideBar />
-      </Drawer>
+      )}
 
       <Modal id="add-notification">
         <AddNotification />

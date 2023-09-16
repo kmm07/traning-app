@@ -1,4 +1,4 @@
-import { Table } from "components";
+import { Button, Modal, Table } from "components";
 import { Drawer } from "components/Drawer";
 import { useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
@@ -95,7 +95,19 @@ export default function ViewWeekDay({}: Props) {
         modalTitle="اضافة يوم"
         id="add-week-day"
       />
-
+      {data.length === 0 && (
+        <div className="flex justify-center mt-10">
+          <Button
+            onClick={() => document.getElementById("add-week-day")?.click()}
+            secondaryBorder
+          >
+            إضافة يوم
+          </Button>
+        </div>
+      )}
+      <Modal id="add-week-day">
+        <WeekDayForm />
+      </Modal>
       <Drawer>
         <WeekDaySideBar weekDayData={active} />
       </Drawer>

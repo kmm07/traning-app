@@ -22,6 +22,7 @@ import HomeWomen from "pages/Exercises/home-women";
 import Subscriptions from "pages/subscriptions";
 import UserSubscriptions from "pages/Users/subscriptions";
 import ViewWeekDay from "pages/view-week-days";
+import Coupones from "pages/coupones";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -53,6 +54,8 @@ const router = createBrowserRouter(
         </Route>
 
         <Route path="notifications" element={<Notifications />} />
+
+        <Route path="coupones" element={<Coupones />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

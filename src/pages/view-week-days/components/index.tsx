@@ -9,10 +9,10 @@ import {
   UploadInput,
 } from "components";
 import { Form, Formik } from "formik";
-import { useGetQuery } from "hooks/useQueryHooks";
+import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
-import { UseQueryResult } from "react-query";
-// import { useParams } from "react-router-dom";
+import { UseQueryResult, useQueryClient } from "react-query";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 const initialValues = {
   name: "",
@@ -24,7 +24,7 @@ const initialValues = {
 };
 
 export default function WeekDayForm() {
-  // const { id } = useParams();
+  const { id } = useParams();
 
   // get exercieses categories ===============>
   const categoriesURL = "/exercise-categories";
@@ -49,8 +49,6 @@ export default function WeekDayForm() {
     }
   );
 
-  const onClose = () => document.getElementById("add-week-day")?.click();
-
   const onDeleteExercise = (
     values: any,
     setFieldValue: any,
@@ -67,7 +65,11 @@ export default function WeekDayForm() {
     exercise_id: "",
     rest_sec: "",
     private: false,
-    sessions: [],
+    sessions: {
+      session_num: "",
+      counter: "",
+      rest_sec: "",
+    },
   });
 
   const [exerciseSession, setExerciseSession] = useState<any>([]);
@@ -83,11 +85,24 @@ export default function WeekDayForm() {
   };
 
   // on submit weekday data ======================>
-  // const url = "/training-week-days";
-  // const { mutateAsync, isLoading } = usePostQuery({
-  //   url,
-  //   contentType: "multipart/form-data",
-  // });
+  const url = "/training-week-days";
+  const { mutateAsync, isLoading } = usePostQuery({
+    url,
+    contentType: "multipart/form-data",
+  });
+
+  const queryClient = useQueryClient();
+
+  const onClose = () => {
+    document.getElementById("add-week-day")?.click();
+    setExercise({
+      exercise_id: "",
+      rest_sec: "",
+      private: false,
+      sessions: [],
+    });
+    setExerciseSession([]);
+  };
 
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
@@ -100,28 +115,46 @@ export default function WeekDayForm() {
       }
 
       if (data[0] === "exercises") {
-        (data[1] as any).forEach((subData: any, index: number) => {
-          if (subData[0] !== "sessions") {
-            formData.append(
-              `exercises[${index}][exercise_id]`,
-              subData[1]?.value as any
-            );
-            formData.append(
-              `exercises[${index}][private]`,
-              subData.private ? 1 : (0 as any)
-            );
-            formData.append(
-              `exercises[${index}][rest_sec]`,
-              subData.rest_sec as any
-            );
-          } else console.log(subData);
+        (data[1] as any).forEach((subData: any, i: number) => {
+          Object.entries(subData).forEach((item: any) => {
+            if (item[0] !== "sessions") {
+              formData.append(
+                `exercises[${i}][${item[0]}]`,
+                item[0] === "exercise_id"
+                  ? item[1]?.value
+                  : item[0] === "private"
+                  ? item[1]
+                    ? 1
+                    : 0
+                  : item[1]
+              );
+            } else {
+              item[1].forEach((item: any, sessionIndex: number) =>
+                Object.entries(item).forEach((session: any) => {
+                  formData.append(
+                    `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
+                    session[1] as any
+                  );
+                })
+              );
+            }
+          });
         });
       }
     });
 
+    formData.append("training_week_id", id as any);
+
     try {
-      // await mutateAsync(formData);
+      await mutateAsync(formData as any);
+
       Helpers.resetForm();
+
+      queryClient.invalidateQueries(
+        `/training-week-days?training_week_id=${id}`
+      );
+
+      onClose();
     } catch (error: any) {
       toast.error(error.response?.data.message);
     }
@@ -283,6 +316,19 @@ export default function WeekDayForm() {
                       <Text as="h5">{session.counter} عداد العدات</Text>
 
                       <Text as="h5">{session.rest_sec} ثانية راحة</Text>
+
+                      <Button
+                        onClick={() => {
+                          const filteredArray = singleExercise.sessions.filter(
+                            (item: any) => item !== session
+                          );
+                          singleExercise.sessions = filteredArray;
+
+                          setFieldValue("exercises", [...values.exercises]);
+                        }}
+                      >
+                        <Img src="/images/trash.svg" />
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -292,11 +338,12 @@ export default function WeekDayForm() {
                     onDeleteExercise(
                       values,
                       setFieldValue,
-                      exercise?.exercise_id
+                      singleExercise?.exercise_id
                     )
                   }
+                  danger
                 >
-                  <Img src="/images/trash.svg" />
+                  حذف التمرين
                 </Button>
               </div>
             ))}
@@ -313,7 +360,12 @@ export default function WeekDayForm() {
               الغاء
             </Button>
 
-            <Button className={"!w-20"} primary type="submit" isLoading={false}>
+            <Button
+              className={"!w-20"}
+              primary
+              type="submit"
+              isLoading={isLoading}
+            >
               حفظ
             </Button>
           </div>
