@@ -6,9 +6,9 @@ import { toast } from "react-toastify";
 import Pusher from "pusher-js";
 
 function Chat({ userData }: { userData: any }) {
-  const url = `/send-message/${userData.id}`;
+  const url = `/send-message/${userData?.id}`;
 
-  const [messages, seMessages] = useState<any>(userData.chat);
+  const [messages, seMessages] = useState<any>(userData?.chat);
 
   const { mutateAsync, isLoading } = usePostQuery({ url });
 
@@ -100,7 +100,7 @@ interface MsgProps {
 function Msg({ messages, messagesEndRef }: MsgProps) {
   return (
     <div dir="ltr">
-      {messages.map((message: MsgProps["messages"][0]) => (
+      {messages?.map((message: MsgProps["messages"][0]) => (
         <>
           {message.to !== "admin" && (
             <div className="chat chat-start">
