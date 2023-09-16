@@ -13,6 +13,9 @@ import { setImageDelete } from "redux/slices/imageDelete";
 type Props = {};
 
 export default function Coupones({}: Props) {
+export default function Coupones() {
+  const [active, setActive] = useState<number>();
+
   // get notifications data =================>
   const url = "/coupons";
 
@@ -28,11 +31,10 @@ export default function Coupones({}: Props) {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original?.name}

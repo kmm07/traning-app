@@ -8,9 +8,7 @@ import { Row } from "react-table";
 import WeekDayForm from "./components/weekdayForm";
 import WeekDaySideBar from "./components/sideBar";
 
-type Props = {};
-
-export default function ViewWeekDay({}: Props) {
+export default function ViewWeekDay() {
   const [active, setActive] = useState<any>();
 
   const { id } = useParams();
@@ -30,11 +28,10 @@ export default function ViewWeekDay({}: Props) {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               اليوم رقم {row.original?.day_num}

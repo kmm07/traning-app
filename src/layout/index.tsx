@@ -13,7 +13,7 @@ function Layout() {
   const token: string | any = useAppSelector(selectCurrentToken);
 
   useEffect(() => {
-    const userLocalStorage = localStorage.getItem("user");
+    const userLocalStorage = localStorage.getItem("userLogin");
 
     const userParse =
       userLocalStorage !== null
@@ -22,13 +22,18 @@ function Layout() {
 
     dispatch(setCredentials(userParse));
 
+    axios.defaults.headers.common.Authorization = `Bearer ${
+      userParse?.token as string
+    }`;
     // redirect to Home
     if (userParse?.token === null || userParse?.token === undefined) {
       void push("/");
     }
   }, [pathname, token]);
 
-  axios.defaults.headers.common.Authorization = `Bearer ${token as string}`;
+  if (token === null || token === undefined) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div className="flex flex-col h-full relative">

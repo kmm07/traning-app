@@ -53,7 +53,7 @@ function Ingredients() {
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: any[] } }) =>
-      data.data.slice(0, 20).map((item: any) => ({
+      data.data.map((item: any) => ({
         id: item.id,
         name: item.name,
         calories: item.calories,
@@ -64,6 +64,7 @@ function Ingredients() {
         carbohydrate: item.carbohydrate,
         size: item.size,
         measure: item.measure,
+        image: item.image,
       })),
 
     refetchOnWindowFocus: false,
@@ -78,11 +79,10 @@ function Ingredients() {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original.name}

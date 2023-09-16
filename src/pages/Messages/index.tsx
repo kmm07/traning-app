@@ -11,12 +11,15 @@ import useAxios from "hooks/useAxios";
 function Messages() {
   const [activeUser, setActiveUser] = useState<any>(null);
 
-  // get users list ======================>
   const url = "/users";
 
-  const { data: users = [] }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: [] } }) => data.data,
-  });
+  const { data: users = [], isLoading }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
 
   const columns = React.useMemo(
     () => [
@@ -27,11 +30,10 @@ function Messages() {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original.name}
@@ -79,7 +81,6 @@ function Messages() {
     []
   );
 
-  // on view user data ============================>
   const axios = useAxios({});
 
   const rowOnClick = async (e: any) => {
@@ -91,6 +92,10 @@ function Messages() {
       toast.error(`${error.response.data.message}`);
     }
   };
+
+  if (isLoading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div className="w-full">
