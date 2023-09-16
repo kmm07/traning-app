@@ -6,7 +6,7 @@ function MessagesSideBAr({ userData }: { userData: any }) {
     <div className="flex flex-col gap-2 mt-[5px] w-full h-full">
       <UsersInfo activeUser={userData} />
 
-      <Chat messages={userData?.chat ?? []} />
+      <Chat userData={userData} />
     </div>
   );
 }

@@ -69,7 +69,9 @@ function UsersInfo({
             </div>
             <div className="flex-1 flex px-2  flex-col">
               <Text>تاريخ الاشتراك</Text>
-              <Text>{activeUser?.subscription_date}</Text>
+              <Text>
+                {moment(activeUser?.subscription_date).format("YYYY-MM-DD")}
+              </Text>
             </div>
           </div>
         </Card>
