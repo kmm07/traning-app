@@ -37,6 +37,7 @@ function Chat({ userData }: { userData: any }) {
         scrollToBottom();
       }, 100);
     }
+
     return () => {
       clearTimeout(timout);
     };
