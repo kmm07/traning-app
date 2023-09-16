@@ -8,7 +8,7 @@ import Pusher from "pusher-js";
 function Chat({ userData }: { userData: any }) {
   const url = `/send-message/${userData?.id}`;
 
-  const [messages, seMessages] = useState<any>(userData?.chat);
+  const [messages, seMessages] = useState<any>([]);
 
   const { mutateAsync, isLoading } = usePostQuery({ url });
 
@@ -27,6 +27,15 @@ function Chat({ userData }: { userData: any }) {
       });
     }
   };
+
+  useEffect(() => {
+    seMessages(userData?.chat);
+    if (userData?.chat.length > 0) {
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [userData?.chat, userData?.id]);
 
   useEffect(() => {
     const channel = pusher.subscribe("personal-trainer");

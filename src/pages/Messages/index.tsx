@@ -11,12 +11,15 @@ import useAxios from "hooks/useAxios";
 function Messages() {
   const [activeUser, setActiveUser] = useState<any>(null);
 
-  // get users list ======================>
   const url = "/users";
 
-  const { data: users = [] }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: [] } }) => data.data,
-  });
+  const { data: users = [], isLoading }: UseQueryResult<any> = useGetQuery(
+    url,
+    url,
+    {
+      select: ({ data }: { data: { data: [] } }) => data.data,
+    }
+  );
 
   const columns = React.useMemo(
     () => [
@@ -79,7 +82,6 @@ function Messages() {
     []
   );
 
-  // on view user data ============================>
   const axios = useAxios({});
 
   const rowOnClick = async (e: any) => {
@@ -91,6 +93,10 @@ function Messages() {
       toast.error(`${error.response.data.message}`);
     }
   };
+
+  if (isLoading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div className="w-full">
