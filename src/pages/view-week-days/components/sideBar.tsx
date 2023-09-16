@@ -172,16 +172,17 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                 </div>
               </div>
             </div>
-    <div className="flex flex-col gap-10">
-      <div className="flex justify-between">
-        <div className="flex gap-4">
-          <Img
-            className="w-24"
-            src={weekDayData?.image || "/images/img_rectangle347.png"}
-          />
-          <Text size="3xl">asd</Text>
-        </div>
-      </div>
+          </div>
+          <div className="flex flex-col gap-10">
+            <div className="flex justify-between">
+              <div className="flex gap-4">
+                <Img
+                  className="w-24"
+                  src={weekDayData?.image || "/images/img_rectangle347.png"}
+                />
+                <Text size="3xl">asd</Text>
+              </div>
+            </div>
 
             <Card className="p-6">
               <Text as="h5" className="mb-3">
