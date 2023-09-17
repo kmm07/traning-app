@@ -208,7 +208,7 @@ export default function CouponeSideBar({ couponeData }: Props) {
             <Text as="h5">تفاصيل الكوبون</Text>
             <ul>
               {values.details?.map((_detail: any, index: number) => (
-                <Input name={`details.[${index}]`} />
+                <Input name={`details[${index}]`} />
               ))}
             </ul>
           </Card>

@@ -13,7 +13,6 @@ import { setImageDelete } from "redux/slices/imageDelete";
 type Props = {};
 
 export default function Coupones({}: Props) {
-
   // get notifications data =================>
   const url = "/coupons";
 
