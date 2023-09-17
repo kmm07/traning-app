@@ -1,4 +1,4 @@
-import { Button, Card, Input, Modal, Table, Text } from "components";
+import { Button, Card, Img, Input, Modal, Table, Text } from "components";
 import { RowTable } from "components/RowTable";
 import TableActions from "components/Table/actions";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
@@ -64,60 +64,6 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     setIngredientData(item);
     document.getElementById("edit-ingredient")?.click();
   };
-
-  const columnsIngredients = React.useMemo(
-    () => [
-      {
-        Header: "الاسم",
-        accessor: "name",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return (
-            <div className="flex text-white items-center gap-4">
-              <div className="w-8 h-">
-                <img
-                  src={row.original.image || "/images/img_rectangle347.png"}
-                />
-              </div>
-              {row.original.name ?? row.original.label}
-            </div>
-          );
-        },
-      },
-      {
-        Header: "السعرات",
-        accessor: "calories",
-      },
-      {
-        Header: " الكاربوهيدرات",
-        accessor: "carbohydrate",
-      },
-      {
-        Header: "البروتين",
-        accessor: "protein",
-      },
-
-      {
-        Header: "الدهون",
-        accessor: "fat",
-      },
-
-      {
-        Header: "السكريات",
-        accessor: "sugar",
-      },
-
-      {
-        Header: " ",
-        Cell: ({ row }: { row: Row<any> }) => (
-          <TableActions
-            onEdit={() => onEditIngredient(row.original)}
-            onDelete={() => onDeleteIngredient(row.original)}
-          />
-        ),
-      },
-    ],
-    []
-  );
 
   // steps actions =====================>
   const onDeleteStep = (item: any) => {
@@ -198,12 +144,17 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       }
 
       if (value[0] === "ingredients") {
-        (value[1] as any).forEach((subValue: any, index: any) =>
+        (value[1] as any).forEach((subValue: any, index: any) => {
           formData.append(
-            `meal_ingredients[${index}]`,
+            `meal_ingredients[${index}][id]`,
             subValue.id ?? subValue.value
-          )
-        );
+          );
+
+          formData.append(
+            `meal_ingredients[${index}][parent_id]`,
+            subValue.parent_id
+          );
+        });
       }
     });
 
@@ -212,6 +163,8 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     formData.append("diet_category_id", categoryId as any);
 
     formData.append("meal", meal);
+
+    console.log(formattedValues);
 
     try {
       await editMeal(formData as any);
@@ -228,6 +181,13 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
+  };
+
+  const [parentId, setParentId] = useState<number | null>(null);
+
+  const onAddSpareIngredient = (parentId: number) => {
+    setParentId(parentId);
+    document.getElementById("add-ingredient")?.click();
   };
 
   return (
@@ -269,15 +229,110 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
               <div className="flex justify-between py-3">
                 <Text size="3xl">المكونات</Text>
               </div>
-              <Table
-                noPagination
-                search={false}
-                data={values?.ingredients ?? []}
-                columns={columnsIngredients}
-                modalTitle="اضافة مكون"
-                modalContent={<AddIngredient />}
-                id="add-ingredient"
-              />
+
+              {values?.ingredients
+                ?.filter(({ parent_id }: any) => parent_id === null)
+                ?.map((ingredient: any) => (
+                  <div className="mb-6 border-[1px] p-4 rounded-md">
+                    <div className="grid grid-cols-6">
+                      <div className="flex flex-col items-center gap-2 w-[100px]">
+                        <Text as="h5">الإسم</Text>
+                        <Text as="h5" className="!w-full overflow-hidden">
+                          {ingredient?.name}
+                        </Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">السعرات</Text>
+                        <Text as="h5">{ingredient?.calories}</Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">الكاربوهيدرات</Text>
+                        <Text as="h5">{ingredient?.carbohydrate}</Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">البروتين</Text>
+                        <Text as="h5">{ingredient?.protein}</Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">الدهون</Text>
+                        <Text as="h5">{ingredient?.fat}</Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">السكريات</Text>
+                        <Text as="h5">{ingredient?.sugar}</Text>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button onClick={() => onDeleteIngredient(ingredient)}>
+                          <Img src="/images/trash.svg" />
+                        </Button>
+                        <Button onClick={() => onEditIngredient(ingredient)}>
+                          <Img src="/images/edit.svg" />
+                        </Button>
+
+                        <Button
+                          secondaryBorder
+                          className="w-[120px] !mt-4"
+                          onClick={() => onAddSpareIngredient(ingredient?.id)}
+                        >
+                          إضافة مكون بديل
+                        </Button>
+                      </div>
+                    </div>
+                    <Text as="h5">المكونات البديلة:</Text>
+                    <div>
+                      {values?.ingredients
+                        ?.filter(
+                          (item: any) => item.parent_id === ingredient?.id
+                        )
+                        ?.map((subIngredient: any) => (
+                          <div className="grid grid-cols-7 mb-6 border-[1px] p-4 rounded-md">
+                            <div className="flex flex-col items-center gap-2 w-[100px]">
+                              <Text as="h5">الإسم</Text>
+                              <Text as="h5">{subIngredient?.name}</Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">السعرات</Text>
+                              <Text as="h5">{subIngredient?.calories}</Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">الكاربوهيدرات</Text>
+                              <Text as="h5">{subIngredient?.carbohydrate}</Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">البروتين</Text>
+                              <Text as="h5">{subIngredient?.protein}</Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">الدهون</Text>
+                              <Text as="h5">{subIngredient?.fat}</Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">السكريات</Text>
+                              <Text as="h5">{subIngredient?.sugar}</Text>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                onClick={() =>
+                                  onDeleteIngredient(subIngredient)
+                                }
+                              >
+                                <Img src="/images/trash.svg" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+
+              <Button
+                secondaryBorder
+                onClick={() =>
+                  document.getElementById("add-ingredient")?.click()
+                }
+              >
+                إضافة مكون
+              </Button>
             </Card>
             <Card className="px-4 pb-4">
               <div className="flex justify-between py-3">
@@ -375,6 +430,9 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                 editData={ingredientData as any}
                 setEditData={setIngredientData}
               />
+            </Modal>
+            <Modal id="add-ingredient">
+              <AddIngredient parentId={parentId} setParentId={setParentId} />
             </Modal>
           </>
         </Form>

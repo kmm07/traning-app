@@ -4,7 +4,7 @@ import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
 import { UseQueryResult } from "react-query";
 
-export default function AddIngredient() {
+export default function AddIngredient({ parentId, setParentId }: any) {
   const [ingredients, setIngredients] = useState([]);
 
   // get descriptions data list =================>
@@ -15,7 +15,7 @@ export default function AddIngredient() {
     url,
     {
       select: ({ data }: { data: { data: any[] } }) =>
-        data.data.map((item: any) => ({
+        data.data.slice(0, 20).map((item: any) => ({
           value: item.id,
           label: item.name,
           calories: item.calories,
@@ -32,10 +32,14 @@ export default function AddIngredient() {
 
   const { setFieldValue, values } = useFormikContext<{ ingredients: any }>();
 
-  const onClose = () => document.getElementById("add-ingredient")?.click();
+  const onClose = () => {
+    document.getElementById("add-ingredient")?.click();
+    setParentId(null);
+  };
 
   const onSaveIngredient = () => {
     setFieldValue("ingredients", [...values.ingredients, ...ingredients]);
+
     onClose();
   };
 
@@ -45,7 +49,11 @@ export default function AddIngredient() {
         options={ingredientsList ?? []}
         name=""
         label="المكونات"
-        onChange={(val: any) => setIngredients(val.map((value: any) => value))}
+        onChange={(val: any) =>
+          setIngredients(
+            val.map((value: any) => ({ ...value, parent_id: parentId }))
+          )
+        }
         isMulti
         isForm={false}
       />

@@ -16,6 +16,9 @@ import { useQueryClient } from "react-query";
 import { Form } from "react-router-dom";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { toast } from "react-toastify";
+import React from "react";
+import { Row } from "react-table";
+import useAxios from "hooks/useAxios";
 interface Props {
   couponeData: any;
 }
@@ -93,6 +96,75 @@ export default function CouponeSideBar({ couponeData }: Props) {
     }
   };
 
+  // on accepts copoune request ========================>
+  const axios = useAxios({});
+
+  const onAcceptRequest = async (id: number) => {
+    try {
+      await axios.post(`/accept-coupon-request/${id}`);
+
+      toast.success("تم قبول الطلب");
+    } catch (error: any) {}
+  };
+
+  const requestsColumns = React.useMemo(
+    () => [
+      {
+        Header: "الإسم",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <div className="flex items-center gap-4">
+              <div className="avatar indicator">
+                <div className="w-12 h-12 rounded-full">
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
+                </div>
+              </div>
+              {row.original.user_name}
+            </div>
+          );
+        },
+      },
+
+      {
+        Header: "مشترك أم لا",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <span className="flex items-center gap-4">
+              {row.original.is_subscriped ? "مشترك" : "غير مشترك"}
+            </span>
+          );
+        },
+      },
+
+      {
+        Header: "نوع المستخدم",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <span className="flex items-center gap-4">
+              {row.original.user_gender === "male" ? "ذكر" : "انثي"}
+            </span>
+          );
+        },
+      },
+      {
+        Header: " ",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <Button
+              onClick={() => onAcceptRequest(row.original?.id)}
+              primaryBorder
+            >
+              قبول الطلب
+            </Button>
+          );
+        },
+      },
+    ],
+    []
+  );
+
   return (
     <Formik
       initialValues={{
@@ -135,7 +207,7 @@ export default function CouponeSideBar({ couponeData }: Props) {
           <Card className="p-6">
             <Text as="h5">تفاصيل الكوبون</Text>
             <ul>
-              {values.details?.map((detail: any, index: number) => (
+              {values.details?.map((_detail: any, index: number) => (
                 <Input name={`details.[${index}]`} />
               ))}
             </ul>
@@ -149,7 +221,7 @@ export default function CouponeSideBar({ couponeData }: Props) {
           <Card className="p-6">
             <Table
               data={couponeData?.requests ?? []}
-              columns={[]}
+              columns={requestsColumns ?? []}
               title="طلبات الإشتراك"
             />
           </Card>

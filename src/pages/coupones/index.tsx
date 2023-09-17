@@ -13,8 +13,6 @@ import { setImageDelete } from "redux/slices/imageDelete";
 type Props = {};
 
 export default function Coupones({}: Props) {
-export default function Coupones() {
-  const [active, setActive] = useState<number>();
 
   // get notifications data =================>
   const url = "/coupons";

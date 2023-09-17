@@ -1,4 +1,4 @@
-import { Button, Card, Img, Modal, Text } from "components";
+import { Button, Card, Img, Input, Modal, Text } from "components";
 import { Formik } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import AddWeekDayExercise from "./add-day-exercise";
 import { useAppSelector } from "hooks/useRedux";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
+import { useState } from "react";
+import AddWeekSpareDayExercise from "./add-spare-exercise";
 
 interface SideBarProps {
   weekDayData: any;
@@ -17,20 +19,25 @@ interface SingleExerciseProps {
   rest_sec: number;
   sessions: any;
   exercise_muscle_image: string;
-  onDeleteEXercise: any;
+  name: any;
+  onAddSpareExercise?: () => void;
+  onDeleteEXercise?: () => void;
 }
 const SingleExercise = ({
   exercise_name,
   sessions,
   exercise_muscle_image,
   rest_sec,
+  name,
+  onAddSpareExercise,
+  onDeleteEXercise,
 }: SingleExerciseProps) => {
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <Img src={exercise_muscle_image} alt="image" />
-          <Text>{exercise_name}</Text>
+          <Text>{exercise_name ?? name}</Text>
         </div>
 
         <div className="rounded-full border-[1px] p-2">
@@ -46,6 +53,16 @@ const SingleExercise = ({
           </div>
         </div>
       </div>
+      {onAddSpareExercise !== undefined && (
+        <Button secondaryBorder onClick={onAddSpareExercise}>
+          إضافة تمرين بديل
+        </Button>
+      )}
+      {onAddSpareExercise === undefined && (
+        <Button secondaryBorder onClick={onDeleteEXercise}>
+          <Img src="/images/trash.svg" />
+        </Button>
+      )}
     </div>
   );
 };
@@ -150,44 +167,65 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     }
   };
 
+  const [parentId, setParentId] = useState<number | null>(null);
+
+  const onAddSpareExercise = (id: number) => {
+    setParentId(id);
+    document.getElementById("add-spare-weekday")?.click();
+  };
+
+  const onDeleteSpareExercise = (
+    deletedExercise: any,
+    values: any,
+    setFieldValue: any
+  ) => {
+    const filteredArray = values.exercises?.filter(
+      (exercise: any) => exercise.name !== deletedExercise
+    );
+
+    setFieldValue("exercises", filteredArray);
+  };
+
   return (
     <Formik
-      initialValues={{ ...initialValues, ...weekDayData }}
+      initialValues={{
+        ...initialValues,
+        ...weekDayData,
+      }}
       onSubmit={onSubmit}
       enableReinitialize
     >
-      {({ values, submitForm }) => (
+      {({ values, submitForm, setFieldValue }) => (
         <Form>
-          <div className="flex flex-col gap-10">
-            <div className="flex justify-between">
-              <div className="flex gap-4">
-                <Img className="w-24" src={values.image} />
-                <div>
-                  <Text as="h5" size="3xl">
-                    اليوم رقم {values.day_num}
+          <div className="flex flex-col gap-10 mb-10">
+            <div className="flex gap-4">
+              <Img
+                className="w-24"
+                src={weekDayData?.image || "/images/img_rectangle347.png"}
+              />
+              <div>
+                <div className="flex items-center gap-4">
+                  <Text as="h1" className="!text-[24px]">
+                    اليوم رقم
                   </Text>
-                  <Text as="h5" size="3xl">
-                    {values.exercise_category}
-                  </Text>
+                  <Input
+                    name="day_num"
+                    className="!w-[80px] text-center font-bold text-[24px]"
+                  />
                 </div>
+                <Text as="h5" size="3xl">
+                  {values.exercise_category}
+                </Text>
               </div>
             </div>
-    <div className="flex flex-col gap-10">
-      <div className="flex justify-between">
-        <div className="flex gap-4">
-          <Img
-            className="w-24"
-            src={weekDayData?.image || "/images/img_rectangle347.png"}
-          />
-          <Text size="3xl">asd</Text>
-        </div>
-      </div>
+          </div>
 
+          <div className="flex flex-col gap-10">
             <Card className="p-6">
               <Text as="h5" className="mb-3">
                 هدف اليوم
               </Text>
-              <Text as="h5">{values.target_text}</Text>
+              <Input name="target_text" />
             </Card>
 
             <Card className="p-6">
@@ -206,9 +244,37 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                 </Text>
               </div>
               <div className="pb-4 border-b-[1px]">
-                {values.exercises?.map((exercise: any) => (
-                  <SingleExercise key={exercise?.name} {...exercise} />
-                ))}
+                {values.exercises
+                  .filter((exercise: any) => exercise.parent_id === null)
+                  ?.map((exercise: any) => (
+                    <div className="border-[1px] rounded-lg p-4">
+                      <SingleExercise
+                        key={exercise?.name}
+                        {...exercise}
+                        onAddSpareExercise={() =>
+                          onAddSpareExercise(exercise?.id)
+                        }
+                      />
+                      <Text as="h5" className="!mb-2">
+                        التمرينات البديلة:
+                      </Text>
+                      {values.exercises
+                        .filter((item: any) => item.parent_id === exercise?.id)
+                        .map((subExercise: any) => (
+                          <SingleExercise
+                            key={exercise?.name}
+                            {...subExercise}
+                            onDeleteEXercise={() =>
+                              onDeleteSpareExercise(
+                                subExercise.name,
+                                values,
+                                setFieldValue
+                              )
+                            }
+                          />
+                        ))}
+                    </div>
+                  ))}
 
                 <Button
                   secondaryBorder
@@ -244,6 +310,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
               </Button>
             </div>
           </div>
+
           <Modal id="add-week-day-side-bar" className="!h-full !w-full">
             <AddWeekDayExercise
               onAddExercise={() =>
@@ -251,6 +318,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
               }
               isEditing={true}
             />
+          </Modal>
+
+          <Modal id="add-spare-weekday" className="!h-full !w-full">
+            <AddWeekSpareDayExercise parentId={parentId} />
           </Modal>
         </Form>
       )}
