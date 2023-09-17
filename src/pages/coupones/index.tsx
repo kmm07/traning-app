@@ -10,9 +10,7 @@ import CouponeSideBar from "./components/sideBar";
 import { useAppDispatch } from "hooks/useRedux";
 import { setImageDelete } from "redux/slices/imageDelete";
 
-type Props = {};
-
-export default function Coupones({}: Props) {
+export default function Coupones() {
   // get notifications data =================>
   const url = "/coupons";
 
