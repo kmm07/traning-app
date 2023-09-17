@@ -104,7 +104,9 @@ export default function CouponeSideBar({ couponeData }: Props) {
       await axios.post(`/accept-coupon-request/${id}`);
 
       toast.success("تم قبول الطلب");
-    } catch (error: any) {}
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
   };
 
   const requestsColumns = React.useMemo(
