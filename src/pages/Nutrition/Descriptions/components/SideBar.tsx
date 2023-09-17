@@ -152,7 +152,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
 
           formData.append(
             `meal_ingredients[${index}][parent_id]`,
-            subValue.parent_id
+            subValue.parent_id === null ? "" : subValue.parent_id
           );
         });
       }
@@ -163,8 +163,6 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     formData.append("diet_category_id", categoryId as any);
 
     formData.append("meal", meal);
-
-    console.log(formattedValues);
 
     try {
       await editMeal(formData as any);
@@ -203,7 +201,6 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       {({ values, setFieldValue, submitForm }) => (
         <Form>
           <>
-            {" "}
             <RowTable
               data={{
                 columns: [
@@ -288,7 +285,9 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                           <div className="grid grid-cols-7 mb-6 border-[1px] p-4 rounded-md">
                             <div className="flex flex-col items-center gap-2 w-[100px]">
                               <Text as="h5">الإسم</Text>
-                              <Text as="h5">{subIngredient?.name}</Text>
+                              <Text as="h5">
+                                {subIngredient?.name ?? subIngredient.label}
+                              </Text>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">السعرات</Text>

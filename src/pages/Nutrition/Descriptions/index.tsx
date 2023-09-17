@@ -229,14 +229,12 @@ function Descriptions() {
       </Modal>
 
       <Drawer>
-        {
-          <SideBar
-            setMealData={setMealData}
-            mealData={mealData ?? {}}
-            categoryId={categoryId as any}
-            meal={meal}
-          />
-        }
+        <SideBar
+          setMealData={setMealData}
+          mealData={mealData ?? {}}
+          categoryId={categoryId as any}
+          meal={meal}
+        />
       </Drawer>
     </div>
   );

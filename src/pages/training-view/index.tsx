@@ -257,6 +257,7 @@ function TrainingView({ home, gender }: Props) {
           columns={columns}
           modalTitle="اضافة اسبوع"
           rowOnClick={rowOnClick}
+          id="add-new-exercise"
           modalContent={
             <WeekForm
               weekData={weekData}
@@ -267,6 +268,17 @@ function TrainingView({ home, gender }: Props) {
         />
       ) : (
         <>loading....</>
+      )}
+
+      {trainingWeeks.length === 0 && (
+        <div className="flex justify-center">
+          <Button
+            secondaryBorder
+            onClick={() => document.getElementById("add-new-exercise")?.click()}
+          >
+            إضافة إسبوع
+          </Button>
+        </div>
       )}
 
       <Drawer>

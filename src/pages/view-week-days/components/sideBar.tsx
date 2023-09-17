@@ -19,7 +19,7 @@ interface SingleExerciseProps {
   rest_sec: number;
   sessions: any;
   exercise_muscle_image: string;
-  name: any;
+  exercise_id: any;
   onAddSpareExercise?: () => void;
   onDeleteEXercise?: () => void;
 }
@@ -28,7 +28,7 @@ const SingleExercise = ({
   sessions,
   exercise_muscle_image,
   rest_sec,
-  name,
+  exercise_id,
   onAddSpareExercise,
   onDeleteEXercise,
 }: SingleExerciseProps) => {
@@ -37,11 +37,11 @@ const SingleExercise = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <Img src={exercise_muscle_image} alt="image" />
-          <Text>{exercise_name ?? name}</Text>
+          <Text>{exercise_name ?? exercise_id?.label}</Text>
         </div>
 
         <div className="rounded-full border-[1px] p-2">
-          الجلسات <span className="ms-4">{sessions.length}</span>
+          الجلسات <span className="ms-4">{sessions?.length}</span>
         </div>
       </div>
 
@@ -110,7 +110,20 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
-    const formattedData = Object.entries(values);
+    let exercises: any = [];
+
+    values.exercises?.forEach((exercise: any) => {
+      exercises.push(exercise);
+
+      if (exercise.children?.length !== 0) {
+        exercise.children?.forEach((children: any) => exercises.push(children));
+      }
+    });
+
+    const formattedData = Object.entries({
+      ...values,
+      exercises,
+    });
 
     formattedData.forEach((data) => {
       if (data[0] !== "exercises") {
@@ -121,17 +134,27 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         (data[1] as any).forEach((subData: any, i: number) => {
           Object.entries(subData).forEach((item: any) => {
             if (item[0] !== "sessions") {
-              formData.append(
-                `exercises[${i}][${item[0]}]`,
-                item[0] === "exercise_id"
-                  ? item[1].value ?? item[1]
-                  : item[0] === "private"
-                  ? item[1]
-                    ? 1
-                    : 0
-                  : item[1]
-              );
-            } else {
+              if (item[0] === "parent_id") {
+                formData.append(
+                  `exercises[${i}][${item[0]}]`,
+                  item[1] === null ? "" : item[1]
+                );
+              } else {
+                formData.append(
+                  `exercises[${i}][${item[0]}]`,
+                  item[0] === "exercise_id"
+                    ? item[1].value ?? item[1]
+                    : item[0] === "private"
+                    ? item[1]
+                      ? 1
+                      : 0
+                    : item[1]
+                );
+              }
+              return;
+            }
+
+            if (item[0] === "sessions") {
               item[1].forEach((item: any, sessionIndex: number) =>
                 Object.entries(item).forEach((session: any) => {
                   formData.append(
@@ -140,6 +163,8 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   );
                 })
               );
+
+              return;
             }
           });
         });
@@ -161,7 +186,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         `/training-week-days?training_week_id=${id}`
       );
 
-      document.getElementById("add-week-day")?.click();
+      document.getElementById("my-drawer")?.click();
     } catch (error: any) {
       toast.error(error.response?.data.message);
     }
@@ -179,11 +204,17 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     values: any,
     setFieldValue: any
   ) => {
-    const filteredArray = values.exercises?.filter(
-      (exercise: any) => exercise.name !== deletedExercise
+    const parentExercise = values.exercises.find(
+      (exercise: any) => exercise.id === deletedExercise.parent_id
     );
 
-    setFieldValue("exercises", filteredArray);
+    const filteredArray = parentExercise?.children?.filter(
+      (exercise: any) =>
+        exercise.exercise_name !== deletedExercise?.exercise_name
+    );
+    parentExercise.children = filteredArray;
+
+    setFieldValue("exercises", [...values.exercises]);
   };
 
   return (
@@ -259,20 +290,34 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                         التمرينات البديلة:
                       </Text>
                       {values.exercises
-                        .filter((item: any) => item.parent_id === exercise?.id)
-                        .map((subExercise: any) => (
+                        ?.filter((item: any) => item.parent_id === exercise?.id)
+                        ?.map((subExercise: any) => (
                           <SingleExercise
                             key={exercise?.name}
                             {...subExercise}
                             onDeleteEXercise={() =>
                               onDeleteSpareExercise(
-                                subExercise.name,
+                                subExercise,
                                 values,
                                 setFieldValue
                               )
                             }
                           />
                         ))}
+
+                      {exercise?.children?.map((subExercise: any) => (
+                        <SingleExercise
+                          key={exercise?.name}
+                          {...subExercise}
+                          onDeleteEXercise={() =>
+                            onDeleteSpareExercise(
+                              subExercise,
+                              values,
+                              setFieldValue
+                            )
+                          }
+                        />
+                      ))}
                     </div>
                   ))}
 

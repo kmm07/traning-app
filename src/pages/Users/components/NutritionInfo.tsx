@@ -1,78 +1,99 @@
-import {
-  Card,
-  Input,
-  Modal,
-  RadialProgress,
-  Select,
-  Text,
-  UploadInput,
-} from "components";
-import { Form, Formik } from "formik";
+import { Card, RadialProgress, Select, Text } from "components";
+import { useFormikContext } from "formik";
+import { useGetQuery } from "hooks/useQueryHooks";
+import { UseQueryResult } from "react-query";
 
 function NutritionInfo({ activeUser }: { activeUser: any }) {
+  const { values } = useFormikContext<any>();
+
   const percentageCalc = (all: any, current: any) =>
     all === 0 && current === 0 ? 0 : Number((current / all) * 100).toFixed(1);
 
   const radial = [
     {
+      name: "protein",
       body_title: "البروتين",
-      percentage: percentageCalc(
-        activeUser?.protein?.all,
-        activeUser?.protein?.current
-      ),
+      percentage: percentageCalc(values?.protein, activeUser?.protein?.current),
+      cardTitle: values?.protein,
       body_number: Number(activeUser?.protein?.current).toFixed(2).toString(),
       className: "text-[#FFC300]",
     },
     {
+      name: "fat",
       body_title: "الدهون",
-      percentage: percentageCalc(
-        activeUser?.fat?.all,
-        activeUser?.fat?.current
-      ),
+      percentage: percentageCalc(values?.fat, activeUser?.fat?.current),
+      cardTitle: values?.fat,
       body_number: Number(activeUser?.fat?.current).toFixed(2).toString(),
       className: "text-[#00E8A2]",
     },
     {
+      name: "calories",
       body_title: "السعرات",
       percentage: percentageCalc(
-        activeUser?.calories?.all,
+        values?.calories,
         activeUser?.calories?.current
       ),
+      cardTitle: values?.calories,
       body_number: Number(activeUser?.calories?.current).toFixed(2).toString(),
       className: "text-[#E80054]",
     },
     {
+      name: "carbohydrates",
       body_title: "الكارب",
       percentage: percentageCalc(
-        activeUser?.carbs?.all,
+        values?.carbohydrates,
         activeUser?.carbs?.current
       ),
+      cardTitle: values?.carbohydrates,
       body_number: Number(activeUser?.carbs?.current).toFixed(2).toString(),
       className: "text-[#00D4FF]",
     },
   ];
+
+  // get diet categories =======================>
+  const url = "/diet-categories";
+
+  const { data = [] }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: [] } }) =>
+      data.data?.map((category: any) => ({
+        label: category.name,
+        value: category?.id,
+      })),
+  });
+
+  // get meal arabic name ================>
+  const getMealName = (name: string) => {
+    switch (name) {
+      case "Breakfast":
+        return "فطار";
+      case "Lunch":
+        return "غداء";
+      case "Snack":
+        return "سناك";
+      case "Dinner":
+        return "عشاء";
+    }
+  };
 
   return (
     <Card className="grid grid-cols-2 gap-10 p-4">
       <div className="space-y-4">
         <Text size="2xl">الملعومات الغذائية</Text>
         <Select
-          isForm={false}
-          options={[]}
+          name="diet_category_id"
+          options={data ?? []}
           label="الجدول الغذائي"
           placeholder="الجدول الغذائي"
         />
-        <div className="flex">
-          <div>
-            <Food label="الفطور" isActive={true} />
-          </div>
-          <Modal
-            id="user_modal_add_food"
-            label={<img src="/images/plus.svg" alt="plus" />}
-            onSave={() => {}}
-          >
-            <NutritionModal />
-          </Modal>
+
+        <div className="flex gap-4 flex-wrap">
+          {values.meals?.map((meal: any) => (
+            <Food
+              key={meal.meal}
+              label={getMealName(meal.meal) as string}
+              isActive={meal.done === 1}
+            />
+          ))}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -80,8 +101,9 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
           <RadialProgress
             key={index}
             percentage={item?.percentage as any}
-            label={item?.body_number}
+            label={item?.cardTitle}
             className={item.className}
+            name={item?.name}
             body={
               <div className="flex flex-col gap-2 justify-center items-center">
                 <Text>{item?.body_title}</Text>
@@ -105,26 +127,6 @@ function Food({ isActive, label }: { isActive: boolean; label: string }) {
         alt={label}
       />
     </Card>
-  );
-}
-
-function NutritionModal() {
-  return (
-    <Formik
-      initialValues={{
-        image: "",
-      }}
-      onSubmit={() => {}}
-    >
-      <Form className="space-y-4">
-        <div>
-          <Text size="2xl">اشعار مخصص</Text>
-        </div>
-        <UploadInput name="image" />
-        <Input name="title" label="عنوان" />
-        <Input name="url" label="ارفاق رابط" />
-      </Form>
-    </Formik>
   );
 }
 

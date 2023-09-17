@@ -1,4 +1,4 @@
-import { Button, Card, Img, SubState, Text } from "components";
+import { Button, Card, Img, Input, SubState, Text } from "components";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 
@@ -23,9 +23,11 @@ function Info({ activeUser }: { activeUser: any }) {
 function UsersInfo({
   activeUser,
   showUserInfo = true,
+  location = "users",
 }: {
   showUserInfo?: boolean;
   activeUser: any;
+  location?: string;
 }) {
   const navigate = useNavigate();
 
@@ -48,9 +50,16 @@ function UsersInfo({
               النقاط
             </Text>
           </div>
-          <div className="font-roboto text-center p-2 border-2 rounded-md border-blue_gray-400 border-solid">
-            <Text size="2xl">{activeUser?.points} نقاط</Text>
-          </div>
+          {location === "users" ? (
+            <Input
+              name="points"
+              className="w-[100px] text-center font-bold !text-[30px]"
+            />
+          ) : (
+            <Text size="2xl" className="mt-1  tracking-[0.14px]">
+              {activeUser?.points}
+            </Text>
+          )}
         </Card>
         <Card
           className="p-4 space-y-4 cursor-pointer"

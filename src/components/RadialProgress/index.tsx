@@ -1,4 +1,4 @@
-import { Text } from "components";
+import { Input } from "components";
 import React from "react";
 
 type Props = {
@@ -6,12 +6,17 @@ type Props = {
   className?: string;
   body?: React.ReactNode;
   label?: string | number;
+  name?: string | number;
 };
 
-const RadialProgress = ({ percentage, className, body, label }: Props) => {
+const RadialProgress = ({ percentage, className, body, name }: Props) => {
+
   return (
     <div className="flex flex-col justify-center items-center w-fit gap-2">
-      <Text>{label}</Text>
+      <Input
+        name={name ?? ("blank" as any)}
+        className="text-center font-bold !text-[20px] w-[98px]"
+      />
       <div
         className={`radial-progress  ${className}`}
         style={

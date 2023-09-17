@@ -82,9 +82,19 @@ export default function ViewWeekDay() {
     const exercises = e.original.exercises?.map((exercise: any) => ({
       ...exercise,
       is_new: 0,
+
       sessions: exercise.sessions?.map((session: any) => ({
         ...session,
         is_new: 0,
+      })),
+
+      children: exercise.children?.map((children: any) => ({
+        ...children,
+        is_new: 0,
+        sessions: children?.sessions?.map((item: any) => ({
+          ...item,
+          is_new: 0,
+        })),
       })),
     }));
 

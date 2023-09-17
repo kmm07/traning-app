@@ -92,8 +92,6 @@ export default function AddWeekDayExercise({
     <div>
       <UploadInput name="image" />
       <div className="grid grid-cols-2 gap-4">
-        <Input name="name" label="الإسم" />
-
         <Input name="day_num" label="رقم اليوم" />
 
         <Select
