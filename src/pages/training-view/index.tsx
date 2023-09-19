@@ -101,8 +101,10 @@ function TrainingView({ home, gender }: Props) {
   const onEditWeek = (week: any) => {
     setWeekData(week);
 
-    document.getElementById("my_modal")?.click();
+    document.getElementById("add-new-exercise")?.click();
   };
+
+  const onView = (id: number) => navigate(`/exercises/week-days/${id}`);
 
   const columns = React.useMemo(
     () => [
@@ -154,15 +156,13 @@ function TrainingView({ home, gender }: Props) {
           <TableActions
             onEdit={() => onEditWeek(row.original)}
             onDelete={() => onDeleteWeek(row.original.id)}
+            onView={() => onView(row.original.id)}
           />
         ),
       },
     ],
     []
   );
-
-  const rowOnClick = (e: any) =>
-    navigate(`/exercises/week-days/${e.original?.id}`);
 
   useEffect(() => {
     setExerciseCategory(trainingCategories?.[0]?.id);
@@ -187,6 +187,13 @@ function TrainingView({ home, gender }: Props) {
 
       <h2>عدد أيام التمرين</h2>
       <div className="flex gap-4">
+        <Button
+          onClick={() => setDaysNum(2)}
+          primary={daysNum === 2}
+          secondaryBorder={daysNum !== 2}
+        >
+          2 أيام في الاسبوع
+        </Button>
         <Button
           onClick={() => setDaysNum(3)}
           primary={daysNum === 3}
@@ -256,13 +263,16 @@ function TrainingView({ home, gender }: Props) {
           data={trainingWeeks ?? []}
           columns={columns}
           modalTitle="اضافة اسبوع"
-          rowOnClick={rowOnClick}
           id="add-new-exercise"
           modalContent={
             <WeekForm
+              trainingWeeks={trainingWeeks}
               weekData={weekData}
-              setWeekData={setWeekData}
               exerciesCategory={exerciesCategory as any}
+              onClose={() => {
+                document.getElementById("add-new-exercise")?.click();
+                setWeekData(null);
+              }}
             />
           }
         />
@@ -274,7 +284,9 @@ function TrainingView({ home, gender }: Props) {
         <div className="flex justify-center">
           <Button
             secondaryBorder
-            onClick={() => document.getElementById("add-new-exercise")?.click()}
+            onClick={() =>
+              document.getElementById("add-new-exercise-empty")?.click()
+            }
           >
             إضافة إسبوع
           </Button>
@@ -289,6 +301,17 @@ function TrainingView({ home, gender }: Props) {
         <ExerciseCategoryForm
           categoryData={categoryData}
           setCategoryData={setCategoryData}
+        />
+      </Modal>
+      <Modal id="add-new-exercise-empty">
+        <WeekForm
+          trainingWeeks={trainingWeeks}
+          weekData={weekData}
+          exerciesCategory={exerciesCategory as any}
+          onClose={() => {
+            document.getElementById("add-new-exercise-empty")?.click();
+            setWeekData(null);
+          }}
         />
       </Modal>
     </div>

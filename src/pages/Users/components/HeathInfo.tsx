@@ -1,8 +1,6 @@
 import { Card, Input, Select, Text } from "components";
 import { useFormikContext } from "formik";
 
-// type Props = {};
-
 function HeathInfo() {
   const { values, setFieldValue } = useFormikContext<any>();
 

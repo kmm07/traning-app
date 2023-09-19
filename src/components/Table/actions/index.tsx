@@ -4,10 +4,17 @@ export interface Props {
   onEdit?: () => void;
   onDelete?: () => void;
   onAdd?: () => void;
+  onView?: () => void;
   className?: string;
 }
 
-function TableActions({ onEdit, onDelete, onAdd, className = "" }: Props) {
+function TableActions({
+  onEdit,
+  onDelete,
+  onAdd,
+  onView,
+  className = "",
+}: Props) {
   return (
     <div className={`flex gap-4 ${className}`}>
       {onAdd !== undefined ? (
@@ -25,6 +32,11 @@ function TableActions({ onEdit, onDelete, onAdd, className = "" }: Props) {
       {onDelete !== undefined ? (
         <span className="cursor-pointer w-4" onClick={onDelete}>
           <Img src="/images/trash.svg" />
+        </span>
+      ) : null}
+      {onView !== undefined ? (
+        <span className="cursor-pointer w-4" onClick={onView}>
+          <Img src="/images/eye.svg" />
         </span>
       ) : null}
     </div>

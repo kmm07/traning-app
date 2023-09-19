@@ -1,4 +1,4 @@
-import { Button, Input } from "components";
+import { Button,  TextArea } from "components";
 import { useFormikContext } from "formik";
 import { useState, useEffect } from "react";
 
@@ -56,7 +56,7 @@ export default function AddStep({
   return (
     <div>
       <div>
-        <Input
+        <TextArea
           name="description"
           label={"الوصف"}
           onChange={(e) =>
@@ -64,6 +64,7 @@ export default function AddStep({
           }
           value={stepsData?.description}
           isForm={false}
+          className="border-[1px]"
         />
       </div>
       <div className="flex items-center justify-evenly mt-6">

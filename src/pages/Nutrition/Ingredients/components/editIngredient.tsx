@@ -2,6 +2,7 @@ import { Button, Input, Select, UploadInput } from "components";
 import { Form, Formik } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
+import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
@@ -50,6 +51,8 @@ export default function EditIngredient({
     }
   };
 
+  const queryClient = useQueryClient();
+
   const onSubmit = async (values: any) => {
     try {
       if (isEditing) {
@@ -65,6 +68,10 @@ export default function EditIngredient({
       } else {
         await addIngredient(formData(values) as any);
       }
+
+      await queryClient.invalidateQueries(
+        `/meal-ingredients?meal_ingredient_category_id=${categoryId}`
+      );
 
       onClose();
 
@@ -86,7 +93,7 @@ export default function EditIngredient({
       enableReinitialize
     >
       <Form>
-        {!isEditing && <UploadInput name="image" className="mb-8" />}
+        <UploadInput name="image" className="mb-8" />
         <div className="grid grid-cols-2 gap-4">
           <Input name="name" isForm label="الإسم" />
           <Input name="calories" isForm label="السعرات" />

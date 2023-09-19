@@ -1,4 +1,4 @@
-import { Button, Input, TextArea, UploadInput } from "components";
+import { Button, Input, Select, Text, TextArea, UploadInput } from "components";
 import { Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
@@ -7,11 +7,14 @@ import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
+import { useMemo } from "react";
 
 interface Props {
   weekData?: any;
   exerciesCategory: number;
   setWeekData?: any;
+  trainingWeeks?: any;
+  onClose: () => void;
 }
 
 const initialValues = {
@@ -24,8 +27,9 @@ const initialValues = {
 
 export default function WeekForm({
   weekData,
-  setWeekData,
   exerciesCategory,
+  trainingWeeks,
+  onClose,
 }: Props) {
   const isEditing = weekData !== null;
 
@@ -37,11 +41,6 @@ export default function WeekForm({
     url,
     contentType: "multipart/form-data",
   });
-
-  const onClose = () => {
-    document.getElementById("my_modal")?.click();
-    setWeekData(null);
-  };
 
   const queryClient = useQueryClient();
 
@@ -78,6 +77,13 @@ export default function WeekForm({
     }
   };
 
+  const repeatedWeaksOptions = useMemo(() => {
+    return trainingWeeks?.map((week: any) => ({
+      label: week.name,
+      value: week.value,
+    }));
+  }, [trainingWeeks]);
+
   return (
     <Formik
       initialValues={{
@@ -87,16 +93,65 @@ export default function WeekForm({
       onSubmit={onSubmit}
       enableReinitialize
     >
-      {({ submitForm }) => (
+      {({ submitForm, setFieldValue, values }) => (
         <Form>
-          <UploadInput name="image" />
-          <div className="grid grid-cols-2 gap-4 my-8">
-            <Input name="name" label="الإسم" />
-
-            <Input name="week_num" label="رقم الإسبوع" />
+          <div className="flex flex-col gap-4">
+            <Text as="h1" className="!text-[30px]">
+              {!isEditing ? "إضافة" : "تعديل"} اسبوع
+            </Text>
+            <div className="flex items-center gap-2">
+              <label htmlFor="new-week" className="mb-2 text-lg text-white">
+                اسبوع جديد
+              </label>
+              <input
+                id="new-week"
+                name="week_type"
+                type="radio"
+                checked={values.week_type === "new"}
+                onChange={() => setFieldValue("week_type", "new")}
+              />
+            </div>
           </div>
 
-          <TextArea name="target_text" label="نص الهدف" className="w-full" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <label htmlFor="repeat-week" className="mb-2 text-lg text-white">
+                اسبوع مكرر
+              </label>
+              <input
+                id="repeat-week"
+                name="week_type"
+                type="radio"
+                checked={values.week_type === "repeat"}
+                onChange={() => setFieldValue("week_type", "repeat")}
+              />
+            </div>
+            {values.week_type === "repeat" && (
+              <div className="w-1/2">
+                <Select options={repeatedWeaksOptions ?? []} name="week_num" />
+              </div>
+            )}
+          </div>
+
+          <div className="!my-10 flex items-center justify-between">
+            <Text as="h1">رفع صورة</Text>
+            <div className="w-3/4">
+              <UploadInput name="image" />
+            </div>
+          </div>
+          {values.week_type === "new" && (
+            <div className="grid grid-cols-2 gap-4 my-8">
+              <Input name="name" label="الإسم" />
+
+              <Input name="week_num" label="رقم الإسبوع" />
+            </div>
+          )}
+
+          <TextArea
+            name="target_text"
+            placeholder="نص الهدف"
+            className="w-full !border-[1px]"
+          />
 
           <div className="flex items-center justify-end gap-4 mt-8">
             <Button

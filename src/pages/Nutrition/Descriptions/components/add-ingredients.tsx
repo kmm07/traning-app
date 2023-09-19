@@ -16,6 +16,7 @@ export default function AddIngredient({ parentId, setParentId }: any) {
     {
       select: ({ data }: { data: { data: any[] } }) =>
         data.data.slice(0, 20).map((item: any) => ({
+          image: item.image,
           value: item.id,
           label: item.name,
           calories: item.calories,

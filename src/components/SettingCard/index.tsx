@@ -7,12 +7,23 @@ type Props = {
   onEdit?: (value?: any) => void;
   onDelete?: (id: number) => void;
   id: number | string;
+  className?: string;
 };
 
-function SettingCard({ id, active, onClick, label, onEdit, onDelete }: Props) {
+function SettingCard({
+  className,
+  id,
+  active,
+  onClick,
+  label,
+  onEdit,
+  onDelete,
+}: Props) {
   return (
     <Card
-      className={`p-4 w-[180px] cursor-pointer ${active && "!bg-[#00A4FA]"}`}
+      className={`p-4 w-[180px] cursor-pointer ${
+        active && "!bg-[#00A4FA]"
+      } ${className}`}
     >
       <div
         onClick={onClick}

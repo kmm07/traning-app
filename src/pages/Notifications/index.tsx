@@ -1,11 +1,13 @@
-import { Card, Img, Modal, Table, Text } from "components";
-import React from "react";
+import { Card, Img, Modal, SettingCard, Table, Text } from "components";
+import React, { useMemo, useState } from "react";
 import { Row } from "react-table";
 import { UseQueryResult } from "react-query";
 import { useGetQuery } from "hooks/useQueryHooks";
 import AddNotification from "./components/AddNotification";
 
 function Notifications() {
+  const [active, setActive] = useState(0);
+
   // get notifications data =================>
   const url = "/notifications";
 
@@ -56,12 +58,37 @@ function Notifications() {
     []
   );
 
+  const cardData = [
+    {
+      label: "الاشعارات العامه",
+      id: 0,
+    },
+    {
+      label: "الاشعارات المخصصة",
+      id: 1,
+    },
+  ];
+
+  const filteredNotifications = useMemo(() => {
+    return data?.filter((notify: any) => notify.private === active);
+  }, [active]);
+
   return (
     <div className="w-full space-y-4">
-      <div className="grid grid-cols-5 gap-3"></div>
+      <div className="grid grid-cols-5 gap-3">
+        {cardData.map((item, index) => (
+          <SettingCard
+            id={item.id}
+            key={index}
+            label={item.label}
+            active={active === item.id}
+            onClick={() => setActive(item.id)}
+          />
+        ))}
+      </div>
       {data?.length > 0 ? (
         <Table
-          data={data ?? []}
+          data={filteredNotifications ?? []}
           columns={columns}
           modalContent={<AddNotification />}
           id="add-notification"

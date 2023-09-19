@@ -160,6 +160,9 @@ function Descriptions() {
               label={item.name}
               active={categoryId === item.id}
               onClick={() => setCategoryId(item.id as any)}
+              className={
+                categoryId !== item.id ? "!border-[1px] !border-[#CFFF0F]" : ""
+              }
             />
           ))
         ) : (

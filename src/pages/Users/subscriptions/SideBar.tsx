@@ -1,10 +1,11 @@
 import { Button, Card, Img, SubState, Text } from "components";
+import DateInput from "components/dateInput";
 import { Form, Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
+import moment from "moment";
 import { useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import formData from "util/formData";
 
 const initialValues = {};
 
@@ -41,12 +42,13 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
 
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
-      await editSubscription(
-        formData({
-          ...values,
-          _method: "PUT",
-        }) as any
-      );
+      await editSubscription({
+        ...values,
+        start_date: moment(new Date(values.start_date)).format("YYYY-MM-DD"),
+        expire_date: moment(new Date(values.expire_date)).format("YYYY-MM-DD"),
+        subscription_id: Number(values.id),
+        _method: "PUT",
+      } as any);
 
       helpers.resetForm();
 
@@ -81,21 +83,16 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
           <Card className="px-10 py-6 flex flex-col gap-8">
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">تاريخ البداية</Text>
-              <Text
-                as="h5"
-                className="border-[1px] border-primary rounded-md p-2"
-              >
-                {subscriptionData?.start_date}
-              </Text>
+              <div className="w-1/4">
+                <DateInput name="start_date" isForm />
+              </div>
             </div>
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">تاريخ النهاية</Text>
-              <Text
-                as="h5"
-                className="border-[1px] border-primary rounded-md p-2"
-              >
-                {subscriptionData?.expire_date}
-              </Text>
+
+              <div className="w-1/4">
+                <DateInput name="expire_date" isForm />
+              </div>
             </div>
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">حالة الإشتراك</Text>

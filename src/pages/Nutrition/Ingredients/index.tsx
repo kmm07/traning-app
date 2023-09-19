@@ -132,6 +132,20 @@ function Ingredients() {
           <span>{Number(row.original.sugar).toFixed(2)}</span>
         ),
       },
+      {
+        Header: "الحجم",
+        accessor: "size",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.size).toFixed(2)}</span>
+        ),
+      },
+      {
+        Header: "المعيار",
+        accessor: "measure",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{row.original.measure}</span>
+        ),
+      },
     ],
     []
   );

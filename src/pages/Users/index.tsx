@@ -1,5 +1,5 @@
 import { Card, Select, SubState, Table, Text } from "components";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import UsersSideBar from "./components/UsersSideBar";
@@ -25,6 +25,8 @@ interface UserType {
 
 function Users() {
   const [activeUser, setActiveUser] = useState<any>(null);
+
+  const [activeState, setActiveState] = useState<string>("all");
 
   // get users list ======================>
   const url = "/users";
@@ -108,18 +110,49 @@ function Users() {
     }
   };
 
+  const cardsTranslator = (name: string) => {
+    switch (name) {
+      case "all":
+        return "جميع المستخدمين";
+      case "subscriped":
+        return "المشتركين";
+      case "canceled":
+        return "اشتراكات ملغية";
+      case "free":
+        return "اشتراكات مجانية";
+      case "not_subscriped":
+        return "غير مشتركين";
+    }
+  };
+
+  // filter by category =====================>
+  const onChangeCategory = (category: string) => setActiveState(category);
+
+  const filteredUsers = useMemo(() => {
+    return users?.users?.filter(
+      (user: any) =>
+        user?.subscription_status === activeState || activeState === "all"
+    );
+  }, [activeState, users]);
+
   return (
     <div className="w-full space-y-4">
       <div className="flex gap-3 h-24 ">
         {Object.entries(users?.cards ?? {})?.map((item: any, index: number) => {
           return (
-            <Card key={index} className="p-4">
+            <Card
+              key={index}
+              className={`p-4 cursor-pointer ${
+                activeState === item[0] ? "bg-light_blue-500" : ""
+              }`}
+              onClick={() => onChangeCategory(item[0])}
+            >
               <div className="flex flex-col  justify-between">
                 <Text size="3xl" className=" font-bold capitalize">
                   {item[1]}
                 </Text>
-                <Text size="3xl" className="text-gray-500 text-sm">
-                  {item[0]}
+                <Text size="3xl" className="text-white text-sm font-bold">
+                  {cardsTranslator(item[0])}
                 </Text>
               </div>
             </Card>
@@ -127,17 +160,18 @@ function Users() {
         })}
       </div>
 
-      <Select
-        isForm={false}
-        options={options}
-        placeholder="الكل"
-        className="!w-48"
-        onChange={(e) => {
-          console.log(e);
-        }}
-      />
+      <div className="w-1/4">
+        <Select
+          isForm={false}
+          options={options}
+          placeholder="الكل"
+          onChange={(e) => {
+            console.log(e);
+          }}
+        />
+      </div>
       <Table
-        data={users.users ?? []}
+        data={(filteredUsers as any) ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"

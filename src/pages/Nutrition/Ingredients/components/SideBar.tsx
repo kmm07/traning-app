@@ -35,8 +35,8 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     <div className="flex flex-col gap-10">
       <div className="flex justify-between">
         <div className="flex gap-4">
-          <Img className="w-24" src="/images/img_rectangle347.png" />
-          <Text size="3xl">{ingredientData.name}</Text>
+          <Img className="w-24" src={ingredientData?.image} />
+          <Text size="3xl">{ingredientData?.name}</Text>
         </div>
       </div>
       <RowTable

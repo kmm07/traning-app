@@ -22,8 +22,8 @@ function TrainingInfo() {
     daysNum: { label: "", value: "" },
   });
 
-  const isNoValidToGetData = Object.values(trainingData).some(
-    (value) => value === ""
+  const isNoValidToGetData = Object.values(trainingData).some((value) =>
+    ["", undefined, null].includes(value as string)
   );
 
   const url = `/training-categories?lvl=${trainingData?.selectValue?.value?.lvl}&gender=${trainingData?.selectValue?.value?.gender}&days_num=${trainingData?.daysNum?.value}&home=${trainingData?.selectValue?.value?.home}`;
@@ -50,6 +50,8 @@ function TrainingInfo() {
     } else setFieldValue("rest_days", [...values.rest_days, day_num]);
   };
 
+  console.log(values.training_week_days);
+
   // get level options =================>
   const trainingPeriods = [
     { label: "أقل من 3 شهور", value: "less_3" },
@@ -65,6 +67,7 @@ function TrainingInfo() {
 
   // get level options =================>
   const weekDaysOptions = [
+    { label: "2 أيام في السبوع", value: "2" },
     { label: "3 أيام في السبوع", value: "3" },
     { label: "4 أيام في السبوع", value: "4" },
     { label: "5 أيام في السبوع", value: "5" },

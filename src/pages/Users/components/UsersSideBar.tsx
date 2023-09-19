@@ -42,7 +42,7 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
 
   const queryClient = useQueryClient();
 
-  const onEditUser = async (values: any, helpers: any) => {
+  const onEditUser = async (values: any) => {
     delete values.training_week_days;
 
     delete values.chat;
@@ -75,7 +75,7 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
 
       await queryClient.invalidateQueries("/users");
 
-      helpers.resetForm();
+      // helpers.resetForm();
 
       onClose();
     } catch (error: any) {}
@@ -97,6 +97,7 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
         type: activeUser?.gender,
         training_category_id: activeUser?.category_id,
         weekly_training: activeUser?.training_days,
+        training_week_days: activeUser?.training_week_days,
       }}
       onSubmit={onEditUser}
       enableReinitialize

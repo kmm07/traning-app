@@ -168,12 +168,12 @@ function CustomCalendarButton({
 
   return (
     <div
-      className={`border h-10 w-full dark:bg-transparent border-dark-300 rounded-md flex items-center ${className}`}
+      className={`border border-primary h-10 w-full  rounded-md flex items-center ${className}`}
       onClick={onClick}
     >
       {/* <Calendar className="stroke-dark-300 mx-2" /> */}
       {!ssr && (
-        <span className="flex items-center h-full text-dark-100 dark:text-white">
+        <span className="flex items-center h-full text-dark-100 dark:text-white !w-full justify-center">
           {showDate(0) ?? <span className="text-dark-300">{placeholder}</span>}
           {splitDate(1) !== undefined && showDate(1) !== "Invalid date"
             ? ` -  ${showDate(1)}`

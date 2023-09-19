@@ -1,4 +1,12 @@
-import { Card, Img, Table, Text, TrhButton, UploadInput } from "components";
+import {
+  Card,
+  Img,
+  Input,
+  Table,
+  Text,
+  TrhButton,
+  UploadInput,
+} from "components";
 import TableActions from "components/Table/actions";
 import { Form, Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
@@ -134,7 +142,7 @@ function SideBar({
             <div className="flex gap-5 ">
               <Img className="w-24 rounded-2xl" src={values?.image} />
               <div className="flex flex-col ">
-                <Text size="3xl">{values?.name} </Text>
+                <Input name="name" className="text-[25px] border-none" />
               </div>
             </div>
           </div>

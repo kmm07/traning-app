@@ -60,10 +60,10 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
 
   const [ingredientData, setIngredientData] = useState<any>(null);
 
-  const onEditIngredient = (item: any) => {
-    setIngredientData(item);
-    document.getElementById("edit-ingredient")?.click();
-  };
+  // const onEditIngredient = (item: any) => {
+  //   setIngredientData(item);
+  //   document.getElementById("edit-ingredient")?.click();
+  // };
 
   // steps actions =====================>
   const onDeleteStep = (item: any) => {
@@ -90,7 +90,9 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
         Header: "",
         accessor: "description",
         className: "w-full",
-        Cell: ({ row }: { row: Row<any> }) => <span>{row.original}</span>,
+        Cell: ({ row }: { row: Row<any> }) => (
+          <p className="max-w-[500px] break-words">{row.original}</p>
+        ),
       },
       {
         Header: " ",
@@ -151,6 +153,11 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
           );
 
           formData.append(
+            `meal_ingredients[${index}][size]`,
+            subValue.size ?? subValue.size
+          );
+
+          formData.append(
             `meal_ingredients[${index}][parent_id]`,
             subValue.parent_id === null ? "" : subValue.parent_id
           );
@@ -193,6 +200,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       initialValues={{
         ...initialValues,
         ...mealData,
+        prepare: { ...mealData?.prepare, video_type: "internal" },
       }}
       onSubmit={onSubmit}
       enableReinitialize
@@ -201,6 +209,16 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       {({ values, setFieldValue, submitForm }) => (
         <Form>
           <>
+            <div className="mb-10 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Img src={values.image} />
+                <Text className="text-lg">{values.name}</Text>
+              </div>
+              <div>
+                <Text className="flex items-center gap-4">الصنف</Text>
+                <Card>شسيشسيش</Card>
+              </div>
+            </div>
             <RowTable
               data={{
                 columns: [
@@ -229,11 +247,20 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
 
               {values?.ingredients
                 ?.filter(({ parent_id }: any) => parent_id === null)
-                ?.map((ingredient: any) => (
+                ?.map((ingredient: any, index: number) => (
                   <div className="mb-6 border-[1px] p-4 rounded-md">
-                    <div className="grid grid-cols-6">
+                    <div className="grid grid-cols-7">
                       <div className="flex flex-col items-center gap-2 w-[100px]">
-                        <Text as="h5">الإسم</Text>
+                        <div className="avatar indicator">
+                          <div className="w-12 h-12 rounded-full">
+                            <img
+                              src={
+                                ingredient.image ||
+                                "/images/img_rectangle347.png"
+                              }
+                            />
+                          </div>
+                        </div>
                         <Text as="h5" className="!w-full overflow-hidden">
                           {ingredient?.name}
                         </Text>
@@ -258,12 +285,13 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                         <Text as="h5">السكريات</Text>
                         <Text as="h5">{ingredient?.sugar}</Text>
                       </div>
+                      <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">الحجم</Text>
+                        <Input name={`ingredients.[${index}].size`} />
+                      </div>
                       <div className="flex items-center gap-2">
                         <Button onClick={() => onDeleteIngredient(ingredient)}>
                           <Img src="/images/trash.svg" />
-                        </Button>
-                        <Button onClick={() => onEditIngredient(ingredient)}>
-                          <Img src="/images/edit.svg" />
                         </Button>
 
                         <Button
@@ -284,11 +312,21 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                         ?.map((subIngredient: any) => (
                           <div className="grid grid-cols-7 mb-6 border-[1px] p-4 rounded-md">
                             <div className="flex flex-col items-center gap-2 w-[100px]">
-                              <Text as="h5">الإسم</Text>
-                              <Text as="h5">
+                              <div className="avatar indicator">
+                                <div className="w-12 h-12 rounded-full">
+                                  <img
+                                    src={
+                                      subIngredient.image ||
+                                      "/images/img_rectangle347.png"
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <Text as="h5" className="!text-center">
                                 {subIngredient?.name ?? subIngredient.label}
                               </Text>
                             </div>
+
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">السعرات</Text>
                               <Text as="h5">{subIngredient?.calories}</Text>
