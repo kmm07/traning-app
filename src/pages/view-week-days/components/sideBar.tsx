@@ -110,7 +110,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
-    let exercises: any = [];
+    const exercises: any = [];
 
     values.exercises?.forEach((exercise: any) => {
       exercises.push(exercise);

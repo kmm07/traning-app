@@ -1,13 +1,6 @@
 // import React from "react";
 
-import {
-  Button,
-  Card,
-  Input,
-  Text,
-  TextArea,
-  UploadInput,
-} from "components";
+import { Button, Card, Input, Text, TextArea, UploadInput } from "components";
 import { Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
