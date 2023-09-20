@@ -66,9 +66,11 @@ function SideBar({ exerciseData, categoryData }: any) {
 
       values.muscle_image === "" && delete values.muscle_image;
 
-      delete values.video_type;
+      values.image === "" && delete values.image;
 
-      !isImageDelete && delete values.image;
+      !isImageDelete && delete values.muscle_image;
+
+      delete values.video_type;
 
       await editExercise(
         formData({

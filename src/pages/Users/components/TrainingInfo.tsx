@@ -50,8 +50,6 @@ function TrainingInfo() {
     } else setFieldValue("rest_days", [...values.rest_days, day_num]);
   };
 
-  console.log(values.training_week_days);
-
   // get level options =================>
   const trainingPeriods = [
     { label: "أقل من 3 شهور", value: "less_3" },

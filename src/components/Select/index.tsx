@@ -46,7 +46,7 @@ function Select({
               options={options}
               styles={ReactSelectTheme()}
               {...field}
-              value={options.filter(function (option) {
+              value={options?.filter(function (option) {
                 return option.value === values[name];
               })}
               name={name}

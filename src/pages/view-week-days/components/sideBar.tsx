@@ -9,39 +9,41 @@ import { useAppSelector } from "hooks/useRedux";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
+import EditExerciseSessions from "./edit-exercise-session";
 
 interface SideBarProps {
   weekDayData: any;
 }
 
 interface SingleExerciseProps {
-  exercise_name: string;
-  rest_sec: number;
-  sessions: any;
-  exercise_muscle_image: string;
-  exercise_id: any;
+  exercise: any;
   onAddSpareExercise?: () => void;
   onDeleteEXercise?: () => void;
+  onEditExercise?: (exercise: any) => void;
 }
 const SingleExercise = ({
-  exercise_name,
-  sessions,
-  exercise_muscle_image,
-  rest_sec,
-  exercise_id,
+  exercise,
   onAddSpareExercise,
   onDeleteEXercise,
+  onEditExercise,
 }: SingleExerciseProps) => {
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <Img src={exercise_muscle_image} alt="image" />
-          <Text>{exercise_name ?? exercise_id?.label}</Text>
+          <Img src={exercise?.exercise_muscle_image} alt="image" />
+          <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
 
-        <div className="rounded-full border-[1px] p-2">
-          الجلسات <span className="ms-4">{sessions?.length}</span>
+        <div className="flex items-center">
+          <div className="rounded-full border-[1px] p-2">
+            الجلسات <span className="ms-4">{exercise?.sessions?.length}</span>
+          </div>
+          <div>
+            <Button onClick={onEditExercise as any}>
+              <Img src="/images/edit.svg" />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -49,10 +51,11 @@ const SingleExercise = ({
         <Text as="h5">وقت الراحة</Text>
         <div className="flex items-center">
           <div className="rounded-full border-[1px] p-2">
-            <span className="me-2">{rest_sec}</span> ثانية
+            <span className="me-2">{exercise?.rest_sec}</span> ثانية
           </div>
         </div>
       </div>
+
       {onAddSpareExercise !== undefined && (
         <Button secondaryBorder onClick={onAddSpareExercise}>
           إضافة تمرين بديل
@@ -217,6 +220,14 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     setFieldValue("exercises", [...values.exercises]);
   };
 
+  const [editableExercise, setEditableExercise] = useState<any>(null);
+
+  const onEditExercise = (exercise: any) => {
+    setEditableExercise(exercise);
+
+    document.getElementById("edit-exercise-sessions")?.click();
+  };
+
   return (
     <Formik
       initialValues={{
@@ -281,7 +292,8 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                     <div className="border-[1px] rounded-lg p-4">
                       <SingleExercise
                         key={exercise?.name}
-                        {...exercise}
+                        exercise={exercise}
+                        onEditExercise={() => onEditExercise(exercise) as any}
                         onAddSpareExercise={() =>
                           onAddSpareExercise(exercise?.id)
                         }
@@ -294,7 +306,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                         ?.map((subExercise: any) => (
                           <SingleExercise
                             key={exercise?.name}
-                            {...subExercise}
+                            exercise={subExercise}
+                            onEditExercise={() =>
+                              onEditExercise(subExercise) as any
+                            }
                             onDeleteEXercise={() =>
                               onDeleteSpareExercise(
                                 subExercise,
@@ -308,7 +323,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                       {exercise?.children?.map((subExercise: any) => (
                         <SingleExercise
                           key={exercise?.name}
-                          {...subExercise}
+                          exercise={subExercise}
+                          onEditExercise={() =>
+                            onEditExercise(subExercise) as any
+                          }
                           onDeleteEXercise={() =>
                             onDeleteSpareExercise(
                               subExercise,
@@ -367,6 +385,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
 
           <Modal id="add-spare-weekday" className="!h-full !w-full">
             <AddWeekSpareDayExercise parentId={parentId} />
+          </Modal>
+
+          <Modal id="edit-exercise-sessions" className="!h-full !w-full">
+            <EditExerciseSessions exercise={editableExercise} />
           </Modal>
         </Form>
       )}

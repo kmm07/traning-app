@@ -46,7 +46,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
         ...values,
         start_date: moment(new Date(values.start_date)).format("YYYY-MM-DD"),
         expire_date: moment(new Date(values.expire_date)).format("YYYY-MM-DD"),
-        subscription_id: Number(values.id),
+        subscription_id: Number(values.subscription_id),
         _method: "PUT",
       } as any);
 

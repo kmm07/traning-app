@@ -195,6 +195,10 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     document.getElementById("add-ingredient")?.click();
   };
 
+  const getItemPercentage = (size: number, itemValue: number) => {
+    return Number((itemValue / 100) * size).toFixed(2);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -211,9 +215,12 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
           <>
             <div className="mb-10 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Img src={values.image} />
+                <div className="w-[100px] h-[100px]">
+                  <img src={values.image} className="h-full w-full" />
+                </div>
                 <Text className="text-lg">{values.name}</Text>
               </div>
+
               <div>
                 <Text className="flex items-center gap-4">الصنف</Text>
                 <Card>شسيشسيش</Card>
@@ -267,27 +274,53 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">السعرات</Text>
-                        <Text as="h5">{ingredient?.calories}</Text>
+                        <Text as="h5">
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.calories
+                          )}
+                        </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">الكاربوهيدرات</Text>
-                        <Text as="h5">{ingredient?.carbohydrate}</Text>
+                        <Text as="h5">
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.carbohydrate
+                          )}
+                        </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">البروتين</Text>
-                        <Text as="h5">{ingredient?.protein}</Text>
+                        <Text as="h5">
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.protein
+                          )}
+                        </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">الدهون</Text>
-                        <Text as="h5">{ingredient?.fat}</Text>
+                        <Text as="h5">
+                          {getItemPercentage(ingredient?.size, ingredient?.fat)}
+                        </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">السكريات</Text>
-                        <Text as="h5">{ingredient?.sugar}</Text>
+                        <Text as="h5">
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.sugar
+                          )}
+                        </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">الحجم</Text>
-                        <Input name={`ingredients.[${index}].size`} />
+                        <Input
+                          name={`ingredients.[${index}].size`}
+                          className="text-center"
+                        />
+                        <Text>{ingredient.measure}</Text>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button onClick={() => onDeleteIngredient(ingredient)}>

@@ -57,6 +57,7 @@ function Descriptions() {
         carbohydrate: item.carbohydrate,
         ingredients: item.ingredients,
         prepare: item.prepare,
+        image: item.image,
       })),
     refetchOnWindowFocus: false,
     enabeld: categoryId !== undefined,
@@ -151,20 +152,22 @@ function Descriptions() {
     <div className="w-full space-y-4">
       <div className="grid grid-cols-4 gap-3">
         {!isCardsLoading ? (
-          cardData?.map((item: { name: string; id: number }) => (
-            <SettingCard
-              onDelete={onDelete}
-              onEdit={() => onEdit(item)}
-              id={item.id}
-              key={item.id}
-              label={item.name}
-              active={categoryId === item.id}
-              onClick={() => setCategoryId(item.id as any)}
-              className={
-                categoryId !== item.id ? "!border-[1px] !border-[#CFFF0F]" : ""
-              }
-            />
-          ))
+          cardData?.map(
+            (item: { name: string; id: number; private: number }) => (
+              <SettingCard
+                onDelete={onDelete}
+                onEdit={() => onEdit(item)}
+                id={item.id}
+                key={item.id}
+                label={item.name}
+                active={categoryId === item.id}
+                onClick={() => setCategoryId(item.id as any)}
+                className={
+                  item.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
+                }
+              />
+            )
+          )
         ) : (
           <>laoding...</>
         )}
@@ -188,7 +191,7 @@ function Descriptions() {
         <Button
           primary={meal === "BreakFast"}
           secondaryBorder={meal !== "BreakFast"}
-          onClick={() => setMeal("BreakFast")}
+          onClick={() => setMeal("Breakfast")}
         >
           فطور
         </Button>
@@ -225,6 +228,23 @@ function Descriptions() {
         />
       ) : (
         <>loading...</>
+      )}
+
+      {descriptionsList?.length === 0 && (
+        <>
+          <Modal id="add-new-desc">
+            <AddDescription emptyData />
+          </Modal>
+
+          <div className="flex justify-center">
+            <Button
+              secondaryBorder
+              onClick={() => document.getElementById("add-new-desc")?.click()}
+            >
+              إضافة وجبة
+            </Button>
+          </div>
+        </>
       )}
 
       <Modal id="add-new-nutrition">

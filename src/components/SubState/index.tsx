@@ -8,6 +8,10 @@ type Props = {
 
 function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
+    subscriped: {
+      src: "/images/img_checkmark.svg",
+      name: "مشترك (سنة)",
+    },
     subscripe: {
       src: "/images/img_checkmark.svg",
       name: "مشترك (سنة)",

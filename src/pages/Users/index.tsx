@@ -1,5 +1,5 @@
 import { Card, Select, SubState, Table, Text } from "components";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import UsersSideBar from "./components/UsersSideBar";
@@ -134,6 +134,28 @@ function Users() {
         user?.subscription_status === activeState || activeState === "all"
     );
   }, [activeState, users]);
+
+  // open sidebar if is coming from messages ===============>
+  useEffect(() => {
+    const userFromMessage = localStorage.getItem("user_id_From_messages");
+
+    if (![null, undefined].includes(userFromMessage as any)) {
+      const getUserData = async () => {
+        try {
+          const { data } = await axios.get(`/users/${userFromMessage as any}`);
+
+          await setActiveUser(data.data);
+
+          document.getElementById("my-drawer")?.click();
+        } catch (error: any) {
+          toast.error(`${error.response.data.message}`);
+        }
+      };
+      getUserData();
+    }
+
+    return () => localStorage.removeItem("user_id_From_messages");
+  }, []);
 
   return (
     <div className="w-full space-y-4">

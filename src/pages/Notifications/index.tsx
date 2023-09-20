@@ -86,7 +86,8 @@ function Notifications() {
           />
         ))}
       </div>
-      {data?.length > 0 ? (
+
+      {filteredNotifications?.length > 0 ? (
         <Table
           data={filteredNotifications ?? []}
           columns={columns}
@@ -95,7 +96,7 @@ function Notifications() {
           modalTitle="إضافة إشعار"
         />
       ) : (
-        <Card className={"p-4 w-[180px]"}>
+        <Card className={"p-4 !w-[280px] !h-[120px] mx-auto"}>
           <label
             htmlFor="add-notification"
             className={

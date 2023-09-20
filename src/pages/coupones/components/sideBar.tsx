@@ -100,11 +100,13 @@ export default function CouponeSideBar({ couponeData }: Props) {
         <Form className="flex flex-col gap-6">
           <Card className="flex items-center justify-between p-6">
             <div className="flex gap-4">
-              <img src={couponeData?.file} alt="image" />
+              <div className="w-[100px] h-[100px]">
+                <img src={couponeData?.file_path} alt="image" />
+              </div>
               <Input name="name" className="text-[30px]" />
             </div>
 
-            <Card className="p-6 w-[200px] flex flex-col items-center">
+            <Card className="p-6 !w-[200px] flex flex-col items-center">
               <Text as="h5" className="text-[30px] mb-4">
                 النقاط
               </Text>

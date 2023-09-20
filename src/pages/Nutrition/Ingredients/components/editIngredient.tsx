@@ -25,10 +25,12 @@ export default function EditIngredient({
   values,
   categoryId,
   categories,
+  empty,
 }: {
   values?: any;
   categoryId?: number;
   categories?: any;
+  empty?: boolean;
 }) {
   const isEditing = values !== null;
 
@@ -47,6 +49,10 @@ export default function EditIngredient({
 
       document.getElementById("my-drawer")?.click();
     } else {
+      if (empty) {
+        document.getElementById("add-new-ing")?.click();
+        return;
+      }
       document.getElementById("my_modal")?.click();
     }
   };

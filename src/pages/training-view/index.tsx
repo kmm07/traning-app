@@ -237,6 +237,9 @@ function TrainingView({ home, gender }: Props) {
               label={category?.name}
               active={exerciesCategory === category.id}
               onClick={() => setExerciseCategory(category.id)}
+              className={
+                category.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
+              }
             />
           ))
         ) : (
