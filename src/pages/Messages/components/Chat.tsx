@@ -75,6 +75,19 @@ function Chat({ userData }: { userData: any }) {
 
   const fileRef = useRef<any>(null);
 
+  // on mark as read ================>
+  const { mutateAsync: messageReaded } = usePostQuery({
+    url: `/mark-chat-as-read/${userData?.id}`,
+    contentType: "multipart/form-data",
+  });
+  const onInputFocus = async () => {
+    try {
+      messageReaded();
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -99,6 +112,7 @@ function Chat({ userData }: { userData: any }) {
               placeholder="Type your message"
               className="h-12 px-5 py-2 bg-neutral-800 rounded-lg"
               isForm
+              onFocus={onInputFocus}
             />
             <Button onClick={() => fileRef.current.click()}>
               <Img

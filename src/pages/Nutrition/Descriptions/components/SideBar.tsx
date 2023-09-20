@@ -11,6 +11,7 @@ import { Form } from "react-router-dom";
 import AddStep from "./addStep";
 import EditIngredient from "./editIngredient";
 import AddIngredient from "./add-ingredients";
+import AssignMealCategories from "./assign-meal-categories";
 
 interface SideBarProps {
   mealData: any;
@@ -24,6 +25,7 @@ const initialValues = {
   meal: "",
   image: "",
   meal_ingredients: [],
+  diet_categories: [],
   prepare: { url: "", video_type: "internal", steps: [], video: "" },
 };
 
@@ -122,6 +124,8 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
+    delete values.diet_mea_categories;
+
     values.prepare.video_type === "external"
       ? delete values.prepare.video
       : delete values.prepare.url;
@@ -129,7 +133,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     const formattedValues = Object.entries(values);
 
     formattedValues.forEach((value) => {
-      if (!["prepare", "ingredients"].includes(value[0])) {
+      if (!["prepare", "ingredients", "diet_categories"].includes(value[0])) {
         formData.append(value[0], value[1] as any);
         return;
       }
@@ -160,6 +164,16 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
           formData.append(
             `meal_ingredients[${index}][parent_id]`,
             subValue.parent_id === null ? "" : subValue.parent_id
+          );
+        });
+      }
+      if (value[0] === "diet_categories") {
+        (value[1] as any).forEach((category: any, index: any) => {
+          formData.append(`diet_categories[${index}][id]`, category.id?.value);
+
+          formData.append(
+            `diet_categories[${index}][meal]`,
+            category.meal.value
           );
         });
       }
@@ -199,12 +213,26 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     return Number((itemValue / 100) * size).toFixed(2);
   };
 
+  const meals = [
+    { label: "فطار", value: "Breakfast" },
+    { label: "غداء", value: "Lunch" },
+    { label: "سناكس", value: "Snack" },
+    { label: "عشاء", value: "Dinner" },
+  ];
+
+  const onViewCategories = () =>
+    document.getElementById("edit-categories")?.click();
+
   return (
     <Formik
       initialValues={{
         ...initialValues,
         ...mealData,
         prepare: { ...mealData?.prepare, video_type: "internal" },
+        diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
+          meal: meals.find((meal) => meal.value === item.meal),
+          id: { label: item.category_name, value: item.id },
+        })),
       }}
       onSubmit={onSubmit}
       enableReinitialize
@@ -223,7 +251,21 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
 
               <div>
                 <Text className="flex items-center gap-4">الصنف</Text>
-                <Card>شسيشسيش</Card>
+                <Card
+                  className="grid grid-cols-3 p-4 gap-4 max-w-[450px] cursor-pointer text-center"
+                  onClick={onViewCategories}
+                >
+                  {values.diet_categories?.map(
+                    (category: any, index: number) => (
+                      <div
+                        key={index}
+                        className="mb-2 border-primary border-[1px] p-1 rounded-full"
+                      >
+                        {category?.id?.label} / {category?.meal?.label}
+                      </div>
+                    )
+                  )}
+                </Card>
               </div>
             </div>
             <RowTable
@@ -495,14 +537,20 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                 حذف
               </Button>
             </div>
+
             <Modal id="edit-ingredient">
               <EditIngredient
                 editData={ingredientData as any}
                 setEditData={setIngredientData}
               />
             </Modal>
+
             <Modal id="add-ingredient">
               <AddIngredient parentId={parentId} setParentId={setParentId} />
+            </Modal>
+
+            <Modal id="edit-categories">
+              <AssignMealCategories />
             </Modal>
           </>
         </Form>

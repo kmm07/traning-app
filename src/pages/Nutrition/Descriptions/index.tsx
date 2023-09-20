@@ -20,6 +20,7 @@ interface DescriptionType {
   trans_fat: number;
   ingredients: { name: string };
   prepare: any;
+  diet_mea_categories: any;
 }
 
 function Descriptions() {
@@ -58,6 +59,7 @@ function Descriptions() {
         ingredients: item.ingredients,
         prepare: item.prepare,
         image: item.image,
+        diet_mea_categories: item.diet_mea_categories,
       })),
     refetchOnWindowFocus: false,
     enabeld: categoryId !== undefined,
@@ -189,8 +191,8 @@ function Descriptions() {
 
       <div className="flex flex-col lg:flex-row items-center gap-4">
         <Button
-          primary={meal === "BreakFast"}
-          secondaryBorder={meal !== "BreakFast"}
+          primary={meal === "Breakfast"}
+          secondaryBorder={meal !== "Breakfast"}
           onClick={() => setMeal("Breakfast")}
         >
           فطور
