@@ -46,6 +46,20 @@ export default function WeekForm({
 
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
+      if (values.week_type === "repeat") {
+        await mutateAsync(
+          formData({ repeat_id: values.repeat_id?.value }) as any
+        );
+        helpers.resetForm();
+
+        onClose();
+
+        queryClient.invalidateQueries(
+          `/training-weeks?category_id=${exerciesCategory}`
+        );
+        return;
+      }
+
       if (isEditing) {
         !isImageDelete && delete values.image;
 
@@ -80,7 +94,7 @@ export default function WeekForm({
   const repeatedWeaksOptions = useMemo(() => {
     return trainingWeeks?.map((week: any) => ({
       label: week.name,
-      value: week.value,
+      value: week.id,
     }));
   }, [trainingWeeks]);
 
@@ -89,6 +103,7 @@ export default function WeekForm({
       initialValues={{
         ...initialValues,
         ...weekData,
+        week_type: "new",
       }}
       onSubmit={onSubmit}
       enableReinitialize
@@ -128,30 +143,39 @@ export default function WeekForm({
             </div>
             {values.week_type === "repeat" && (
               <div className="w-1/2">
-                <Select options={repeatedWeaksOptions ?? []} name="week_num" />
+                <Select
+                  options={repeatedWeaksOptions ?? []}
+                  name="repeat_id"
+                  isForm={false}
+                  value={values.repeat_id}
+                  onChange={(e) => setFieldValue("repeat_id", e)}
+                />
               </div>
             )}
           </div>
 
-          <div className="!my-10 flex items-center justify-between">
-            <Text as="h1">رفع صورة</Text>
-            <div className="w-3/4">
-              <UploadInput name="image" />
-            </div>
-          </div>
+          <div className="!mb-10 flex items-center justify-between"></div>
           {values.week_type === "new" && (
-            <div className="grid grid-cols-2 gap-4 my-8">
-              <Input name="name" label="الإسم" />
+            <>
+              <Text as="h1" className="mb-2">
+                رفع صورة
+              </Text>
+              <div className="w-3/4">
+                <UploadInput name="image" />
+              </div>
 
-              <Input name="week_num" label="رقم الإسبوع" />
-            </div>
+              <div className="grid grid-cols-2 gap-4 my-8">
+                <Input name="name" label="الإسم" />
+
+                <Input name="week_num" label="رقم الإسبوع" />
+              </div>
+              <TextArea
+                name="target_text"
+                placeholder="نص الهدف"
+                className="w-full !border-[1px]"
+              />
+            </>
           )}
-
-          <TextArea
-            name="target_text"
-            placeholder="نص الهدف"
-            className="w-full !border-[1px]"
-          />
 
           <div className="flex items-center justify-end gap-4 mt-8">
             <Button
