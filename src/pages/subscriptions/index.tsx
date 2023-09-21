@@ -1,4 +1,4 @@
-import { Button, Table } from "components";
+import { Button, Modal, Table } from "components";
 import TableActions from "components/Table/actions";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
@@ -7,9 +7,7 @@ import { Row } from "react-table";
 import { toast } from "react-toastify";
 import AddNewSubscription from "./components/addSubscription";
 
-type Props = {};
-
-export default function Subscriptions({}: Props) {
+export default function Subscriptions() {
   const [subscription, setSubscription] = useState<any>();
 
   // get exercises categories ======================>
@@ -71,7 +69,7 @@ export default function Subscriptions({}: Props) {
       },
 
       {
-        Header: "product_id",
+        Header: "المنتج",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <span className="flex items-center gap-4">
@@ -132,14 +130,23 @@ export default function Subscriptions({}: Props) {
             id="add-new-subscription"
           />
         ) : (
-          <div
-            className="flex justify-center"
-            onClick={() =>
-              document.getElementById("add-new-subscription")?.click()
-            }
-          >
-            <Button secondaryBorder>إضافة إشتراك</Button>
-          </div>
+          <>
+            <Modal id="add-new-subscription">
+              <AddNewSubscription
+                subscriptionData={subscription}
+                setSubscriptionData={setSubscription}
+              />
+            </Modal>
+
+            <div
+              className="flex justify-center"
+              onClick={() =>
+                document.getElementById("add-new-subscription")?.click()
+              }
+            >
+              <Button secondaryBorder>إضافة إشتراك</Button>
+            </div>
+          </>
         )
       ) : (
         <>loading...</>

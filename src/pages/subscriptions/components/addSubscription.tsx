@@ -80,7 +80,7 @@ const AddNewSubscription = ({
 
           <Input name="months" label="عدد الشهور" type={"number" as any} />
 
-          <Input name="product_id" label="product_id" />
+          <Input name="product_id" label="المنتج" />
 
           <Input name="price" label="سعر الإشتراك" type={"number" as any} />
 

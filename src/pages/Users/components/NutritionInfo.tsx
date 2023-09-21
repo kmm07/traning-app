@@ -1,10 +1,5 @@
-import {
-  Card,
-  RadialProgress,
-  Select,
-  Text,
-} from "components";
-import {  useFormikContext } from "formik";
+import { Card, RadialProgress, Select, Text } from "components";
+import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 
@@ -68,6 +63,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
 
   // get meal arabic name ================>
   const getMealName = (name: string) => {
+    console.log("name >>>> ", name);
     switch (name) {
       case "Breakfast":
         return "فطار";
@@ -134,7 +130,5 @@ function Food({ isActive, label }: { isActive: boolean; label: string }) {
     </Card>
   );
 }
-
-
 
 export default NutritionInfo;

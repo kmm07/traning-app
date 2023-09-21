@@ -12,9 +12,7 @@ import { setImageDelete } from "redux/slices/imageDelete";
 import useAxios from "hooks/useAxios";
 import { toast } from "react-toastify";
 
-type Props = {};
-
-export default function Coupones({}: Props) {
+export default function Coupones() {
   const [active, setActive] = useState<number>(1);
 
   // get notifications data =================>
@@ -157,12 +155,14 @@ export default function Coupones({}: Props) {
       await axios.post(`/accept-coupon-request/${id}`);
 
       toast.success("تم قبول الطلب");
-    } catch (error: any) {}
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    }
   };
 
   // get coupones requests =================>
   const getRequests = useMemo(() => {
-    let requests: any = [];
+    const requests: any = [];
 
     data.forEach((request: any) => requests.push(request?.requests));
 
@@ -184,14 +184,28 @@ export default function Coupones({}: Props) {
       </div>
 
       {active === 1 ? (
-        <Table
-          data={data ?? []}
-          columns={columns}
-          modalContent={<AddCoupone />}
-          rowOnClick={rowOnClick}
-          id="add-coupone"
-          modalTitle="إضافة كوبون"
-        />
+        <>
+          <Table
+            data={data ?? []}
+            columns={columns}
+            modalContent={<AddCoupone />}
+            rowOnClick={rowOnClick}
+            id="add-coupone"
+            modalTitle="إضافة كوبون"
+          />
+          {data.length === 0 && (
+            <div className="flex justify-center">
+              <Button
+                onClick={() => {
+                  document.getElementById("add-coupone")?.click();
+                }}
+                primary
+              >
+                إضافة كوبون
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <Table
           data={getRequests ?? []}

@@ -164,12 +164,19 @@ function ExercisesView({ home }: Props) {
             id="add-new-exercise"
           />
         ) : (
-          <div
-            className="flex justify-center"
-            onClick={() => document.getElementById("add-new-exercise")?.click()}
-          >
-            <Button secondaryBorder>إضافة تمرين جديد</Button>
-          </div>
+          <>
+            <Modal id="add-new-exercise">
+              <AddExercise exercise_category_id={categoryData?.id} />
+            </Modal>
+            <div
+              className="flex justify-center"
+              onClick={() =>
+                document.getElementById("add-new-exercise")?.click()
+              }
+            >
+              <Button secondaryBorder>إضافة تمرين جديد</Button>
+            </div>
+          </>
         )
       ) : (
         <>loading...</>

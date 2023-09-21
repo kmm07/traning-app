@@ -1,7 +1,5 @@
 import TrainingView from "pages/training-view";
 
-type Props = {};
-
-export default function GymMen({}: Props) {
+export default function GymMen() {
   return <TrainingView gender="male" home={0} />;
 }
