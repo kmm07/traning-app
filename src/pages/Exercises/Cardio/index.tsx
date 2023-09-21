@@ -128,6 +128,7 @@ function Cardio() {
             <Button
               className="bg-primary text-white"
               htmlFor="add-new-nutrition"
+              primary
             >
               اضافة كارديو
             </Button>
