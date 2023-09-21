@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Pusher from "pusher-js";
 import { useQueryClient } from "react-query";
+import useAxios from "hooks/useAxios";
 
 function Chat({ userData }: { userData: any }) {
   const url = `/send-message/${userData?.id}`;
@@ -61,6 +62,8 @@ function Chat({ userData }: { userData: any }) {
 
   const queryClient = useQueryClient();
 
+  const axios = useAxios({});
+
   const onSubmit = async (values: any, { resetForm }: any) => {
     try {
       await mutateAsync(values as any);
@@ -76,13 +79,10 @@ function Chat({ userData }: { userData: any }) {
   const fileRef = useRef<any>(null);
 
   // on mark as read ================>
-  const { mutateAsync: messageReaded } = usePostQuery({
-    url: `/mark-chat-as-read/${userData?.id}`,
-    contentType: "multipart/form-data",
-  });
+
   const onInputFocus = async () => {
     try {
-      messageReaded();
+      await axios.post(`/mark-chat-as-read/${userData?.id}`, {});
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

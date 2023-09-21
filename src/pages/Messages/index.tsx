@@ -30,6 +30,9 @@ function Messages() {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
+                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
+                  {row.original.chat_badge}
+                </span>
                 <div className="w-12 h-12 rounded-full">
                   <img
                     src={row.original.image || "/images/img_rectangle347.png"}
