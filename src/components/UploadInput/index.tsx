@@ -36,11 +36,13 @@ function UploadInput({ className = "", name, video, label }: Props) {
   };
 
   useEffect(() => {
+    console.log("values[name] >>>> ", values[name]);
     if (values[name] === "" || values[name] === null) setImage("");
     else {
       if (typeof values[name] === "string") setImage(values[name]);
     }
   }, [values[name]]);
+  console.log("values[name] >>>> ", image);
 
   return (
     <div className={`relative   flex flex-col items-center  ${className}`}>

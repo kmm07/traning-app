@@ -59,7 +59,7 @@ export default function WeekForm({
         );
         return;
       }
-
+      console.log("isEditing >>>> ", isEditing);
       if (isEditing) {
         !isImageDelete && delete values.image;
 

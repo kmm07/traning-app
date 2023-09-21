@@ -140,23 +140,24 @@ function UsersInfo({
             </button>
           </Card>
         </div>
-        <Card className="px-5 py-4 flex justify-between items-center">
+        <Card
+          onClick={() => document.getElementById("special-notify")?.click()}
+          className="px-5 py-4 flex justify-between items-center cursor-pointer"
+        >
           <Text size="2xl" className="!whitespace-normal text-right w-2/3">
             ارسال اشعارات للمستخدم
           </Text>
-          <button
-            onClick={() => document.getElementById("special-notify")?.click()}
-          >
+          <button>
             <Img
               className="h-6 md:h-auto mb-[17px] md:ml-[0] object-cover"
               src="/images/img_group_white_a700.png"
               alt="group_Two"
             />
           </button>
-          <Modal id="special-notify">
-            <NutritionModal activeUser={activeUser} />
-          </Modal>
         </Card>
+        <Modal id="special-notify">
+          <NutritionModal activeUser={activeUser} />
+        </Modal>
       </div>
       {showUserInfo && (
         <Card className="!w-fit">
@@ -218,7 +219,7 @@ function NutritionModal({ activeUser }: any) {
 
       Helpers.resetForm();
 
-      document.getElementById("special-notify")?.click();
+      document.getElementById("id_special_notify")?.click();
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -242,68 +243,79 @@ function NutritionModal({ activeUser }: any) {
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      enableReinitialize
-      innerRef={formRef}
-    >
-      {({ values, submitForm }) => (
-        <Form className="space-y-4">
-          <div>
-            <Text size="2xl">اشعار مخصص</Text>
-          </div>
-          <UploadInput name="image" />
-          <Input name="title" label="عنوان" />
-          <Input name="description" label="وصف الإشعار" />
-          {/* <Input name="url" label="ارفاق رابط" /> */}
-          <TextArea
-            name="single_detail"
-            label="تفاصيل الإشعار"
-            className="border-[1px]"
-          />
+    <>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        enableReinitialize
+        innerRef={formRef}
+      >
+        {({ values, setFieldValue }) => (
+          <Form className="space-y-4">
+            <div>
+              <Text size="2xl">اشعار مخصص</Text>
+            </div>
+            <UploadInput name="image" />
+            <Input name="title" label="عنوان" />
+            <Input name="description" label="وصف الإشعار" />
+            {/* <Input name="url" label="ارفاق رابط" /> */}
+            <TextArea
+              name="single_detail"
+              label="تفاصيل الإشعار"
+              className="border-[1px]"
+            />
 
-          <Button
-            secondaryBorder
-            onClick={() => onSaveDetail(values.single_detail)}
-          >
-            إضافة
-          </Button>
-
-          {/* view details */}
-
-          {values.details?.map((detail: string) => {
-            return (
-              <div key={detail}>
-                <Text as="h5">{detail}</Text>
-
-                <Button onClick={() => onDeleteDetail(detail)}>
-                  <Img src="/images/trash.svg" />
-                </Button>
-              </div>
-            );
-          })}
-
-          <div className="flex items-center justify-evenly mt-6">
             <Button
-              className="w-[100px]"
-              primary
-              isLoading={isLoading}
-              onClick={submitForm}
+              secondaryBorder
+              onClick={() => {
+                onSaveDetail(values.single_detail);
+
+                setFieldValue("single_detail", "");
+              }}
             >
-              إرسال
+              إضافة
             </Button>
-            <Button
-              className="w-[100px]"
-              primary
-              onClick={() => document.getElementById("special-notify")?.click()}
-            >
-              إلغاء
-            </Button>
-          </div>
-        </Form>
-      )}
-    </Formik>
+
+            {/* view details */}
+
+            {values.details?.map((detail: string) => {
+              return (
+                <div key={detail}>
+                  <Text as="h5">{detail}</Text>
+
+                  <Button onClick={() => onDeleteDetail(detail)}>
+                    <Img src="/images/trash.svg" />
+                  </Button>
+                </div>
+              );
+            })}
+
+            <div className="flex items-center justify-evenly mt-6">
+              <Button
+                className="w-[100px]"
+                primary
+                isLoading={isLoading}
+                type="submit"
+                onClick={() => {
+                  document.getElementById("special-notify")?.click();
+                }}
+              >
+                إرسال
+              </Button>
+              <Button
+                className="w-[100px]"
+                primary
+                onClick={() =>
+                  document.getElementById("special-notify")?.click()
+                }
+              >
+                إلغاء
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </>
   );
 }
 

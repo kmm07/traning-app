@@ -103,7 +103,7 @@ function Users() {
   const rowOnClick = async (e: any) => {
     try {
       const { data } = await axios.get(`/users/${e.original.id as any}`);
-
+      console.log("data >>>> ", data);
       setActiveUser(data.data);
     } catch (error: any) {
       toast.error(`${error.response.data.message}`);
