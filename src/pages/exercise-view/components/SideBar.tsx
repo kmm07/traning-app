@@ -56,9 +56,9 @@ function SideBar({ exerciseData, categoryData }: any) {
         delete values.internal_video;
       } else delete values.external_video;
 
-      values.muscle_image.includes("http") && delete values.muscle_image;
+      typeof values.muscle_image !== "object" && delete values.muscle_image;
 
-      values.image.includes("http") && delete values.image;
+      typeof values.image !== "object" && delete values.image;
 
       if (isEditing) {
         delete values.video_type;
@@ -91,11 +91,11 @@ function SideBar({ exerciseData, categoryData }: any) {
 
   return (
     <Formik
-      initialValues={{ ...initialValues, ...exerciseData }}
       onSubmit={onSubmit}
+      initialValues={{ ...initialValues, ...exerciseData }}
       enableReinitialize
     >
-      {({ values, setFieldValue, submitForm }) => (
+      {({ values, setFieldValue }) => (
         <Form className="flex flex-col gap-10">
           <div className="flex gap-5 justify-between w-full">
             <div className="flex gap-5 ">
@@ -182,11 +182,11 @@ function SideBar({ exerciseData, categoryData }: any) {
               className="w-[100px]"
               primary
               type="submit"
-              onClick={submitForm}
               isLoading={isEditLoading}
             >
               {isEditing ? "تعديل" : "اضافة"}
             </Button>
+
             <Button className="w-[100px]" primary onClick={onClose}>
               إلغاء
             </Button>
