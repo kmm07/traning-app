@@ -1,18 +1,17 @@
 import {
+  Button,
   Card,
   Img,
   Input,
-  Table,
+  Modal,
   Text,
   TrhButton,
   UploadInput,
 } from "components";
-import TableActions from "components/Table/actions";
 import { Form, Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useQueryClient } from "react-query";
-import { Row } from "react-table";
 import { toast } from "react-toastify";
 import AddCardio from "./add-exercise";
 import { useAppSelector } from "hooks/useRedux";
@@ -53,9 +52,12 @@ function SideBar({
   };
 
   // ON save Item =========================>
+
+  const isEditing = cardioData !== null;
+
   const isImageDelete = useAppSelector(selectIsImageDelete);
 
-  const url = `/cardios/${cardioData?.id}`;
+  const url = isEditing ? `/cardios/${cardioData?.id}` : "/cardios";
 
   const { mutateAsync: saveCardio } = usePostQuery({
     url,
@@ -79,10 +81,10 @@ function SideBar({
           })
     );
 
-    formData.append("_method", "PUT");
+    isEditing && formData.append("_method", "PUT");
 
     try {
-      !isImageDelete && formData.delete("image");
+      !isImageDelete && isEditing && formData.delete("image");
 
       saveCardio(formData as any);
 
@@ -107,28 +109,6 @@ function SideBar({
     formRef.current.setFieldValue("cardios", filteredData);
   };
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "الإسم",
-        accessor: "name",
-      },
-
-      {
-        Header: "مستوى الشدة",
-        accessor: "met",
-      },
-
-      {
-        Header: " ",
-        Cell: ({ row }: { row: Row<any> }) => (
-          <TableActions onDelete={() => onDeleteExercise(row.original)} />
-        ),
-      },
-    ],
-    []
-  );
-
   return (
     <Formik
       initialValues={{ ...initialValues, ...cardioData }}
@@ -140,28 +120,56 @@ function SideBar({
         <Form className="flex flex-col gap-10">
           <div className="flex gap-5 justify-between w-full">
             <div className="flex gap-5 ">
-              <Img className="w-24 rounded-2xl" src={values?.image} />
+              <UploadInput name="image" />{" "}
               <div className="flex flex-col ">
-                <Input name="name" className="text-[25px] border-none" />
+                <Input
+                  name="name"
+                  className="text-[25px] border-[1px]"
+                  label="الإسم"
+                />
               </div>
             </div>
           </div>
 
-          <Card className="flex  gap-5 p-4">
+          {/* <Card className="flex  gap-5 p-4">
             <Text size="3xl">الصورة </Text>
             <hr />
             <UploadInput name="image" />
+          </Card> */}
+
+          <Card className="p-6">
+            <Text as="h1" className="mb-4">
+              مستوي الشدة
+            </Text>
+            {values.cardios?.map((item: any, index: number) => (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-4 mb-6"
+              >
+                <Input name={`cardios.[${index}].name`} />
+
+                <Input name={`cardios.[${index}].met`} />
+
+                <Button onClick={() => onDeleteExercise(item)}>
+                  <Img src="/images/trash.svg" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              className="flex items-center gap-1"
+              onClick={() =>
+                document.getElementById("cardio-exercise")?.click()
+              }
+            >
+              <Img src="/images/plus.svg" />
+              <Text className="!text-primary">إضافة</Text>
+            </Button>
+
+            <Modal id="cardio-exercise">
+              <AddCardio />
+            </Modal>
           </Card>
 
-          <Table
-            noPagination
-            search={false}
-            data={values.cardios ?? []}
-            columns={columns}
-            modalTitle="اضافة"
-            modalContent={<AddCardio />}
-            id="cardio-exercise"
-          />
           <TrhButton onDelete={onDeleteItem} />
         </Form>
       )}

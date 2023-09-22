@@ -206,7 +206,7 @@ function TrainingInfo() {
         </Text>
         {values.training_week_days?.map((weekDay: any, index: number) => (
           <Card
-            key={weekDay.day_num}
+            key={index}
             className="p-2 flex items-center justify-between mb-2"
           >
             <Text as="h5">
@@ -221,7 +221,7 @@ function TrainingInfo() {
                   ? "/images/img_checkmark.svg"
                   : "/images/img_clock5.png"
               }
-              alt={"image"}
+              alt="image"
             />
           </Card>
         ))}

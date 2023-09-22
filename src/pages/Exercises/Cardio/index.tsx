@@ -9,7 +9,7 @@ import CardioForm from "./add-cardio";
 
 function Cardio() {
   const [cardioData, setCardioData] = useState<any>(null);
-  const [categoryId, setCategoryId] = useState(1);
+
   // get cards data =================>
   const url = "/cardios";
 
@@ -24,7 +24,7 @@ function Cardio() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "التمرين",
+        Header: "الإسم",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
@@ -42,12 +42,14 @@ function Cardio() {
       },
 
       {
-        Header: "التمرين",
+        Header: "التمارين",
         accessor: "cardios",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
-              {row.original.cardios?.map(({ name }: { name: string }) => name)}
+              {row.original.cardios?.map(
+                ({ name }: { name: string }) => ` ${name} `
+              )}
             </div>
           );
         },
@@ -55,6 +57,7 @@ function Cardio() {
     ],
     []
   );
+
   const rowOnClick = (
     e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
   ) => {
@@ -71,44 +74,6 @@ function Cardio() {
   }
   return (
     <>
-      <div className="flex gap-3 h-24 ">
-        {!isLoading ? (
-          cardioList?.map((item: any) => {
-            return (
-              <SettingCard
-                // onDelete={onDelete}
-                // onEdit={() => onEdit(item)}
-                id={item.id}
-                key={item.id}
-                label={item.name}
-                active={categoryId === item.id}
-                onClick={() => setCategoryId(item.id)}
-                className={`h-[120px] ${
-                  item.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
-                }`}
-              />
-            );
-          })
-        ) : (
-          <>loading...</>
-        )}
-
-        <Card className={`p-4 w-[180px] cursor-pointer`}>
-          <label
-            htmlFor="add-new-cardio"
-            className={`flex flex-col justify-between items-center relative `}
-          >
-            <Img
-              className="w-16 absolute top-0 left-0"
-              src="/images/plus.svg"
-            />
-            <Text size="3xl" className="mt-4">
-              اضافة
-            </Text>
-          </label>
-        </Card>
-        <Modal id="add-new-cardio">asdasd</Modal>
-      </div>
       <div className="w-full space-y-4">
         <Table
           data={cardioList ?? []}
@@ -120,14 +85,11 @@ function Cardio() {
             <CardioForm cardioData={cardioData} setCardioData={setCardioData} />
           }
         />
-        <Modal id="add-new-nutrition">
-          <CardioForm cardioData={cardioData} setCardioData={setCardioData} />
-        </Modal>
         {cardioList.length === 0 && (
           <div className="flex justify-center items-center h-96">
             <Button
               className="bg-primary text-white"
-              htmlFor="add-new-nutrition"
+              htmlFor="my-drawer"
               primary
             >
               اضافة كارديو
