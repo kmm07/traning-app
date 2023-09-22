@@ -18,9 +18,12 @@ const initialValues = {
 };
 
 function SideBar({ exerciseData, categoryData }: any) {
+  const isEditing = exerciseData !== null;
   const onClose = () => {
     document.getElementById("my-drawer")?.click();
   };
+
+  const url = isEditing ? `/exercises/${exerciseData?.id}` : "/exercises";
 
   // exercises actions =====================>
   const queryClient = useQueryClient();
@@ -40,8 +43,6 @@ function SideBar({ exerciseData, categoryData }: any) {
       toast.error(error.response.data.message);
     }
   };
-
-  const url = `/exercises/${exerciseData?.id}`;
 
   const isImageDelete = useAppSelector(selectIsImageDelete);
 
@@ -83,7 +84,7 @@ function SideBar({ exerciseData, categoryData }: any) {
       toast.error(error.response.data.message);
     }
   };
-  console.log("exerciseData >>>> ", exerciseData);
+
   return (
     <Formik
       initialValues={{ ...initialValues, ...exerciseData }}
@@ -97,12 +98,9 @@ function SideBar({ exerciseData, categoryData }: any) {
               <UploadInput name="image" className="w-24 rounded-2xl" />
 
               <div className="flex flex-col ">
-                <Input name="name" label={"صورة التمرين"} />
+                <Input name="name" label="اسم العضلة" />
               </div>
             </div>
-            <Card className="!w-fit p-6 text-white text-lg">
-              {categoryData?.name}
-            </Card>
           </div>
           <Card className="flex  gap-5 p-4">
             <Text size="3xl">الفيديو </Text>
@@ -179,7 +177,7 @@ function SideBar({ exerciseData, categoryData }: any) {
               onClick={submitForm}
               isLoading={isEditLoading}
             >
-              تعديل
+              {isEditing ? "تعديل" : "اضافة"}
             </Button>
             <Button className="w-[100px]" primary onClick={onClose}>
               إلغاء

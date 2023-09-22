@@ -21,6 +21,7 @@ export interface TableProps<ColumnsType> {
   pagination?: PaginationType;
   noPagination?: boolean;
   rowOnClick?: (row: any) => void;
+  opnSideBarOpen?: () => void;
   title?: string;
   modalTitle?: string;
   modalContent?: React.ReactNode;
@@ -37,6 +38,7 @@ const Table = <ColumnsType,>({
   title,
   modalTitle,
   rowOnClick,
+  opnSideBarOpen,
   modalContent,
   modalOnDelete,
   onSave,
@@ -107,7 +109,7 @@ const Table = <ColumnsType,>({
           <div className="flex me-auto gap-4 items-center">
             <Button
               htmlFor="my-drawer"
-              onClick={() => rowOnClick?.({})}
+              onClick={opnSideBarOpen}
               rounded={"full"}
               primary
             >
