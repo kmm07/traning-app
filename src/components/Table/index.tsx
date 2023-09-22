@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTable, useFilters, useGlobalFilter, Column } from "react-table";
 import NoDataFounded from "../NoData";
 import PaginationType from "./paginationType";
-import { Input, Modal, Text } from "components";
+import { Button, Input, Modal, Text } from "components";
 import ReactPaginate from "react-paginate";
 
 declare global {
@@ -21,6 +21,7 @@ export interface TableProps<ColumnsType> {
   pagination?: PaginationType;
   noPagination?: boolean;
   rowOnClick?: (row: any) => void;
+  opnSideBarOpen?: () => void;
   title?: string;
   modalTitle?: string;
   modalContent?: React.ReactNode;
@@ -28,6 +29,7 @@ export interface TableProps<ColumnsType> {
   onSave?: () => void;
   search?: boolean;
   id?: string;
+  opnSideBar?: string;
 }
 
 const Table = <ColumnsType,>({
@@ -36,9 +38,11 @@ const Table = <ColumnsType,>({
   title,
   modalTitle,
   rowOnClick,
+  opnSideBarOpen,
   modalContent,
   modalOnDelete,
   onSave,
+  opnSideBar,
   search = true,
   id,
 }: TableProps<ColumnsType>) => {
@@ -101,16 +105,30 @@ const Table = <ColumnsType,>({
           )}
         </div>
 
-        <div className="flex me-auto gap-4 items-center">
-          <Modal
-            modalOnDelete={modalOnDelete}
-            onSave={onSave}
-            label={modalTitle}
-            id={id}
-          >
-            {modalContent}
-          </Modal>
-        </div>
+        {opnSideBar && (
+          <div className="flex me-auto gap-4 items-center">
+            <Button
+              htmlFor="my-drawer"
+              onClick={opnSideBarOpen}
+              rounded={"full"}
+              primary
+            >
+              {opnSideBar}
+            </Button>
+          </div>
+        )}
+        {modalTitle && (
+          <div className="flex me-auto gap-4 items-center">
+            <Modal
+              modalOnDelete={modalOnDelete}
+              onSave={onSave}
+              label={modalTitle}
+              id={id}
+            >
+              {modalContent}
+            </Modal>
+          </div>
+        )}
       </div>
 
       <table

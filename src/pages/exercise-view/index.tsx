@@ -71,10 +71,7 @@ function ExercisesView({ home }: Props) {
               <div className="avatar indicator">
                 <div className="w-12 h-12 rounded-full">
                   <img
-                    src={
-                      row.original.muscle_image ||
-                      "/images/img_rectangle347.png"
-                    }
+                    src={row.original.image || "/images/img_rectangle347.png"}
                   />
                 </div>
               </div>
@@ -157,7 +154,10 @@ function ExercisesView({ home }: Props) {
             data={exerciseList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
-            modalTitle="اضافة تمرين"
+            opnSideBar="اضافة تمرين"
+            opnSideBarOpen={() =>
+              setExerciseData({ exercise_category_id: categoryData?.id })
+            }
             modalContent={
               <AddExercise exercise_category_id={categoryData?.id} />
             }
@@ -183,7 +183,7 @@ function ExercisesView({ home }: Props) {
       )}
 
       <Drawer>
-        <SideBar exerciseData={exerciseData} categoryData={categoryData} />
+        `<SideBar exerciseData={exerciseData} categoryData={categoryData} />`
       </Drawer>
 
       <Modal id="new-exercise-category">
