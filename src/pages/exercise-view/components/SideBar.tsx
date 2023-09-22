@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Img,
-  Input,
-  Text,
-  TextArea,
-  UploadInput,
-} from "components";
+import { Button, Card, Input, Text, TextArea, UploadInput } from "components";
 import { Form, Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
@@ -91,6 +83,7 @@ function SideBar({ exerciseData, categoryData }: any) {
       toast.error(error.response.data.message);
     }
   };
+  console.log("exerciseData >>>> ", exerciseData);
   return (
     <Formik
       initialValues={{ ...initialValues, ...exerciseData }}
@@ -101,12 +94,10 @@ function SideBar({ exerciseData, categoryData }: any) {
         <Form className="flex flex-col gap-10">
           <div className="flex gap-5 justify-between w-full">
             <div className="flex gap-5 ">
-              <Img
-                className="w-24 rounded-2xl"
-                src={values.image || "/images/img_rectangle347.png"}
-              />
+              <UploadInput name="image" className="w-24 rounded-2xl" />
+
               <div className="flex flex-col ">
-                <Text size="3xl">{exerciseData?.name}</Text>
+                <Input name="name" label={"صورة التمرين"} />
               </div>
             </div>
             <Card className="!w-fit p-6 text-white text-lg">

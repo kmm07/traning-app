@@ -157,7 +157,7 @@ function ExercisesView({ home }: Props) {
             data={exerciseList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
-            modalTitle="اضافة تمرين"
+            opnSideBar="اضافة تمرين"
             modalContent={
               <AddExercise exercise_category_id={categoryData?.id} />
             }
