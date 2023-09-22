@@ -1,7 +1,16 @@
-import { Button, Card, Img, Input, Modal, Text } from "components";
+import {
+  Button,
+  Card,
+  Img,
+  Input,
+  Modal,
+  Select,
+  Text,
+  UploadInput,
+} from "components";
 import { Formik } from "formik";
-import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
-import { useQueryClient } from "react-query";
+import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
+import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AddWeekDayExercise from "./add-day-exercise";
@@ -35,8 +44,14 @@ const SingleExercise = ({
           <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
 
-        <div className="flex items-center">
-          <div className="rounded-full border-[1px] p-2">
+        <div className={"flex items-center"}>
+          <div
+            className={`rounded-full border-[1px] p-2  ${
+              exercise?.sessions?.length === 0
+                ? "text-red-600 !border-red-600"
+                : ""
+            }`}
+          >
             الجلسات <span className="ms-4">{exercise?.sessions?.length}</span>
           </div>
           <div>
@@ -104,7 +119,12 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   const isImageDelete = useAppSelector(selectIsImageDelete);
 
   // on submit weekday data ======================>
-  const url = `/training-week-days/${weekDayData?.id}`;
+  const isEditing = weekDayData !== null;
+
+  const url = isEditing
+    ? `/training-week-days/${weekDayData?.id}`
+    : "/training-week-days";
+
   const { mutateAsync: editWeekDay, isLoading: isEditLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
@@ -129,6 +149,11 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     });
 
     formattedData.forEach((data) => {
+      if (data[0] === "exercise_category_id") {
+        formData.append("exercise_category_id", data[1]?.value as any);
+
+        return;
+      }
       if (data[0] !== "exercises") {
         formData.append(data[0], data[1] as any);
       }
@@ -176,10 +201,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
 
     formData.append("training_week_id", id as any);
 
-    formData.append("_method", "PUT" as any);
+    isEditing && formData.append("_method", "PUT" as any);
 
     try {
-      !isImageDelete && formData.delete("image");
+      !isImageDelete && isEditing && formData.delete("image");
 
       await editWeekDay(formData as any);
 
@@ -195,27 +220,25 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     }
   };
 
-  const [parentId, setParentId] = useState<number | null>(null);
+  const [parent, setParent] = useState<number | null>(null);
 
-  const onAddSpareExercise = (id: number) => {
-    setParentId(id);
+  const onAddSpareExercise = async (exercise: number) => {
+    await setParent(exercise);
     document.getElementById("add-spare-weekday")?.click();
   };
 
   const onDeleteSpareExercise = (
+    exercise: any,
     deletedExercise: any,
-    values: any,
-    setFieldValue: any
+    setFieldValue: any,
+    values: any
   ) => {
-    const parentExercise = values.exercises.find(
-      (exercise: any) => exercise.id === deletedExercise.parent_id
+    const filteredArray = exercise.children?.filter(
+      (child: any) =>
+        child.exercise_id?.value !== deletedExercise?.exercise_id?.value
     );
 
-    const filteredArray = parentExercise?.children?.filter(
-      (exercise: any) =>
-        exercise.exercise_name !== deletedExercise?.exercise_name
-    );
-    parentExercise.children = filteredArray;
+    exercise.children = filteredArray;
 
     setFieldValue("exercises", [...values.exercises]);
   };
@@ -228,11 +251,27 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     document.getElementById("edit-exercise-sessions")?.click();
   };
 
+  // get exercieses categories ===============>
+  const categoriesURL = "/exercise-categories";
+
+  const { data: categories }: UseQueryResult<any> = useGetQuery(
+    categoriesURL,
+    categoriesURL,
+    {
+      select: ({ data }: { data: { data: [] } }) =>
+        data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
+    }
+  );
+
   return (
     <Formik
       initialValues={{
         ...initialValues,
         ...weekDayData,
+        exercise_category_id: {
+          label: weekDayData?.exercise_category,
+          value: weekDayData?.exercise_category_id,
+        },
       }}
       onSubmit={onSubmit}
       enableReinitialize
@@ -241,10 +280,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         <Form>
           <div className="flex flex-col gap-10 mb-10">
             <div className="flex gap-4">
-              <Img
-                className="w-24"
-                src={weekDayData?.image || "/images/img_rectangle347.png"}
-              />
+              <UploadInput name="image" />
               <div>
                 <div className="flex items-center gap-4">
                   <Text as="h1" className="!text-[24px]">
@@ -252,12 +288,17 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   </Text>
                   <Input
                     name="day_num"
-                    className="!w-[80px] text-center font-bold text-[24px]"
+                    className="!w-[200px] text-center font-bold text-[24px]"
                   />
                 </div>
-                <Text as="h5" size="3xl">
-                  {values.exercise_category}
-                </Text>
+                <Select
+                  options={categories ?? []}
+                  name="exercise_category_id"
+                  label="فئة التمرين"
+                  isForm={false}
+                  onChange={(e) => setFieldValue("exercise_category_id", e)}
+                  value={values.exercise_category_id}
+                />
               </div>
             </div>
           </div>
@@ -289,14 +330,12 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                 {values.exercises
                   .filter((exercise: any) => exercise.parent_id === null)
                   ?.map((exercise: any) => (
-                    <div className="border-[1px] rounded-lg p-4">
+                    <div className="border-[1px] rounded-lg p-4 !mb-6 ">
                       <SingleExercise
                         key={exercise?.name}
                         exercise={exercise}
                         onEditExercise={() => onEditExercise(exercise) as any}
-                        onAddSpareExercise={() =>
-                          onAddSpareExercise(exercise?.id)
-                        }
+                        onAddSpareExercise={() => onAddSpareExercise(exercise)}
                       />
                       <Text as="h5" className="!mb-2">
                         التمرينات البديلة:
@@ -312,9 +351,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                             }
                             onDeleteEXercise={() =>
                               onDeleteSpareExercise(
+                                exercise,
                                 subExercise,
-                                values,
-                                setFieldValue
+                                setFieldValue,
+                                values
                               )
                             }
                           />
@@ -329,9 +369,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                           }
                           onDeleteEXercise={() =>
                             onDeleteSpareExercise(
+                              exercise,
                               subExercise,
-                              values,
-                              setFieldValue
+                              setFieldValue,
+                              values
                             )
                           }
                         />
@@ -340,13 +381,13 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   ))}
 
                 <Button
-                  secondaryBorder
-                  className="!mt-5"
+                  className="!mt-5 flex items-center gap-1"
                   onClick={() =>
-                    document.getElementById("add-week-day-side-bar")?.click()
+                    document.getElementById("add-week-day-exercise")?.click()
                   }
                 >
-                  تعديل بيانات اليوم
+                  <Img src="/images/plus.svg" />
+                  <Text> إضافة تمرين</Text>
                 </Button>
               </div>
             </Card>
@@ -363,28 +404,28 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
               <Button className="w-[100px]" primary onClick={onClose}>
                 إلغاء
               </Button>
-              <Button
-                className="w-[100px]"
-                danger
-                onClick={onDeleteItem}
-                isLoading={isLoading}
-              >
-                حذف
-              </Button>
+              {isEditing && (
+                <Button
+                  className="w-[100px]"
+                  danger
+                  onClick={onDeleteItem}
+                  isLoading={isLoading}
+                >
+                  حذف
+                </Button>
+              )}
             </div>
           </div>
 
-          <Modal id="add-week-day-side-bar" className="!h-full !w-full">
-            <AddWeekDayExercise
-              onAddExercise={() =>
-                document.getElementById("add-week-day-side-bar")?.click()
-              }
-              isEditing={true}
-            />
+          <Modal id="add-week-day-exercise" className="!h-full !w-full">
+            <AddWeekDayExercise categories={categories} isEditing={isEditing} />
           </Modal>
 
           <Modal id="add-spare-weekday" className="!h-full !w-full">
-            <AddWeekSpareDayExercise parentId={parentId} />
+            <AddWeekSpareDayExercise
+              parent={parent}
+              isEditing={weekDayData !== null}
+            />
           </Modal>
 
           <Modal id="edit-exercise-sessions" className="!h-full !w-full">

@@ -108,13 +108,14 @@ export default function ViewWeekDay() {
         columns={columns}
         rowOnClick={rowOnClick}
         modalContent={<WeekDayForm />}
-        modalTitle="اضافة يوم"
+        opnSideBar="إضافة يوم"
+        opnSideBarOpen={() => setActive(null)}
         id="add-week-day"
       />
       {data.length === 0 && (
         <div className="flex justify-center mt-10">
           <Button
-            onClick={() => document.getElementById("add-week-day")?.click()}
+            onClick={() => document.getElementById("z")?.click()}
             secondaryBorder
           >
             إضافة يوم

@@ -3,18 +3,16 @@ import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
 import { UseQueryResult } from "react-query";
-import { toast } from "react-toastify";
 
 interface Props {
-  parentId?: number | null;
+  parent?: any;
+  isEditing: boolean;
 }
 
-export default function AddWeekSpareDayExercise({ parentId }: Props) {
+export default function AddWeekSpareDayExercise({ parent, isEditing }: Props) {
   const { values, setFieldValue } = useFormikContext<any>();
 
   const [extraData, setExtraData] = useState<any>();
-
-  const [addedExercises, setAddedExercises] = useState<any>([]);
 
   const [exercise, setExercise] = useState<any>({
     exercise_id: "",
@@ -26,8 +24,6 @@ export default function AddWeekSpareDayExercise({ parentId }: Props) {
       rest_sec: "",
     },
   });
-
-  const [exerciseSession, setExerciseSession] = useState<any>([]);
 
   // get exercieses categories ===============>
   const categoriesURL = "/exercise-categories";
@@ -55,53 +51,18 @@ export default function AddWeekSpareDayExercise({ parentId }: Props) {
     }
   );
 
-  const onAddSession = () => {
-    setExerciseSession([
-      ...exerciseSession,
-      { ...exercise?.sessions, is_new: 1 },
-    ]);
-    setExercise({
-      ...exercise,
-      sessions: { session_num: "", counter: "", rest_sec: "" },
-    });
-
-    toast.success("تم إضافة الجسلة بنجاح");
-  };
-
-  const onDeleteExercise = (deletedExercise: any) => {
-    const filteredArray = addedExercises?.exercises?.filter(
-      (exercise: any) => exercise.exercise_id !== deletedExercise
-    );
-
-    setAddedExercises(filteredArray);
-  };
-
-  const onAddExercise = () => {
-    setAddedExercises([
-      ...addedExercises,
+  const onSaveExercises = () => {
+    parent.children = [
+      ...parent.children,
       {
         ...exercise,
-        sessions: exerciseSession,
-        parent_id: parentId,
+        sessions: [],
+        parent_id: parent.id ?? "",
         is_new: 1,
       },
-    ]);
+    ];
 
-    setExercise({
-      exercise_category_id: "",
-      exercise_id: "",
-      rest_sec: "",
-      private: false,
-      sessions: [],
-    });
-
-    setExerciseSession([]);
-  };
-
-  const onSaveExercises = () => {
-    setFieldValue("exercises", [...values.exercises, ...addedExercises]);
-
-    setAddedExercises([]);
+    setFieldValue("exercises", [...values.exercises]);
 
     document.getElementById("add-spare-weekday")?.click();
   };
@@ -152,118 +113,6 @@ export default function AddWeekSpareDayExercise({ parentId }: Props) {
             value={exercise?.private}
           />
         </div>
-        <div className="my-6">
-          <Text> جلسات التمرين:</Text>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              name="sessions-nums"
-              label="عدد جلسات التمرين"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    session_num: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.session_num}
-              isForm={false}
-            />
-
-            <Input
-              name="counter"
-              label="العدد"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    counter: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.counter}
-              isForm={false}
-            />
-
-            <Input
-              name="rest_sec"
-              label="وقت الراحة"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    rest_sec: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.rest_sec}
-              isForm={false}
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button onClick={onAddSession} secondaryBorder>
-            إضافة جلسة
-          </Button>
-
-          <Button onClick={onAddExercise} primary className="!my-6">
-            إضافة تمرين
-          </Button>
-        </div>
-
-        {/* added exercises */}
-        {addedExercises?.map((singleExercise: any) => (
-          <div className="my-6 border-[1px] rounded-md p-4">
-            <Text as="h5">{singleExercise?.name}</Text>
-
-            <Text as="h5">{singleExercise?.exercise_id?.label}</Text>
-
-            <Text>{singleExercise?.rest_sec} ثانية راحة</Text>
-
-            <Text as="h5">
-              {[0, false].includes(singleExercise?.private)
-                ? "تمرين عام"
-                : "تمرين خاص"}
-            </Text>
-
-            <div className="mt-4">
-              <Text>جلسات التمرين:</Text>
-              {singleExercise.sessions?.map((session: any) => (
-                <div className="my-4">
-                  <Text as="h5">{session.session_num} عدد الجلسات</Text>
-
-                  <Text as="h5">{session.counter} عداد العدات</Text>
-
-                  <Text as="h5">{session.rest_sec} ثانية راحة</Text>
-
-                  <Button
-                    onClick={() => {
-                      const filteredArray = singleExercise.sessions.filter(
-                        (item: any) => item !== session
-                      );
-                      singleExercise.sessions = filteredArray;
-
-                      setFieldValue("exercises", [...values.exercises]);
-                    }}
-                  >
-                    <Img src="/images/trash.svg" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => onDeleteExercise(singleExercise?.exercise_id)}
-              danger
-            >
-              حذف التمرين
-            </Button>
-          </div>
-        ))}
       </div>
 
       <div className="flex gap-4">

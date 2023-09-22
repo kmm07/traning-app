@@ -18,28 +18,18 @@ interface Props {
   isLoading?: boolean;
   isEditing?: boolean;
   onAddExercise?: any;
+  categories: any;
 }
 
 export default function AddWeekDayExercise({
   isEditing = false,
   isLoading = false,
-  onAddExercise,
+  categories,
 }: Props) {
   const { values, setFieldValue } = useFormikContext<any>();
 
-  // get exercieses categories ===============>
-  const categoriesURL = "/exercise-categories";
-
-  const {
-    data: categories,
-    isLoading: isCategoriesLoading,
-  }: UseQueryResult<any> = useGetQuery(categoriesURL, categoriesURL, {
-    select: ({ data }: { data: { data: [] } }) =>
-      data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
-  });
-
   // get exercieses  ===============>
-  const exercisesURL = `/exercises?exercise_category_id=${values.exercise_category_id}`;
+  const exercisesURL = `/exercises?exercise_category_id=${values.new_exercise_category_id}`;
 
   const { data: exercises = [] }: UseQueryResult<any> = useGetQuery(
     exercisesURL,
@@ -47,6 +37,7 @@ export default function AddWeekDayExercise({
     {
       select: ({ data }: { data: { data: [] } }) =>
         data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
+      enabled: ![undefined, null, ""].includes(values.new_exercise_category_id),
     }
   );
 
@@ -54,58 +45,36 @@ export default function AddWeekDayExercise({
     exercise_id: "",
     rest_sec: "",
     private: false,
-    sessions: {
-      session_num: "",
-      counter: "",
-      rest_sec: "",
-    },
+    is_new: 1,
+    parent_id: null,
+    sessions: [],
+    children: [],
   });
 
-  const [exerciseSession, setExerciseSession] = useState<any>([]);
+  const onAddNewExercise = () => {
+    setFieldValue("exercises", [...values.exercises, exercise]);
 
-  const onAddSession = () => {
-    setExerciseSession([
-      ...exerciseSession,
-      { ...exercise?.sessions, is_new: isEditing ? 1 : 0 },
-    ]);
+    setFieldValue("new_exercise_category_id", null);
+
     setExercise({
-      ...exercise,
-      sessions: { session_num: "", counter: "", rest_sec: "" },
+      exercise_id: "",
+      rest_sec: "",
+      private: false,
+      is_new: 1,
+      parent_id: null,
+      sessions: [],
+      children: [],
     });
 
-    toast.success("تم إضافة الجسلة بنجاح");
-  };
-
-  const onDeleteExercise = (
-    values: any,
-    setFieldValue: any,
-    deletedExercise: any
-  ) => {
-    const filteredArray = values.exercises?.filter(
-      (exercise: any) => exercise.exercise_id !== deletedExercise
-    );
-
-    setFieldValue("exercises", filteredArray);
+    document.getElementById("add-week-day-exercise")?.click();
   };
 
   return (
     <div>
-      <UploadInput name="image" />
-      <div className="grid grid-cols-2 gap-4">
-        <Input name="day_num" label="رقم اليوم" />
-
-        <Select
-          options={categories ?? []}
-          name="exercise_category_id"
-          label="فئة التمرين"
-          isLoading={isCategoriesLoading}
-        />
-      </div>
-
-      <TextArea
-        name="target_text"
-        label="هدف التمرين"
-        className="border-[1px]"
+      <Select
+        options={categories ?? []}
+        name="new_exercise_category_id"
+        label="فئة التمرين"
       />
 
       <div className="my-6">
@@ -140,141 +109,6 @@ export default function AddWeekDayExercise({
             value={exercise?.private}
           />
         </div>
-        <div className="my-6">
-          <Text> جلسات التمرين:</Text>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              name="sessions-nums"
-              label="عدد جلسات التمرين"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    session_num: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.session_num}
-              isForm={false}
-            />
-
-            <Input
-              name="counter"
-              label="العدد"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    counter: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.counter}
-              isForm={false}
-            />
-
-            <Input
-              name="rest_sec"
-              label="وقت الراحة"
-              onChange={(e) =>
-                setExercise({
-                  ...exercise,
-                  sessions: {
-                    ...exercise?.sessions,
-                    rest_sec: e.target.value,
-                  },
-                })
-              }
-              value={exercise?.session?.rest_sec}
-              isForm={false}
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Button onClick={onAddSession} secondaryBorder>
-            إضافة جلسة
-          </Button>
-
-          <Button
-            onClick={() => {
-              setFieldValue("exercises", [
-                ...values.exercises,
-                {
-                  ...exercise,
-                  sessions: exerciseSession,
-                  is_new: isEditing ? 1 : 0,
-                },
-              ]);
-
-              setExercise({
-                exercise_id: "",
-                rest_sec: "",
-                private: false,
-                sessions: [],
-              });
-              setExerciseSession([]);
-            }}
-            primary
-            className="!my-6"
-          >
-            إضافة تمرين
-          </Button>
-        </div>
-
-        {/* added exercises */}
-        {values.exercises?.map((singleExercise: any) => (
-          <div className="my-6 border-[1px] rounded-md p-4">
-            <Text as="h5">{singleExercise?.exercise_id?.label}</Text>
-
-            <Text>{singleExercise?.rest_sec} ثانية راحة</Text>
-
-            <Text as="h5">
-              {singleExercise?.private === 0 ? "تمرين عام" : "تمرين خاص"}
-            </Text>
-
-            <div className="mt-4">
-              <Text>جلسات التمرين:</Text>
-              {singleExercise.sessions?.map((session: any) => (
-                <div className="my-4">
-                  <Text as="h5">{session.session_num} عدد الجلسات</Text>
-
-                  <Text as="h5">{session.counter} عداد العدات</Text>
-
-                  <Text as="h5">{session.rest_sec} ثانية راحة</Text>
-
-                  <Button
-                    onClick={() => {
-                      const filteredArray = singleExercise.sessions.filter(
-                        (item: any) => item !== session
-                      );
-                      singleExercise.sessions = filteredArray;
-
-                      setFieldValue("exercises", [...values.exercises]);
-                    }}
-                  >
-                    <Img src="/images/trash.svg" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              onClick={() =>
-                onDeleteExercise(
-                  values,
-                  setFieldValue,
-                  singleExercise?.exercise_id
-                )
-              }
-              danger
-            >
-              حذف التمرين
-            </Button>
-          </div>
-        ))}
       </div>
 
       <div className="flex gap-4">
@@ -284,11 +118,7 @@ export default function AddWeekDayExercise({
           type="reset"
           secondary
           onClick={() => {
-            document
-              .getElementById(
-                isEditing ? "add-week-day-side-bar" : "add-week-day"
-              )
-              ?.click();
+            document.getElementById("add-spare-weekday")?.click();
           }}
         >
           الغاء
@@ -299,7 +129,7 @@ export default function AddWeekDayExercise({
           primary
           type="button"
           isLoading={isLoading}
-          onClick={onAddExercise}
+          onClick={onAddNewExercise}
         >
           حفظ
         </Button>

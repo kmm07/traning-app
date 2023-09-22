@@ -42,7 +42,7 @@ const SingleSession = ({ exercise, index, exercise_name }: any) => {
           />
         </div>
         <div className="border-[1px] rounded-full p-2">
-          <Text as="h2">{exercise_name}</Text>
+          <Text as="h2">{exercise_name ?? exercise.exercise_id?.label}</Text>
         </div>
         <div>
           <Text as="h5" className="mb-2">
@@ -82,7 +82,7 @@ export default function EditExerciseSessions({ exercise }: Props) {
           key={index}
           exercise={exercise?.sessions}
           index={index}
-          exercise_name={exercise?.exercise_name}
+          exercise_name={exercise?.exercise_name ?? exercise.exercise_id?.label}
         />
       ))}
       <Button className="flex items-center gap-1" onClick={onAddSession}>

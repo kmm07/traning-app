@@ -72,6 +72,7 @@ function Cardio() {
   if (isLoading) {
     return <>loading...</>;
   }
+
   return (
     <>
       <div className="w-full space-y-4">
@@ -79,11 +80,8 @@ function Cardio() {
           data={cardioList ?? []}
           columns={columns}
           rowOnClick={rowOnClick}
-          modalTitle="اضافة كارديو"
-          id="add-new-nutrition"
-          modalContent={
-            <CardioForm cardioData={cardioData} setCardioData={setCardioData} />
-          }
+          opnSideBar="اضافة كارديو"
+          opnSideBarOpen={() => setCardioData(null)}
         />
         {cardioList.length === 0 && (
           <div className="flex justify-center items-center h-96">
