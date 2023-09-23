@@ -6,7 +6,6 @@ import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import AddDietCategories from "./components/AddDietCategories";
-import AddDescription from "./add-description";
 
 interface DescriptionType {
   calories: number;
@@ -225,28 +224,19 @@ function Descriptions() {
           data={descriptionsList ?? []}
           columns={columns}
           rowOnClick={rowOnClick}
-          modalTitle="اضافة وجبة"
-          modalContent={<AddDescription />}
+          opnSideBar="إضافة وصفة"
+          opnSideBarOpen={() => setMealData(null)}
         />
       ) : (
         <>loading...</>
       )}
-
       {descriptionsList?.length === 0 && (
-        <>
-          <Modal id="add-new-desc">
-            <AddDescription emptyData />
-          </Modal>
-
-          <div className="flex justify-center">
-            <Button
-              secondaryBorder
-              onClick={() => document.getElementById("add-new-desc")?.click()}
-            >
-              إضافة وجبة
-            </Button>
-          </div>
-        </>
+        <Button
+          secondaryBorder
+          onClick={() => document.getElementById("my-drawer")?.click()}
+        >
+          إضافة وصفة
+        </Button>
       )}
 
       <Modal id="add-new-nutrition">
@@ -256,7 +246,7 @@ function Descriptions() {
       <Drawer>
         <SideBar
           setMealData={setMealData}
-          mealData={mealData ?? {}}
+          mealData={mealData}
           categoryId={categoryId as any}
           meal={meal}
         />

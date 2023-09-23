@@ -219,7 +219,7 @@ function NutritionModal({ activeUser }: any) {
 
       Helpers.resetForm();
 
-      document.getElementById("id_special_notify")?.click();
+      document.getElementById("special-notify")?.click();
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -250,7 +250,7 @@ function NutritionModal({ activeUser }: any) {
         enableReinitialize
         innerRef={formRef}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, submitForm }) => (
           <Form className="space-y-4">
             <div>
               <Text size="2xl">اشعار مخصص</Text>
@@ -295,10 +295,7 @@ function NutritionModal({ activeUser }: any) {
                 className="w-[100px]"
                 primary
                 isLoading={isLoading}
-                type="submit"
-                onClick={() => {
-                  document.getElementById("special-notify")?.click();
-                }}
+                onClick={submitForm}
               >
                 إرسال
               </Button>

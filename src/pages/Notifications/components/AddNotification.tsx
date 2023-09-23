@@ -11,7 +11,7 @@ import {
 import { Form, Formik } from "formik";
 import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
-import { UseQueryResult } from "react-query";
+import { UseQueryResult, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 
 const initialValues = {
@@ -20,10 +20,12 @@ const initialValues = {
   details: [],
   users: [],
   image: "",
-  private: "",
+  private: false,
 };
 
 function AddNotification() {
+  const [detail, setDetail] = useState<string>("");
+
   // get users data =================>
   const usersURL = "/users";
 
@@ -37,7 +39,8 @@ function AddNotification() {
     });
 
   // on send notify ========================>
-  const onClose = () => document.getElementById("add-notification")?.click();
+
+  const queryClient = useQueryClient();
 
   const url = "/notifications";
 
@@ -74,7 +77,11 @@ function AddNotification() {
 
       Helpers.resetForm();
 
-      onClose();
+      setDetail("");
+
+      await queryClient.invalidateQueries("/notifications");
+
+      document.getElementById("add-notification")?.click();
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -92,11 +99,13 @@ function AddNotification() {
     setFieldValue("details", filteredArray);
   };
 
-  const [detail, setDetail] = useState<string>("");
-
   return (
-    <Formik onSubmit={onSubmit} initialValues={initialValues}>
-      {({ values, setFieldValue, submitForm }) => (
+    <Formik
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+      enableReinitialize
+    >
+      {({ values, setFieldValue, submitForm, resetForm }) => (
         <Form className="space-y-8">
           <UploadInput name="image" label="الصورة" />
           <div className="grid grid-cols-2 gap-4">
@@ -161,7 +170,14 @@ function AddNotification() {
             >
               {"حفظ"}
             </Button>
-            <Button className="w-[100px]" secondaryBorder onClick={onClose}>
+            <Button
+              className="w-[100px]"
+              secondaryBorder
+              onClick={() => {
+                resetForm();
+                document.getElementById("add-notification")?.click();
+              }}
+            >
               إلغاء
             </Button>
           </div>

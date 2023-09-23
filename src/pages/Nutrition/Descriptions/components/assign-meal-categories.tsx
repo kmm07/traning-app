@@ -1,4 +1,4 @@
-import { Button, Img, Select } from "components";
+import { Button, Img, Select, Text } from "components";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
@@ -37,6 +37,15 @@ export default function AssignMealCategories({}: Props) {
     setFieldValue("diet_categories", [...values.diet_categories]);
   };
 
+  const onAssignCategories = () => {
+    setFieldValue("diet_categories", [
+      ...(values.diet_categories ?? []),
+      { meal: "", id: null },
+    ]);
+  };
+
+  console.log(values.diet_categories);
+
   return (
     <div>
       {values.diet_categories?.map((item: any, index: number) => (
@@ -63,6 +72,10 @@ export default function AssignMealCategories({}: Props) {
           </Button>
         </div>
       ))}
+      <Button onClick={onAssignCategories}>
+        <Img src="/images/plus.svg" />
+        <Text className="!text-primary">إضافة تصنيف</Text>
+      </Button>
 
       <div className="flex items-center justify-evenly mt-6">
         <Button

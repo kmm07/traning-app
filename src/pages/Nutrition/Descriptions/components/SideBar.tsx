@@ -1,5 +1,13 @@
-import { Button, Card, Img, Input, Modal, Table, Text } from "components";
-import { RowTable } from "components/RowTable";
+import {
+  Button,
+  Card,
+  Img,
+  Input,
+  Modal,
+  Table,
+  Text,
+  UploadInput,
+} from "components";
 import TableActions from "components/Table/actions";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import React, { useRef, useState } from "react";
@@ -9,7 +17,6 @@ import { useQueryClient } from "react-query";
 import { Formik } from "formik";
 import { Form } from "react-router-dom";
 import AddStep from "./addStep";
-import EditIngredient from "./editIngredient";
 import AddIngredient from "./add-ingredients";
 import AssignMealCategories from "./assign-meal-categories";
 
@@ -29,7 +36,12 @@ const initialValues = {
   prepare: { url: "", video_type: "internal", steps: [], video: "" },
 };
 
-function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
+function SideBar({
+  setMealData,
+  mealData = null,
+  categoryId,
+  meal,
+}: SideBarProps) {
   // list actions ======================>
   const { mutateAsync, isLoading } = useDeleteQuery();
 
@@ -59,13 +71,6 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
 
     formRef.current.setFieldValue("ingredients", filteredArray);
   };
-
-  const [ingredientData, setIngredientData] = useState<any>(null);
-
-  // const onEditIngredient = (item: any) => {
-  //   setIngredientData(item);
-  //   document.getElementById("edit-ingredient")?.click();
-  // };
 
   // steps actions =====================>
   const onDeleteStep = (item: any) => {
@@ -115,11 +120,44 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
   };
 
   // on submit meal data ======================>
-  const url = `/diet-meals/${mealData.id}`;
+  const isEditing = mealData !== null;
+
+  const url = isEditing ? `/diet-meals/${mealData.id}` : "/diet-meals";
+
   const { mutateAsync: editMeal, isLoading: isEditLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
   });
+
+  const [parentId, setParentId] = useState<number | null>(null);
+
+  const onAddSpareIngredient = (parentId: number) => {
+    setParentId(parentId);
+    document.getElementById("add-ingredient")?.click();
+  };
+
+  const getItemPercentage = (size: number, itemValue: number) => {
+    return Number((itemValue / 100) * size).toFixed(2);
+  };
+
+  const meals = [
+    { label: "فطار", value: "Breakfast" },
+    { label: "غداء", value: "Lunch" },
+    { label: "سناكس", value: "Snack" },
+    { label: "عشاء", value: "Dinner" },
+  ];
+
+  const onViewCategories = () =>
+    document.getElementById("edit-categories")?.click();
+
+  const mealValue = [
+    "السعرات",
+    "البروتين",
+    "الكاربوهيدرات",
+    "الدهون",
+    "الدهون المتحولة",
+    "السكريات",
+  ];
 
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
@@ -167,6 +205,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
           );
         });
       }
+
       if (value[0] === "diet_categories") {
         (value[1] as any).forEach((category: any, index: any) => {
           formData.append(`diet_categories[${index}][id]`, category.id?.value);
@@ -179,7 +218,7 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
       }
     });
 
-    formData.append("_method", "PUT");
+    isEditing && formData.append("_method", "PUT");
 
     formData.append("diet_category_id", categoryId as any);
 
@@ -202,32 +241,17 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
     }
   };
 
-  const [parentId, setParentId] = useState<number | null>(null);
-
-  const onAddSpareIngredient = (parentId: number) => {
-    setParentId(parentId);
-    document.getElementById("add-ingredient")?.click();
-  };
-
-  const getItemPercentage = (size: number, itemValue: number) => {
-    return Number((itemValue / 100) * size).toFixed(2);
-  };
-
-  const meals = [
-    { label: "فطار", value: "Breakfast" },
-    { label: "غداء", value: "Lunch" },
-    { label: "سناكس", value: "Snack" },
-    { label: "عشاء", value: "Dinner" },
-  ];
-
-  const onViewCategories = () =>
-    document.getElementById("edit-categories")?.click();
-
   return (
     <Formik
       initialValues={{
         ...initialValues,
         ...mealData,
+        calories: Number(mealData?.calories ?? 0).toFixed(2),
+        protein: Number(mealData?.protein ?? 0).toFixed(2),
+        fat: Number(mealData?.fat ?? 0).toFixed(2),
+        carbohydrate: Number(mealData?.carbohydrate ?? 0).toFixed(2),
+        sugar: Number(mealData?.calories ?? 0).toFixed(2),
+        trans_fat: Number(mealData?.trans_fat ?? 0).toFixed(2),
         prepare: { ...mealData?.prepare, video_type: "internal" },
         diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
           meal: meals.find((meal) => meal.value === item.meal),
@@ -243,10 +267,10 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
           <>
             <div className="mb-10 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-[100px] h-[100px]">
-                  <img src={values.image} className="h-full w-full" />
+                <div className="w-full">
+                  <UploadInput name="image" />
                 </div>
-                <Text className="text-lg">{values.name}</Text>
+                <Input name="name" className="text-lg" />
               </div>
 
               <div>
@@ -268,28 +292,27 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                 </Card>
               </div>
             </div>
-            <RowTable
-              data={{
-                columns: [
-                  Number(values?.calories).toFixed(2),
-                  Number(values?.protein).toFixed(2),
-                  Number(values?.carbohydrate).toFixed(2),
-                  Number(values?.fat).toFixed(2),
-                  Number(values?.trans_fat).toFixed(2),
-                  Number(values?.sugar).toFixed(2),
-                ],
-                header: [
-                  "السعرات",
-                  "البروتين",
-                  "الكاربوهيدرات",
-                  "الدهون",
-                  "الدهون المتحولة",
-                  "السكريات",
-                ],
-              }}
-              title="القيمة الغذائية"
-            />
-            <Card className="px-4 pb-4">
+
+            <Card className="p-6">
+              <div className="grid grid-cols-6 gap-6">
+                {mealValue.map((item) => (
+                  <Text as="h5" key={item} className="!text-center w-full">
+                    {item}
+                  </Text>
+                ))}
+              </div>
+              <div className="my-4 h-[4px] bg-primary" />
+              <div className="grid grid-cols-6 gap-6">
+                <Input name="calories" className="text-center font-bold" />
+                <Input name="protein" className="text-center font-bold" />
+                <Input name="carbohydrate" className="text-center font-bold" />
+                <Input name="fat" className="text-center font-bold" />
+                <Input name="trans_fat" className="text-center font-bold" />
+                <Input name="sugar" className="text-center font-bold" />
+              </div>
+            </Card>
+
+            <Card className="relative px-4 pb-4">
               <div className="flex justify-between py-3">
                 <Text size="3xl">المكونات</Text>
               </div>
@@ -378,7 +401,9 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                         </Button>
                       </div>
                     </div>
+
                     <Text as="h5">المكونات البديلة:</Text>
+
                     <div>
                       {values?.ingredients
                         ?.filter(
@@ -397,30 +422,70 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                                   />
                                 </div>
                               </div>
-                              <Text as="h5" className="!text-center">
-                                {subIngredient?.name ?? subIngredient.label}
+                              <Text as="h5" className="!w-full overflow-hidden">
+                                {subIngredient?.name}
                               </Text>
                             </div>
-
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">السعرات</Text>
-                              <Text as="h5">{subIngredient?.calories}</Text>
+                              <Text as="h5">
+                                {getItemPercentage(
+                                  subIngredient?.size,
+                                  subIngredient?.calories
+                                )}
+                              </Text>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">الكاربوهيدرات</Text>
-                              <Text as="h5">{subIngredient?.carbohydrate}</Text>
+                              <Text as="h5">
+                                {getItemPercentage(
+                                  subIngredient?.size,
+                                  subIngredient?.carbohydrate
+                                )}
+                              </Text>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">البروتين</Text>
-                              <Text as="h5">{subIngredient?.protein}</Text>
+                              <Text as="h5">
+                                {getItemPercentage(
+                                  subIngredient?.size,
+                                  subIngredient?.protein
+                                )}
+                              </Text>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">الدهون</Text>
-                              <Text as="h5">{subIngredient?.fat}</Text>
+                              <Text as="h5">
+                                {getItemPercentage(
+                                  subIngredient?.size,
+                                  subIngredient?.fat
+                                )}
+                              </Text>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                               <Text as="h5">السكريات</Text>
-                              <Text as="h5">{subIngredient?.sugar}</Text>
+                              <Text as="h5">
+                                {getItemPercentage(
+                                  subIngredient?.size,
+                                  subIngredient?.sugar
+                                )}
+                              </Text>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                              <Text as="h5">الحجم</Text>
+                              <Input
+                                name=""
+                                className="text-center"
+                                isForm={false}
+                                value={subIngredient.size}
+                                onChange={(e) => {
+                                  subIngredient.size = e.target.value;
+                                  setFieldValue("ingredients", [
+                                    ...values.ingredients,
+                                  ]);
+                                }}
+                              />
+                              <Text>{subIngredient.measure}</Text>
                             </div>
                             <div className="flex items-center gap-2">
                               <Button
@@ -446,7 +511,13 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                 إضافة مكون
               </Button>
             </Card>
-            <Card className="px-4 pb-4">
+            <Modal
+              id="add-ingredient"
+              modalClassName="[&>.modal-box]:!max-w-full !z-[1000]"
+            >
+              <AddIngredient parentId={parentId} setParentId={setParentId} />
+            </Modal>
+            <Card className="relative px-4 pb-4">
               <div className="flex justify-between py-3">
                 <Text size="3xl">طريقة التحضير</Text>
                 <div>
@@ -504,17 +575,36 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                   )}
                 </div>
               </div>
-              <Table
-                noPagination
-                search={false}
-                data={values?.prepare?.steps ?? []}
-                columns={columnsSteps}
-                modalTitle="اضافة خطوة"
-                modalContent={
-                  <AddStep editData={stepsData} setEditData={setStepsData} />
-                }
-                id="add-step"
-              />
+              {values?.prepare?.steps?.length > 0 ? (
+                <Table
+                  noPagination
+                  search={false}
+                  data={values?.prepare?.steps ?? []}
+                  columns={columnsSteps}
+                  modalTitle="اضافة خطوة"
+                  modalContent={
+                    <AddStep editData={stepsData} setEditData={setStepsData} />
+                  }
+                  id="add-step"
+                />
+              ) : (
+                <Button
+                  secondaryBorder
+                  onClick={() =>
+                    document.getElementById("add-step-empty")?.click()
+                  }
+                >
+                  إضافة خطوة
+                </Button>
+              )}
+
+              <Modal id="add-step-empty" modalClassName="absolute">
+                <AddStep
+                  editData={stepsData}
+                  setEditData={setStepsData}
+                  isEmpty={true}
+                />
+              </Modal>
             </Card>
             <div className="flex items-center justify-evenly mt-6">
               <Button
@@ -537,17 +627,6 @@ function SideBar({ setMealData, mealData, categoryId, meal }: SideBarProps) {
                 حذف
               </Button>
             </div>
-
-            <Modal id="edit-ingredient">
-              <EditIngredient
-                editData={ingredientData as any}
-                setEditData={setIngredientData}
-              />
-            </Modal>
-
-            <Modal id="add-ingredient">
-              <AddIngredient parentId={parentId} setParentId={setParentId} />
-            </Modal>
 
             <Modal id="edit-categories">
               <AssignMealCategories />

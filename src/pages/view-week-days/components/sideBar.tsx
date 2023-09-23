@@ -133,24 +133,11 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
-    const exercises: any = [];
+    const formattedData = Object.entries(values);
 
-    values.exercises?.forEach((exercise: any) => {
-      exercises.push(exercise);
-
-      if (exercise.children?.length !== 0) {
-        exercise.children?.forEach((children: any) => exercises.push(children));
-      }
-    });
-
-    const formattedData = Object.entries({
-      ...values,
-      exercises,
-    });
-
-    formattedData.forEach((data) => {
+    formattedData.forEach((data: any) => {
       if (data[0] === "exercise_category_id") {
-        formData.append("exercise_category_id", data[1]?.value as any);
+        formData.append("exercise_category_id", data?.[1].value as any);
 
         return;
       }
@@ -161,6 +148,56 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
       if (data[0] === "exercises") {
         (data[1] as any).forEach((subData: any, i: number) => {
           Object.entries(subData).forEach((item: any) => {
+            if (item[0] === "children" && item[1].length > 0) {
+              item[1]?.forEach((child: any, childIndex: number) => {
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][exercise_id]`,
+                  child.exercise_id.value
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][parent_id]`,
+                  child.parent_id
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][is_new]`,
+                  child.is_new
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][rest_sec]`,
+                  child.rest_sec
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][private]`,
+                  child?.private === true ? 1 : (0 as any)
+                );
+
+                child.sessions?.forEach(
+                  (session: any, sessionIndex: number) => {
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][session_num]`,
+                      session?.session_num
+                    );
+
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][counter]`,
+                      session?.counter
+                    );
+
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][rest_sec]`,
+                      session?.rest_sec
+                    );
+                  }
+                );
+              });
+
+              return;
+            }
+
             if (item[0] !== "sessions") {
               if (item[0] === "parent_id") {
                 formData.append(
@@ -180,9 +217,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                 );
               }
               return;
-            }
-
-            if (item[0] === "sessions") {
+            } else
               item[1].forEach((item: any, sessionIndex: number) =>
                 Object.entries(item).forEach((session: any) => {
                   formData.append(
@@ -191,9 +226,6 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   );
                 })
               );
-
-              return;
-            }
           });
         });
       }
@@ -260,6 +292,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     {
       select: ({ data }: { data: { data: [] } }) =>
         data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -311,7 +344,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
               <Input name="target_text" />
             </Card>
 
-            <Card className="p-6">
+            <Card className="relative p-6 !min-h-[400px]">
               <div className="flex items-center justify-between mb-3 pb-4 border-b-[1px]">
                 <Text as="h5" className="text-[20px]">
                   التمارين
@@ -390,6 +423,20 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   <Text> إضافة تمرين</Text>
                 </Button>
               </div>
+              <Modal id="add-week-day-exercise" modalClassName="absolute">
+                <AddWeekDayExercise categories={categories} />
+              </Modal>
+
+              <Modal id="add-spare-weekday" modalClassName="absolute">
+                <AddWeekSpareDayExercise
+                  parent={parent}
+                  isEditing={weekDayData !== null}
+                />
+              </Modal>
+
+              <Modal id="edit-exercise-sessions" modalClassName="absolute">
+                <EditExerciseSessions exercise={editableExercise} />
+              </Modal>
             </Card>
 
             <div className="flex items-center justify-evenly mt-6">
@@ -416,21 +463,6 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
               )}
             </div>
           </div>
-
-          <Modal id="add-week-day-exercise" className="!h-full !w-full">
-            <AddWeekDayExercise categories={categories} isEditing={isEditing} />
-          </Modal>
-
-          <Modal id="add-spare-weekday" className="!h-full !w-full">
-            <AddWeekSpareDayExercise
-              parent={parent}
-              isEditing={weekDayData !== null}
-            />
-          </Modal>
-
-          <Modal id="edit-exercise-sessions" className="!h-full !w-full">
-            <EditExerciseSessions exercise={editableExercise} />
-          </Modal>
         </Form>
       )}
     </Formik>

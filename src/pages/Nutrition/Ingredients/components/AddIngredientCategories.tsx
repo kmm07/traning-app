@@ -49,9 +49,9 @@ function AddIngredientCategories({ values }: { values: any }) {
       validationSchema={validationSchema}
     >
       <Form className="flex flex-col justify-start gap-8">
-        <Input name="name" label="الاسم" isForm />
+        <Input name="name" label="الاسم" />
 
-        <CheckBox name="private" label="خاص" isForm />
+        <CheckBox name="private" label="خاص" />
 
         <div className="flex gap-4 ">
           <Button
@@ -60,7 +60,6 @@ function AddIngredientCategories({ values }: { values: any }) {
             type="reset"
             htmlFor="add-new-nutrition"
             secondary
-            onClick={() => document.getElementById("my-drawer")?.click()}
           >
             الغاء
           </Button>

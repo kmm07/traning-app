@@ -18,6 +18,7 @@ export default function ViewWeekDay() {
 
   const { data = [] }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: [] } }) => data.data,
+    refetchOnWindowFocus: false,
   });
 
   const columns = React.useMemo(
@@ -115,7 +116,7 @@ export default function ViewWeekDay() {
       {data.length === 0 && (
         <div className="flex justify-center mt-10">
           <Button
-            onClick={() => document.getElementById("z")?.click()}
+            onClick={() => document.getElementById("my-drawer")?.click()}
             secondaryBorder
           >
             إضافة يوم

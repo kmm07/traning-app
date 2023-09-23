@@ -88,6 +88,7 @@ export default function WeekDayForm() {
           <AddWeekDayExercise
             isLoading={isLoading}
             onAddExercise={submitForm}
+            categories={[]}
           />
         </Form>
       )}

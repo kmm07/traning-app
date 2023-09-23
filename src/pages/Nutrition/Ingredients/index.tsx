@@ -6,15 +6,15 @@ import SideBar from "./components/SideBar";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
-import EditIngredient from "./components/editIngredient";
 import { toast } from "react-toastify";
+import EditIngredient from "./components/editIngredient";
 
 function Ingredients() {
   const [categoryId, setCategoryId] = useState(1);
 
-  const [ingredientData, setIngredientData] = useState<any>();
+  const [ingredientData, setIngredientData] = useState<any>(null);
 
-  const [valuesItem, setValuesItem] = useState();
+  const [valuesItem, setValuesItem] = useState(null);
 
   // get cards data =================>
   const categoriesURL = "/meal-ingredient-categories";
@@ -203,10 +203,8 @@ function Ingredients() {
             data={ingredientsList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
-            modalTitle="اضافة مكون"
-            modalContent={
-              <EditIngredient values={null} categories={cardData} />
-            }
+            opnSideBar="إضافة مكون"
+            opnSideBarOpen={() => setIngredientData(null)}
           />
         ) : (
           <>loading...</>
@@ -222,7 +220,7 @@ function Ingredients() {
           <div className="flex justify-center">
             <Button
               secondaryBorder
-              onClick={() => document.getElementById("add-new-ing")?.click()}
+              onClick={() => document.getElementById("my-drawer")?.click()}
             >
               إضافة وصفة
             </Button>

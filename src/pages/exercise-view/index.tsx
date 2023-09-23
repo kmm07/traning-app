@@ -14,7 +14,7 @@ interface Props {
 }
 
 function ExercisesView({ home }: Props) {
-  const [categoryData, setCategoryData] = useState<any>();
+  const [categoryData, setCategoryData] = useState<any>(null);
 
   // get exercises categories ======================>
   const url = "/exercise-categories";

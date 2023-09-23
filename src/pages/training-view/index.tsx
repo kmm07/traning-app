@@ -23,7 +23,7 @@ function TrainingView({ home, gender }: Props) {
 
   const [exerciesCategory, setExerciseCategory] = useState<number | null>(null);
 
-  const [categoryData, setCategoryData] = useState();
+  const [categoryData, setCategoryData] = useState(null);
 
   const navigate = useNavigate();
 
@@ -90,7 +90,8 @@ function TrainingView({ home, gender }: Props) {
   const onDeleteWeek = async (id: number) => {
     try {
       await deleteWeek(`/training-weeks/${id}`);
-      queryClient.invalidateQueries(
+
+      await queryClient.invalidateQueries(
         `/training-weeks?category_id=${exerciesCategory}`
       );
     } catch (error: any) {
@@ -169,7 +170,7 @@ function TrainingView({ home, gender }: Props) {
   }, [trainingCategories]);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="relative w-full space-y-4">
       <h2>مستوي المتمرن</h2>
       <div className="flex gap-3 h-24">
         {cardData.map((item, index) => (

@@ -30,6 +30,7 @@ export interface TableProps<ColumnsType> {
   search?: boolean;
   id?: string;
   opnSideBar?: string;
+  withoutCloseDrawer?: boolean;
 }
 
 const Table = <ColumnsType,>({
@@ -45,6 +46,7 @@ const Table = <ColumnsType,>({
   opnSideBar,
   search = true,
   id,
+  withoutCloseDrawer = false,
 }: TableProps<ColumnsType>) => {
   const itemsPerPage = 25;
   const [itemOffset, setItemOffset] = useState(0);
@@ -169,7 +171,8 @@ const Table = <ColumnsType,>({
                 onClick={
                   rowOnClick
                     ? () => {
-                        document.getElementById("my-drawer")?.click();
+                        !withoutCloseDrawer &&
+                          document.getElementById("my-drawer")?.click();
 
                         rowOnClick(row);
                       }

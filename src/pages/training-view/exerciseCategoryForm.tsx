@@ -65,6 +65,8 @@ export default function ExerciseCategoryForm({
       if (isEditing) {
         !isImageDelete && delete values.image;
 
+        values.image.startsWith("https") && delete values.image;
+
         await mutateAsync(
           formData({
             ...values,

@@ -1,4 +1,4 @@
-import { Button, CheckBox, Img, Input, Select, Text } from "components";
+import { Button, CheckBox,  Input, Select, Text } from "components";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
@@ -9,7 +9,7 @@ interface Props {
   isEditing: boolean;
 }
 
-export default function AddWeekSpareDayExercise({ parent, isEditing }: Props) {
+export default function AddWeekSpareDayExercise({ parent }: Props) {
   const { values, setFieldValue } = useFormikContext<any>();
 
   const [extraData, setExtraData] = useState<any>();
@@ -34,6 +34,7 @@ export default function AddWeekSpareDayExercise({ parent, isEditing }: Props) {
   }: UseQueryResult<any> = useGetQuery(categoriesURL, categoriesURL, {
     select: ({ data }: { data: { data: [] } }) =>
       data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
+    refetchOnWindowFocus: false,
   });
 
   // get exercieses  ===============>
@@ -48,6 +49,7 @@ export default function AddWeekSpareDayExercise({ parent, isEditing }: Props) {
       enabled: ![undefined, null, ""].includes(
         extraData?.exercise_category_id?.value
       ),
+      refetchOnWindowFocus: false,
     }
   );
 

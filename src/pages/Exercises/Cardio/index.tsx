@@ -1,11 +1,10 @@
-import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Button, Table } from "components";
 import React, { useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
-import CardioForm from "./add-cardio";
 
 function Cardio() {
   const [cardioData, setCardioData] = useState<any>(null);

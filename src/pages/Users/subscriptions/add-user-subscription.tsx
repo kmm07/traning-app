@@ -13,8 +13,8 @@ interface Props {
 }
 
 const initialValues = {
-  start_date: "",
-  expire_date: "",
+  start_date: moment().locale("en").format("YYYY-MM-DD"),
+  expire_date: moment().locale("en").format("YYYY-MM-DD"),
   subscription_id: "",
 };
 
@@ -82,11 +82,11 @@ export default function AddUserSubscription({
         });
       }
 
+      await queryClient.invalidateQueries(`/user-subscriptions?user_id=${id}`);
+
       helpers.resetForm();
 
       onClose();
-
-      queryClient.invalidateQueries(`/user-subscriptions/${id}`);
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

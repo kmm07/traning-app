@@ -82,7 +82,7 @@ function UploadInput({ className = "", name, video, label }: Props) {
             ) : (
               <Img
                 src={image}
-                className={`w-24 h-24 ${
+                className={`w-[150px] h-[130px] ${
                   values[name] === "" ? "hidden" : "block"
                 }`}
               />

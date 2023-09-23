@@ -1,28 +1,16 @@
-import {
-  Button,
-  CheckBox,
-  Img,
-  Input,
-  Select,
-  Text,
-  TextArea,
-  UploadInput,
-} from "components";
+import { Button, CheckBox, Input, Select, Text } from "components";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
 import { UseQueryResult } from "react-query";
-import { toast } from "react-toastify";
 
 interface Props {
   isLoading?: boolean;
-  isEditing?: boolean;
   onAddExercise?: any;
   categories: any;
 }
 
 export default function AddWeekDayExercise({
-  isEditing = false,
   isLoading = false,
   categories,
 }: Props) {
@@ -38,6 +26,7 @@ export default function AddWeekDayExercise({
       select: ({ data }: { data: { data: [] } }) =>
         data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
       enabled: ![undefined, null, ""].includes(values.new_exercise_category_id),
+      refetchOnWindowFocus: false,
     }
   );
 
