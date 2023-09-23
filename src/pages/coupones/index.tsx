@@ -2,7 +2,7 @@ import { Button, Modal, SettingCard, Table } from "components";
 import { useGetQuery } from "hooks/useQueryHooks";
 // import AddNotification from "pages/Notifications/components/AddNotification";
 import React, { useMemo, useState } from "react";
-import { UseQueryResult } from "react-query";
+import { UseQueryResult, useQueryClient } from "react-query";
 import { Row } from "react-table";
 import AddCoupone from "./components/add-coupone";
 import { Drawer } from "components/Drawer";
@@ -150,11 +150,15 @@ export default function Coupones() {
   // on accepts copoune request ========================>
   const axios = useAxios({});
 
+  const queryClient = useQueryClient();
+
   const onAcceptRequest = async (id: number) => {
     try {
       await axios.post(`/accept-coupon-request/${id}`);
 
       toast.success("تم قبول الطلب");
+
+      await queryClient.invalidateQueries("/coupons");
     } catch (error: any) {
       toast.error(error?.response?.data?.message);
     }

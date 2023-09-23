@@ -76,11 +76,9 @@ const SingleExercise = ({
           إضافة تمرين بديل
         </Button>
       )}
-      {onAddSpareExercise === undefined && (
-        <Button secondaryBorder onClick={onDeleteEXercise}>
-          <Img src="/images/trash.svg" />
-        </Button>
-      )}
+      <Button secondaryBorder onClick={onDeleteEXercise} className="!mt-4">
+        <Img src="/images/trash.svg" />
+      </Button>
     </div>
   );
 };
@@ -150,9 +148,14 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
           Object.entries(subData).forEach((item: any) => {
             if (item[0] === "children" && item[1].length > 0) {
               item[1]?.forEach((child: any, childIndex: number) => {
+                child.is_new === 0 &&
+                  formData.append(
+                    `exercises[${i}][children][${childIndex}][id]`,
+                    child.id
+                  );
                 formData.append(
                   `exercises[${i}][children][${childIndex}][exercise_id]`,
-                  child.exercise_id.value
+                  child.exercise_id?.value ?? child.exercise_id
                 );
 
                 formData.append(
@@ -191,6 +194,15 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                       `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][rest_sec]`,
                       session?.rest_sec
                     );
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][is_new]`,
+                      session?.is_new
+                    );
+                    session?.is_new === 0 &&
+                      formData.append(
+                        `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][id]`,
+                        session?.id
+                      );
                   }
                 );
               });
@@ -296,6 +308,22 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     }
   );
 
+  const onDeleteMainExercise = (
+    exercise: any,
+    values: any,
+    setFieldValue: any
+  ) => {
+    const mainExercises = values.exercises?.filter(
+      (item: any) => item.parent_id === null
+    );
+    const filteredExercises = mainExercises.filter(
+      (exer: any) =>
+        (exer.id ?? exer.exercise_id?.value) !==
+        (exercise.id ?? exercise.exercise_id?.value)
+    );
+    setFieldValue("exercises", filteredExercises);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -369,6 +397,9 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                         exercise={exercise}
                         onEditExercise={() => onEditExercise(exercise) as any}
                         onAddSpareExercise={() => onAddSpareExercise(exercise)}
+                        onDeleteEXercise={() =>
+                          onDeleteMainExercise(exercise, values, setFieldValue)
+                        }
                       />
                       <Text as="h5" className="!mb-2">
                         التمرينات البديلة:

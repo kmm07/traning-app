@@ -9,7 +9,7 @@ import WeekDayForm from "./components/weekdayForm";
 import WeekDaySideBar from "./components/sideBar";
 
 export default function ViewWeekDay() {
-  const [active, setActive] = useState<any>();
+  const [active, setActive] = useState<any>(null);
 
   const { id } = useParams();
 
