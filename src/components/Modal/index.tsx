@@ -4,6 +4,7 @@ type Props = {
   children: React.ReactNode;
   label?: string | React.ReactNode;
   id?: string;
+  modalClassName?: string;
 
   modalOnDelete?: () => void;
   onSave?: () => void;
@@ -14,6 +15,7 @@ type Props = {
 function Modal({
   label,
   className,
+  modalClassName,
   children,
   id = "my_modal",
   modalOnDelete,
@@ -34,7 +36,7 @@ function Modal({
 
       {/* Put this part before </body> tag */}
       <input type="checkbox" id={id} className="modal-toggle" />
-      <div className="modal">
+      <div className={`modal ${modalClassName}`}>
         <div className="modal-box">
           {children}
           <div className="modal-action flex gap-4 justify-start">

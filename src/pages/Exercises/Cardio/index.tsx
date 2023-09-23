@@ -1,11 +1,10 @@
-import { Table } from "components";
+import { Button, Table } from "components";
 import React, { useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
-import CardioForm from "./add-cardio";
 
 function Cardio() {
   const [cardioData, setCardioData] = useState<any>(null);
@@ -24,16 +23,15 @@ function Cardio() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "التمرين",
+        Header: "الإسم",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original.name}
@@ -43,12 +41,14 @@ function Cardio() {
       },
 
       {
-        Header: "التمرين",
+        Header: "التمارين",
         accessor: "cardios",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <div className="flex items-center gap-4">
-              {row.original.cardios?.map(({ name }: { name: string }) => name)}
+              {row.original.cardios?.map(
+                ({ name }: { name: string }) => ` ${name} `
+              )}
             </div>
           );
         },
@@ -56,6 +56,7 @@ function Cardio() {
     ],
     []
   );
+
   const rowOnClick = (
     e: React.MouseEvent<HTMLTableRowElement, MouseEvent> | any
   ) => {
@@ -70,22 +71,33 @@ function Cardio() {
   if (isLoading) {
     return <>loading...</>;
   }
-  return (
-    <div className="w-full space-y-4">
-      <Table
-        data={cardioList ?? []}
-        columns={columns}
-        rowOnClick={rowOnClick}
-        modalTitle="اضافة كارديو"
-        modalContent={
-          <CardioForm cardioData={cardioData} setCardioData={setCardioData} />
-        }
-      />
 
-      <Drawer>
-        <SideBar cardioData={cardioData} setCardioData={setCardioData} />
-      </Drawer>
-    </div>
+  return (
+    <>
+      <div className="w-full space-y-4">
+        <Table
+          data={cardioList ?? []}
+          columns={columns}
+          rowOnClick={rowOnClick}
+          opnSideBar="اضافة كارديو"
+          opnSideBarOpen={() => setCardioData(null)}
+        />
+        {cardioList.length === 0 && (
+          <div className="flex justify-center items-center h-96">
+            <Button
+              className="bg-primary text-white"
+              htmlFor="my-drawer"
+              primary
+            >
+              اضافة كارديو
+            </Button>
+          </div>
+        )}
+        <Drawer>
+          <SideBar cardioData={cardioData} setCardioData={setCardioData} />
+        </Drawer>
+      </div>
+    </>
   );
 }
 

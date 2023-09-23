@@ -21,6 +21,11 @@ function SidePar() {
       src: "/images/img_group30copy9.svg",
     },
     {
+      name: "الإشتراكات",
+      link: "/subscriptions",
+      src: "/images/img_group30copy9.svg",
+    },
+    {
       name: "التغذية",
       src: "/images/img_fork3.png",
       link: "/nutrition",
@@ -49,20 +54,24 @@ function SidePar() {
           link: "/exercises/table-women",
         },
         {
+          name: "جدول المنزل رجال",
+          link: "/exercises/table-home-men",
+        },
+        {
+          name: "جدول المنزل نساء",
+          link: "/exercises/table-home-women",
+        },
+        {
+          name: "الكارديو",
+          link: "/exercises/cardio",
+        },
+        {
           name: "تمارين الجيم",
           link: "/exercises/exercises-gym",
         },
         {
           name: "تمارين المنزل",
           link: "/exercises/exercises-home",
-        },
-        {
-          name: "جدول المنزل",
-          link: "/exercises/table-home",
-        },
-        {
-          name: "الكارديو",
-          link: "/exercises/cardio",
         },
       ],
     },
@@ -73,7 +82,7 @@ function SidePar() {
     },
     {
       name: "الكوبونات",
-      link: "/coupons",
+      link: "/coupones",
       src: "/images/img_coupon3.png",
     },
     // {
@@ -109,7 +118,7 @@ function SidePar() {
         onClick={() => {
           dispatch(logOut());
 
-          push("/signin");
+          push("/");
         }}
         className="btn flex flex-col items-start justify-start w-full "
       >

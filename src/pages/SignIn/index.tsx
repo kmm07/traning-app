@@ -30,11 +30,7 @@ const SignInPage: React.FC = () => {
 
       await dispatch(setCredentials(data.data));
 
-      if (values.remember) {
-        localStorage.setItem("userLogin", JSON.stringify(values));
-      } else {
-        localStorage.setItem("userLogin", JSON.stringify({}));
-      }
+      localStorage.setItem("userLogin", JSON.stringify(data.data));
 
       setIsLoading(true);
 

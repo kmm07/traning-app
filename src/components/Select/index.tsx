@@ -33,9 +33,7 @@ function Select({
             {Boolean(label) && (
               <label
                 htmlFor={name}
-                className={
-                  " text-start block mb-2 text-sm  w-full text-dark-200 dark:text-white"
-                }
+                className={" text-start block mb-2 text-sm  w-full !text-white"}
               >
                 {label}{" "}
                 {required === true && <span className="text-red-500"> *</span>}
@@ -48,11 +46,11 @@ function Select({
               options={options}
               styles={ReactSelectTheme()}
               {...field}
-              value={options.filter(function (option) {
+              value={options?.filter(function (option) {
                 return option.value === values[name];
               })}
               name={name}
-              classNamePrefix={`select2-selection ${
+              classNamePrefix={`select2-selection !text-white ${
                 props.isDisabled === true
                   ? "!opacity-80 !cursor-not-allowed"
                   : ""
@@ -63,7 +61,7 @@ function Select({
                    : ""
                } `}
               {...props}
-              className={`h-10 w-full ${className}  `}
+              className={`h-10 w-full ${className} !text-white `}
               onChange={(selectedOption: any) => {
                 if (props?.onChange == null) {
                   setFieldValue(name, selectedOption.value);
@@ -87,7 +85,7 @@ function Select({
         <label
           htmlFor={name}
           className={
-            " text-start block mb-2 text-sm  w-full text-dark-200 dark:text-white font-normal"
+            " text-start block mb-2 text-sm  w-full !text-white font-normal"
           }
         >
           {label}
@@ -99,11 +97,11 @@ function Select({
         options={options}
         styles={ReactSelectTheme()}
         {...props}
-        classNamePrefix={`select2-selection ${
+        classNamePrefix={`select2-selection !text-white ${
           props.isDisabled === true ? "!opacity-80 " : ""
         }
          `}
-        className={`h-10 w-full ${className} `}
+        className={`h-10 w-full ${className}!text-white `}
       />
     </div>
   );

@@ -21,8 +21,12 @@ const initialValues = {
   prepare: { url: "", video_type: "external", steps: [], video: "" },
 };
 
-export default function AddDescription() {
-  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${1}`;
+export default function AddDescription({
+  emptyData = false,
+}: {
+  emptyData?: boolean;
+}) {
+  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${0}`;
 
   const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
     ingredientsURL,
@@ -53,6 +57,12 @@ export default function AddDescription() {
 
   const onClose = () => {
     formRef.current?.resetForm();
+
+    if (emptyData) {
+      document.getElementById("add-new-desc")?.click();
+      return;
+    }
+
     document.getElementById("my_modal")?.click();
   };
 
@@ -112,12 +122,14 @@ export default function AddDescription() {
       }
 
       if (value[0] === "meal_ingredients") {
-        (value[1] as any).forEach((subValue: any, index: number) =>
+        (value[1] as any).forEach((subValue: any, index: number) => {
           formData.append(
-            `meal_ingredients[${index}]`,
+            `meal_ingredients[${index}][id]`,
             subValue.id ?? subValue.value
-          )
-        );
+          );
+
+          formData.append(`meal_ingredients[${index}][parent_id]`, "");
+        });
       }
     });
     try {

@@ -13,7 +13,7 @@ function Layout() {
   const token: string | any = useAppSelector(selectCurrentToken);
 
   useEffect(() => {
-    const userLocalStorage = localStorage.getItem("user");
+    const userLocalStorage = localStorage.getItem("userLogin");
 
     const userParse =
       userLocalStorage !== null
@@ -22,21 +22,23 @@ function Layout() {
 
     dispatch(setCredentials(userParse));
 
+    axios.defaults.headers.common.Authorization = `Bearer ${
+      userParse?.token as string
+    }`;
     // redirect to Home
-    if (
-      (userParse?.token === null || userParse?.token === undefined) &&
-      isPublic(pathname)
-    ) {
-      void push("/signin");
+    if (userParse?.token === null || userParse?.token === undefined) {
+      void push("/");
     }
   }, [pathname, token]);
 
-  axios.defaults.headers.common.Authorization = `Bearer ${token as string}`;
+  if (token === null || token === undefined) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div className="flex flex-col h-full relative">
       <Header />
-      <div className="font-roboto h-full grid grid-cols-11">
+      <div className="font-roboto h-full grid grid-cols-11 pt-10">
         <div className="col-span-2 bg-gray-900_01">
           <SidePar />
         </div>
@@ -47,9 +49,5 @@ function Layout() {
     </div>
   );
 }
-const isPublic = (url: string) => {
-  const publicRoutes = [/^\/(\?.*)?$/, /^\/signup/];
 
-  return !publicRoutes.some((path) => path.test(url));
-};
 export default Layout;

@@ -6,7 +6,6 @@ import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import AddDietCategories from "./components/AddDietCategories";
-import AddDescription from "./add-description";
 
 interface DescriptionType {
   calories: number;
@@ -20,6 +19,7 @@ interface DescriptionType {
   trans_fat: number;
   ingredients: { name: string };
   prepare: any;
+  diet_mea_categories: any;
 }
 
 function Descriptions() {
@@ -57,6 +57,8 @@ function Descriptions() {
         carbohydrate: item.carbohydrate,
         ingredients: item.ingredients,
         prepare: item.prepare,
+        image: item.image,
+        diet_mea_categories: item.diet_mea_categories,
       })),
     refetchOnWindowFocus: false,
     enabeld: categoryId !== undefined,
@@ -86,11 +88,10 @@ function Descriptions() {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original.name}
@@ -152,17 +153,22 @@ function Descriptions() {
     <div className="w-full space-y-4">
       <div className="grid grid-cols-4 gap-3">
         {!isCardsLoading ? (
-          cardData?.map((item: { name: string; id: number }) => (
-            <SettingCard
-              onDelete={onDelete}
-              onEdit={() => onEdit(item)}
-              id={item.id}
-              key={item.id}
-              label={item.name}
-              active={categoryId === item.id}
-              onClick={() => setCategoryId(item.id as any)}
-            />
-          ))
+          cardData?.map(
+            (item: { name: string; id: number; private: number }) => (
+              <SettingCard
+                onDelete={onDelete}
+                onEdit={() => onEdit(item)}
+                id={item.id}
+                key={item.id}
+                label={item.name}
+                active={categoryId === item.id}
+                onClick={() => setCategoryId(item.id as any)}
+                className={
+                  item.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
+                }
+              />
+            )
+          )
         ) : (
           <>laoding...</>
         )}
@@ -184,9 +190,9 @@ function Descriptions() {
 
       <div className="flex flex-col lg:flex-row items-center gap-4">
         <Button
-          primary={meal === "BreakFast"}
-          secondaryBorder={meal !== "BreakFast"}
-          onClick={() => setMeal("BreakFast")}
+          primary={meal === "Breakfast"}
+          secondaryBorder={meal !== "Breakfast"}
+          onClick={() => setMeal("Breakfast")}
         >
           فطور
         </Button>
@@ -218,11 +224,19 @@ function Descriptions() {
           data={descriptionsList ?? []}
           columns={columns}
           rowOnClick={rowOnClick}
-          modalTitle="اضافة وجبة"
-          modalContent={<AddDescription />}
+          opnSideBar="إضافة وصفة"
+          opnSideBarOpen={() => setMealData(null)}
         />
       ) : (
         <>loading...</>
+      )}
+      {descriptionsList?.length === 0 && (
+        <Button
+          secondaryBorder
+          onClick={() => document.getElementById("my-drawer")?.click()}
+        >
+          إضافة وصفة
+        </Button>
       )}
 
       <Modal id="add-new-nutrition">
@@ -230,14 +244,12 @@ function Descriptions() {
       </Modal>
 
       <Drawer>
-        {
-          <SideBar
-            setMealData={setMealData}
-            mealData={mealData ?? {}}
-            categoryId={categoryId as any}
-            meal={meal}
-          />
-        }
+        <SideBar
+          setMealData={setMealData}
+          mealData={mealData}
+          categoryId={categoryId as any}
+          meal={meal}
+        />
       </Drawer>
     </div>
   );

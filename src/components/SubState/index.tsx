@@ -1,14 +1,18 @@
 import { Text } from "components";
 
 type Props = {
-  state: "subscriber" | "free" | "cancel" | "trail";
+  state: "subscripe" | "free" | "cancel" | "trail";
   className?: string;
   textClassName?: string;
 };
 
 function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
-    subscriber: {
+    subscriped: {
+      src: "/images/img_checkmark.svg",
+      name: "مشترك (سنة)",
+    },
+    subscripe: {
       src: "/images/img_checkmark.svg",
       name: "مشترك (سنة)",
     },
@@ -33,10 +37,10 @@ function SubState({ state, className, textClassName }: Props) {
     <div className="flex gap-2 items-center justify-between">
       <img
         className={`h-5 ${className}`}
-        src={stateObj[state].src}
-        alt={stateObj[state].name}
+        src={stateObj[state]?.src}
+        alt={stateObj[state]?.name}
       />
-      <Text className={textClassName}>{stateObj[state].name}</Text>
+      <Text className={textClassName}>{stateObj[state]?.name}</Text>
     </div>
   );
 }

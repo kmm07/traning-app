@@ -1,4 +1,4 @@
-import { Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
 import React, { useState, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -6,15 +6,15 @@ import SideBar from "./components/SideBar";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
-import EditIngredient from "./components/editIngredient";
 import { toast } from "react-toastify";
+import EditIngredient from "./components/editIngredient";
 
 function Ingredients() {
   const [categoryId, setCategoryId] = useState(1);
 
-  const [ingredientData, setIngredientData] = useState<any>();
+  const [ingredientData, setIngredientData] = useState<any>(null);
 
-  const [valuesItem, setValuesItem] = useState();
+  const [valuesItem, setValuesItem] = useState(null);
 
   // get cards data =================>
   const categoriesURL = "/meal-ingredient-categories";
@@ -53,7 +53,7 @@ function Ingredients() {
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: any[] } }) =>
-      data.data.slice(0, 20).map((item: any) => ({
+      data.data.map((item: any) => ({
         id: item.id,
         name: item.name,
         calories: item.calories,
@@ -64,6 +64,7 @@ function Ingredients() {
         carbohydrate: item.carbohydrate,
         size: item.size,
         measure: item.measure,
+        image: item.image,
       })),
 
     refetchOnWindowFocus: false,
@@ -78,11 +79,10 @@ function Ingredients() {
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  2
-                </span>
                 <div className="w-12 h-12 rounded-full">
-                  <img src="/images/img_rectangle347.png" />
+                  <img
+                    src={row.original.image || "/images/img_rectangle347.png"}
+                  />
                 </div>
               </div>
               {row.original.name}
@@ -132,6 +132,20 @@ function Ingredients() {
           <span>{Number(row.original.sugar).toFixed(2)}</span>
         ),
       },
+      {
+        Header: "الحجم",
+        accessor: "size",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{Number(row.original.size).toFixed(2)}</span>
+        ),
+      },
+      {
+        Header: "المعيار",
+        accessor: "measure",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{row.original.measure}</span>
+        ),
+      },
     ],
     []
   );
@@ -158,6 +172,9 @@ function Ingredients() {
                 label={item.name}
                 active={categoryId === item.id}
                 onClick={() => setCategoryId(item.id)}
+                className={`h-[120px] ${
+                  item.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
+                }`}
               />
             );
           })
@@ -180,17 +197,35 @@ function Ingredients() {
           </label>
         </Card>
       </div>
+      <div className="!mt-10">
+        {!isListLoading ? (
+          <Table
+            data={ingredientsList ?? []}
+            columns={columns}
+            rowOnClick={rowOnClick}
+            opnSideBar="إضافة مكون"
+            opnSideBarOpen={() => setIngredientData(null)}
+          />
+        ) : (
+          <>loading...</>
+        )}
+      </div>
 
-      {!isListLoading ? (
-        <Table
-          data={ingredientsList ?? []}
-          columns={columns}
-          rowOnClick={rowOnClick}
-          modalTitle="اضافة مكون"
-          modalContent={<EditIngredient values={null} categories={cardData} />}
-        />
-      ) : (
-        <>loading...</>
+      {ingredientsList?.length === 0 && (
+        <>
+          <Modal id="add-new-ing">
+            <EditIngredient values={null} categories={cardData} empty />
+          </Modal>
+
+          <div className="flex justify-center">
+            <Button
+              secondaryBorder
+              onClick={() => document.getElementById("my-drawer")?.click()}
+            >
+              إضافة وصفة
+            </Button>
+          </div>
+        </>
       )}
 
       <Modal id="add-new-nutrition">

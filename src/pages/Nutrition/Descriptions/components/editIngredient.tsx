@@ -65,8 +65,6 @@ export default function EditIngredient({
     } else setIngredientData({ ...editData });
   }, [editData]);
 
-  console.log(editData);
-
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">
