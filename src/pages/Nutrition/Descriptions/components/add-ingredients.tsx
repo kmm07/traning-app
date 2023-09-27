@@ -19,7 +19,7 @@ export default function AddIngredient({
     url,
     {
       select: ({ data }: { data: { data: any[] } }) =>
-        data.data.slice(0, 20).map((item: any) => ({
+        data.data.map((item: any) => ({
           image: item.image,
           id: item.id,
           name: item.name,

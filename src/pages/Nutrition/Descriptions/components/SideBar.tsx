@@ -42,7 +42,7 @@ function SideBar({
   categoryId,
   meal,
 }: SideBarProps) {
-  let [refresher, setRefresher] = useState(0);
+  const [refresher, setRefresher] = useState<any>(0);
 
   // list actions ======================>
   const { mutateAsync, isLoading } = useDeleteQuery();
@@ -114,7 +114,7 @@ function SideBar({
     );
 
     formRef.current.setFieldValue("ingredients", filteredArray);
-    setRefresher((refresher += 1));
+    setRefresher((prev: any) => (prev += 1));
   };
 
   // steps actions =====================>
@@ -439,7 +439,7 @@ function SideBar({
                             setFieldValue("ingredients", [
                               ...values.ingredients,
                             ]);
-                            setRefresher((refresher += 1));
+                            setRefresher((prev: any) => (prev += 1));
                           }}
                         />
                         <Text>{ingredient.measure}</Text>
