@@ -102,8 +102,28 @@ export default function ViewWeekDay() {
     setActive({ ...e.original, exercises });
   };
 
+  const {
+    home,
+    gender,
+    daysNum,
+    trLevel,
+    category,
+    weekNum = "sss",
+  } = JSON.parse(localStorage.getItem("week-days") as any);
   return (
     <div className="w-full space-y-4">
+      <div className="col-span-1 text-white space-y-2">
+        <h1 className="text-2xl font-bold ">
+          جدول {home ? "منزل" : "جيم"} {gender === "female" ? "نساء" : "رجال"}
+        </h1>
+
+        <div className="text-lg">{trLevel}</div>
+
+        <div className="text-lg"> السبوع رقم {weekNum}</div>
+        <div className="text-lg">{daysNum} أيام في الاسبوع</div>
+
+        <div>{category}</div>
+      </div>
       <Table
         data={data ?? []}
         columns={columns}

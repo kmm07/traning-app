@@ -183,7 +183,7 @@ function ExercisesView({ home }: Props) {
       )}
 
       <Drawer>
-        `<SideBar exerciseData={exerciseData} categoryData={categoryData} />`
+        <SideBar exerciseData={exerciseData} categoryData={categoryData} />`
       </Drawer>
 
       <Modal id="new-exercise-category">

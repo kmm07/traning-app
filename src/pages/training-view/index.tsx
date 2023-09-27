@@ -105,7 +105,29 @@ function TrainingView({ home, gender }: Props) {
     document.getElementById("add-new-exercise")?.click();
   };
 
-  const onView = (id: number) => navigate(`/exercises/week-days/${id}`);
+  const onView = (id: number, week_num: number) => {
+    const category = trainingCategories?.map(
+      (category: any) =>
+        exerciesCategory === category.id && <div>{category?.name}</div>
+    );
+
+    const trLevel = cardData.filter(
+      (item) => level === item.id && <div className="text-lg">{item.label}</div>
+    )[0].label;
+    //set local stoarge
+    localStorage.setItem(
+      "week-days",
+      JSON.stringify({
+        home,
+        gender,
+        daysNum,
+        trLevel,
+        category,
+        weekNum: week_num,
+      })
+    );
+    navigate(`/exercises/week-days/${id}`);
+  };
 
   const columns = React.useMemo(
     () => [
@@ -157,7 +179,7 @@ function TrainingView({ home, gender }: Props) {
           <TableActions
             onEdit={() => onEditWeek(row.original)}
             onDelete={() => onDeleteWeek(row.original.id)}
-            onView={() => onView(row.original.id)}
+            onView={() => onView(row.original.id, row.original.week_num)}
           />
         ),
       },
@@ -172,22 +194,6 @@ function TrainingView({ home, gender }: Props) {
   return (
     <div className="relative w-full space-y-4">
       <div className="grid grid-cols-7 gap-5">
-        <div className="col-span-1 text-white space-y-2">
-          <h1 className="text-2xl font-bold ">
-            جدول {home ? "منزل" : "جيم"} {gender === "female" ? "نساء" : "رجال"}
-          </h1>
-          {cardData.map(
-            (item) =>
-              level === item.id && <div className="text-lg">{item.label}</div>
-          )}
-
-          <div className="text-lg">{daysNum} أيام في الاسبوع</div>
-
-          {trainingCategories?.map(
-            (category: any) =>
-              exerciesCategory === category.id && <div>{category?.name}</div>
-          )}
-        </div>
         <div className="col-span-6">
           <h2>مستوي المتمرن</h2>
           <div className=" flex gap-3 h-24">
@@ -203,6 +209,22 @@ function TrainingView({ home, gender }: Props) {
               />
             ))}
           </div>
+        </div>
+        <div className="col-span-1 text-white space-y-2">
+          <h1 className="text-2xl font-bold ">
+            جدول {home ? "منزل" : "جيم"} {gender === "female" ? "نساء" : "رجال"}
+          </h1>
+          {cardData.map(
+            (item) =>
+              level === item.id && <div className="text-lg">{item.label}</div>
+          )}
+
+          <div className="text-lg">{daysNum} أيام في الاسبوع</div>
+
+          {trainingCategories?.map(
+            (category: any) =>
+              exerciesCategory === category.id && <div>{category?.name}</div>
+          )}
         </div>
       </div>
       <h2>عدد أيام التمرين</h2>
