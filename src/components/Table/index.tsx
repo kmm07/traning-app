@@ -64,7 +64,7 @@ const Table = <ColumnsType,>({
 
   const endOffset = itemOffset + itemsPerPage;
   const [currentItems, setCurrentItems] = useState(
-    data.slice(itemOffset, endOffset)
+    data?.slice(itemOffset, endOffset)
   );
 
   useEffect(() => {

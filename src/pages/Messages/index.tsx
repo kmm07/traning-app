@@ -103,7 +103,7 @@ function Messages() {
   return (
     <div className="w-full">
       <Table
-        data={users.users ?? []}
+        data={users?.users ?? []}
         columns={columns}
         rowOnClick={rowOnClick}
       />

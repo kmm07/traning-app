@@ -44,8 +44,6 @@ export default function AssignMealCategories({}: Props) {
     ]);
   };
 
-  console.log(values.diet_categories);
-
   return (
     <div>
       {values.diet_categories?.map((item: any, index: number) => (

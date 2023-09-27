@@ -1,14 +1,5 @@
-import {
-  Button,
-  Card,
-  Img,
-  Input,
-  Modal,
-  Select,
-  Text,
-  UploadInput,
-} from "components";
-import { Formik } from "formik";
+import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
+import { Formik, useFormikContext } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
@@ -36,6 +27,8 @@ const SingleExercise = ({
   onDeleteEXercise,
   onEditExercise,
 }: SingleExerciseProps) => {
+  const { values, setFieldValue } = useFormikContext<any>();
+
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -64,10 +57,17 @@ const SingleExercise = ({
 
       <div className="flex items-center justify-between">
         <Text as="h5">وقت الراحة</Text>
-        <div className="flex items-center">
-          <div className="rounded-full border-[1px] p-2">
-            <span className="me-2">{exercise?.rest_sec}</span> ثانية
-          </div>
+        <div className="flex items-center gap-2 w-[120px]">
+          <Input
+            name="rest_sec"
+            isForm={false}
+            value={exercise?.rest_sec}
+            onChange={(e) => {
+              exercise.rest_sec = e.target.value;
+              setFieldValue("exercises", [...values.exercises]);
+            }}
+          />{" "}
+          <span>ثانية</span>
         </div>
       </div>
 
@@ -195,6 +195,10 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                       session?.rest_sec
                     );
                     formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][notes]`,
+                      session?.notes
+                    );
+                    formData.append(
                       `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][is_new]`,
                       session?.is_new
                     );
@@ -232,10 +236,19 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
             } else
               item[1].forEach((item: any, sessionIndex: number) =>
                 Object.entries(item).forEach((session: any) => {
-                  formData.append(
-                    `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
-                    session[1] as any
-                  );
+                  if (session[0] !== "notes") {
+                    formData.append(
+                      `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
+                      session[1] as any
+                    );
+                  } else {
+                    session[0] === null
+                      ? ""
+                      : formData.append(
+                          `exercises[${i}][sessions][${sessionIndex}][notes]`,
+                          session[1] as any
+                        );
+                  }
                 })
               );
           });
@@ -352,14 +365,18 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                     className="!w-[200px] text-center font-bold text-[24px]"
                   />
                 </div>
-                <Select
+                {/* <Select
                   options={categories ?? []}
                   name="exercise_category_id"
                   label="فئة التمرين"
                   isForm={false}
                   onChange={(e) => setFieldValue("exercise_category_id", e)}
                   value={values.exercise_category_id}
-                />
+                /> */}
+
+                <Text as="h2" className="mt-4">
+                  {values.exercise_category_id?.label}
+                </Text>
               </div>
             </div>
           </div>
