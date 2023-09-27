@@ -91,14 +91,16 @@ export default function RequestsSidebar({ couponeData }: any) {
       <Card className="flex items-center justify-between p-6">
         <div className="flex items-center gap-2">
           <div className="w-[100px] h-[100px] bg-primary rounded-md" />
-          <Text className="text-white">{couponeData?.name}</Text>
+          <Text as="h2" className="text-white">
+            {couponeData?.name}
+          </Text>
         </div>
 
         <Card className="p-6 !w-[200px] flex flex-col items-center">
-          <Text as="h5" className="text-[30px] mb-4">
+          <Text as="h2" className="text-[30px] mb-4">
             النقاط
           </Text>
-          <Text as="h5" className="text-[30px] mb-4">
+          <Text as="h2" className="text-[30px] mb-4">
             {couponeData?.points}
           </Text>
         </Card>
