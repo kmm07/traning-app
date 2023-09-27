@@ -171,21 +171,40 @@ function TrainingView({ home, gender }: Props) {
 
   return (
     <div className="relative w-full space-y-4">
-      <h2>مستوي المتمرن</h2>
-      <div className="flex gap-3 h-24">
-        {cardData.map((item, index) => (
-          <SettingCard
-            onDelete={onDelete}
-            onEdit={onEdit}
-            id={item.id}
-            key={index}
-            label={item.label}
-            active={level === item.id}
-            onClick={() => setLevel(item.id as any)}
-          />
-        ))}
-      </div>
+      <div className="grid grid-cols-7 gap-5">
+        <div className="col-span-1 text-white space-y-2">
+          <h1 className="text-2xl font-bold ">
+            جدول {home ? "منزل" : "جيم"} {gender === "female" ? "نساء" : "رجال"}
+          </h1>
+          {cardData.map(
+            (item) =>
+              level === item.id && <div className="text-lg">{item.label}</div>
+          )}
 
+          <div className="text-lg">{daysNum} أيام في الاسبوع</div>
+
+          {trainingCategories?.map(
+            (category: any) =>
+              exerciesCategory === category.id && <div>{category?.name}</div>
+          )}
+        </div>
+        <div className="col-span-6">
+          <h2>مستوي المتمرن</h2>
+          <div className=" flex gap-3 h-24">
+            {cardData.map((item, index) => (
+              <SettingCard
+                onDelete={onDelete}
+                onEdit={onEdit}
+                id={item.id}
+                key={index}
+                label={item.label}
+                active={level === item.id}
+                onClick={() => setLevel(item.id as any)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
       <h2>عدد أيام التمرين</h2>
       <div className="flex gap-4">
         <Button

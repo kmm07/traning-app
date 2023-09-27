@@ -190,3 +190,6 @@ ul li a {
 hr {
   border: 2px solid #2c2c2e;
 }
+.modal-box {
+  @apply h-[50vh];
+}
