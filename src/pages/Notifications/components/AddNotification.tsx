@@ -23,7 +23,7 @@ const initialValues = {
   private: false,
 };
 
-function AddNotification() {
+function AddNotification({ active }: { active: number }) {
   const [detail, setDetail] = useState<string>("");
 
   // get users data =================>
@@ -113,20 +113,23 @@ function AddNotification() {
 
             <Input name="description" label="الوصف" />
           </div>
-          <Select
-            name="users"
-            options={users ?? []}
-            isLoading={isUsersLoading}
-            isForm={false}
-            isMulti
-            label="المستخدمين"
-            onChange={(val: any) => {
-              setFieldValue(
-                "users",
-                val.map((user: any) => user.value)
-              );
-            }}
-          />
+          {active === 1 && (
+            <Select
+              name="users"
+              options={users ?? []}
+              isLoading={isUsersLoading}
+              isForm={false}
+              isMulti
+              label="المستخدمين"
+              onChange={(val: any) => {
+                setFieldValue(
+                  "users",
+                  val.map((user: any) => user.value)
+                );
+              }}
+            />
+          )}
+
           <CheckBox name="private" label="إشعار خاص" />
 
           <div>

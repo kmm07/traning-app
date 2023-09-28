@@ -24,6 +24,7 @@ import UserSubscriptions from "pages/Users/subscriptions";
 import ViewWeekDay from "pages/view-week-days";
 import Coupones from "pages/coupones";
 import Admin from "pages/admin";
+import ContactsPage from "pages/contacts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -58,6 +59,7 @@ const router = createBrowserRouter(
         <Route path="notifications" element={<Notifications />} />
 
         <Route path="coupones" element={<Coupones />} />
+        <Route path="contacts" element={<ContactsPage />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

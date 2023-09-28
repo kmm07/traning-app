@@ -1,4 +1,4 @@
-import { Card, Select, SubState, Table, Text } from "components";
+import { Card, SubState, Table, Text } from "components";
 import React, { useState, useMemo, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -95,8 +95,6 @@ function Users() {
     []
   );
 
-  const options = [{ value: "all", label: "الكل" }];
-
   // on view user data ============================>
   const axios = useAxios({});
 
@@ -182,16 +180,6 @@ function Users() {
         })}
       </div>
 
-      <div className="w-1/4">
-        <Select
-          isForm={false}
-          options={options}
-          placeholder="الكل"
-          onChange={(e) => {
-            console.log(e);
-          }}
-        />
-      </div>
       <Table
         data={(filteredUsers as any) ?? []}
         columns={columns}

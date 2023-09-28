@@ -1,36 +1,28 @@
 import { Text } from "components";
 
 type Props = {
-  state: "subscripe" | "free" | "cancel" | "trail";
+  state: "new" | "renewal" | "issue" | "cancelled";
   className?: string;
   textClassName?: string;
 };
 
 function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
-    subscriped: {
+    new: {
       src: "/images/img_checkmark.svg",
-      name: "مشترك (سنة)",
+      name: "مشترك جديد",
     },
-    subscripe: {
-      src: "/images/img_checkmark.svg",
-      name: "مشترك (سنة)",
+    renewal: {
+      src: "/images/img_clock5.svg",
+      name: "تجديد الإشتراك",
     },
-    free: {
-      src: "/images/img_clock5.png",
-      name: "مجاني",
+    issue: {
+      src: "/images/img_error.png",
+      name: "خطأ",
     },
-    cancel: {
-      src: "/images/img_arrowright.svg",
-      name: "ملغي",
-    },
-    not_subscriped: {
-      src: "/images/img_arrowright.svg",
-      name: "غير مشترك",
-    },
-    trail: {
+    cancelled: {
       src: "/images/img_error.svg",
-      name: "تجريبي",
+      name: "ملغي",
     },
   };
   return (

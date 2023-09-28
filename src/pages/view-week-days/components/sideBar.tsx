@@ -374,9 +374,12 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   value={values.exercise_category_id}
                 /> */}
 
-                <Text as="h2" className="mt-4">
-                  {values.exercise_category_id?.label}
-                </Text>
+                <div className="flex items-center gap-4 mt-6">
+                  <Text as="h1" className="!text-[24px]">
+                    اسم اليوم
+                  </Text>
+                  <Input name="name" />
+                </div>
               </div>
             </div>
           </div>
