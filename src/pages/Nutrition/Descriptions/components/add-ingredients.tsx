@@ -5,7 +5,12 @@ import React from "react";
 import { UseQueryResult } from "react-query";
 import { Row } from "react-table";
 
-export default function AddIngredient({ parentId, setParentId }: any) {
+export default function AddIngredient({
+  parentId,
+  setParentId,
+  setRefresher,
+  refresher,
+}: any) {
   // get descriptions data list =================>
   const url = `/meal-ingredients?meal_ingredient_category_id=${0}`;
 
@@ -14,7 +19,7 @@ export default function AddIngredient({ parentId, setParentId }: any) {
     url,
     {
       select: ({ data }: { data: { data: any[] } }) =>
-        data.data.slice(0, 20).map((item: any) => ({
+        data.data.map((item: any) => ({
           image: item.image,
           id: item.id,
           name: item.name,
@@ -122,6 +127,8 @@ export default function AddIngredient({ parentId, setParentId }: any) {
       ...(values.ingredients ?? []),
       { ...e.original, parent_id: parentId },
     ]);
+
+    setRefresher((refresher += 1));
 
     onClose();
   };

@@ -79,7 +79,7 @@ function Cardio() {
           data={cardioList ?? []}
           columns={columns}
           rowOnClick={rowOnClick}
-          opnSideBar="اضافة كارديو"
+          opnSideBar="اضافة"
           opnSideBarOpen={() => setCardioData(null)}
         />
         {cardioList.length === 0 && (
@@ -87,9 +87,9 @@ function Cardio() {
             <Button
               className="bg-primary text-white"
               htmlFor="my-drawer"
-              primary
+              secondaryBorder
             >
-              اضافة كارديو
+              اضافة
             </Button>
           </div>
         )}

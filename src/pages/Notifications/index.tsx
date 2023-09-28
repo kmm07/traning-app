@@ -91,7 +91,7 @@ function Notifications() {
         <Table
           data={filteredNotifications ?? []}
           columns={columns}
-          modalContent={<AddNotification />}
+          modalContent={<AddNotification active={active} />}
           id="add-notification"
           modalTitle="إضافة إشعار"
         />
@@ -115,7 +115,7 @@ function Notifications() {
       )}
 
       <Modal id="add-notification">
-        <AddNotification />
+        <AddNotification active={active} />
       </Modal>
     </div>
   );

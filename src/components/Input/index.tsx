@@ -90,16 +90,16 @@ const CustomInput = ({
   };
 
   const PasswordEye = () => (
-    <button
+    <span
       onClick={handleShowPassword}
-      className="px-[4px] focus:outline-none absolute items-center justify-end ltr:right-1 rtl:right-1 block z-10 bottom-[8px]"
+      className="px-[4px] cursor-pointer focus:outline-none absolute items-center justify-end ltr:right-1 rtl:right-1 block z-10 bottom-[8px]"
     >
       {!showPassword ? (
         <Img src="/images/eye.svg" className=" relative -top-2 sm:top-0" />
       ) : (
         <Img src="/images/cross-eye.svg" className="relative -top-2 sm:top-0" />
       )}
-    </button>
+    </span>
   );
 
   const { className = "", required, ...otherProps } = props;

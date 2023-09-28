@@ -10,7 +10,7 @@ import {
 } from "components";
 import TableActions from "components/Table/actions";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row } from "react-table";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
@@ -42,6 +42,8 @@ function SideBar({
   categoryId,
   meal,
 }: SideBarProps) {
+  const [refresher, setRefresher] = useState<any>(0);
+
   // list actions ======================>
   const { mutateAsync, isLoading } = useDeleteQuery();
 
@@ -60,6 +62,48 @@ function SideBar({
     }
   };
 
+  const getItemPercentage = (size: number, itemValue: number) => {
+    return Number((itemValue / 100) * size).toFixed(2);
+  };
+
+  const reCalculateNutrationValues = () => {
+    const mainMeals = formRef.current?.values?.ingredients?.filter(
+      ({ parent_id }: { parent_id: number }) => parent_id === null
+    );
+
+    let carbohydrate = 0;
+    let trans_fat = 0;
+    let protein = 0;
+    let calories = 0;
+    let sugar = 0;
+    let fat = 0;
+    mainMeals?.forEach((meal: any) => {
+      Math.trunc(
+        (carbohydrate += Number((meal.carbohydrate / 100) * meal.size))
+      );
+      Math.trunc((trans_fat += Number((meal.trans_fat / 100) * meal.size)));
+
+      Math.trunc((protein += Number((meal.protein / 100) * meal.size)));
+
+      Math.trunc((calories += Number((meal.calories / 100) * meal.size)));
+
+      Math.trunc((sugar += Number((meal.sugar / 100) * meal.size)));
+
+      Math.trunc((fat += Number((meal.fat / 100) * meal.size)));
+    });
+
+    formRef.current?.setFieldValue("carbohydrate", carbohydrate);
+    formRef.current?.setFieldValue("trans_fat", trans_fat);
+    formRef.current?.setFieldValue("protein", protein);
+    formRef.current?.setFieldValue("calories", calories);
+    formRef.current?.setFieldValue("sugar", sugar);
+    formRef.current?.setFieldValue("fat", fat);
+
+    formRef.current?.setFieldValue("ingredients", [
+      ...(formRef.current?.values.ingredients ?? []),
+    ]);
+  };
+
   // ingredients actions =====================>
   const formRef = useRef<any>(null);
 
@@ -70,6 +114,7 @@ function SideBar({
     );
 
     formRef.current.setFieldValue("ingredients", filteredArray);
+    setRefresher((prev: any) => (prev += 1));
   };
 
   // steps actions =====================>
@@ -134,10 +179,6 @@ function SideBar({
   const onAddSpareIngredient = (parentId: number) => {
     setParentId(parentId);
     document.getElementById("add-ingredient")?.click();
-  };
-
-  const getItemPercentage = (size: number, itemValue: number) => {
-    return Number((itemValue / 100) * size).toFixed(2);
   };
 
   const meals = [
@@ -240,6 +281,12 @@ function SideBar({
       toast.error(error.response.data.message);
     }
   };
+
+  useEffect(() => {
+    if (refresher > 0) {
+      reCalculateNutrationValues();
+    }
+  }, [refresher]);
 
   return (
     <Formik
@@ -384,6 +431,16 @@ function SideBar({
                         <Input
                           name={`ingredients.[${index}].size`}
                           className="text-center"
+                          isForm={false}
+                          value={values.ingredients?.[index].size}
+                          onChange={(e) => {
+                            ingredient.size = e.target.value;
+
+                            setFieldValue("ingredients", [
+                              ...values.ingredients,
+                            ]);
+                            setRefresher((prev: any) => (prev += 1));
+                          }}
                         />
                         <Text>{ingredient.measure}</Text>
                       </div>
@@ -511,12 +568,19 @@ function SideBar({
                 إضافة مكون
               </Button>
             </Card>
+
             <Modal
               id="add-ingredient"
               modalClassName="[&>.modal-box]:!max-w-full !z-[1000]"
             >
-              <AddIngredient parentId={parentId} setParentId={setParentId} />
+              <AddIngredient
+                parentId={parentId}
+                setParentId={setParentId}
+                setRefresher={setRefresher}
+                refresher={refresher}
+              />
             </Modal>
+
             <Card className="relative px-4 pb-4">
               <div className="flex justify-between py-3">
                 <Text size="3xl">طريقة التحضير</Text>
@@ -606,6 +670,7 @@ function SideBar({
                 />
               </Modal>
             </Card>
+
             <div className="flex items-center justify-evenly mt-6">
               <Button
                 className="w-[100px]"

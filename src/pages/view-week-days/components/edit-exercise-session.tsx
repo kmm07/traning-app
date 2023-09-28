@@ -1,7 +1,7 @@
 import { Button, Img, Input, Text } from "components";
 import { useFormikContext } from "formik";
 
-const SingleSession = ({ exercise, index, exercise_name }: any) => {
+const SingleSession = ({ exercise, index }: any) => {
   const { values, setFieldValue } = useFormikContext<any>();
 
   const onDeleteSession = () => {
@@ -41,9 +41,12 @@ const SingleSession = ({ exercise, index, exercise_name }: any) => {
             onChange={(e) => onChangeInput("counter", e)}
           />
         </div>
-        <div className="border-[1px] rounded-full p-2">
-          <Text as="h2">{exercise_name ?? exercise.exercise_id?.label}</Text>
-        </div>
+        <Input
+          name="notes"
+          isForm={false}
+          value={exercise[index].notes}
+          onChange={(e) => onChangeInput("notes", e)}
+        />
         <div>
           <Text as="h5" className="mb-2">
             وقت الراحة

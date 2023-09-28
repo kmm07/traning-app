@@ -1,7 +1,7 @@
 import { Button, Modal, SettingCard, Table } from "components";
 import { useGetQuery } from "hooks/useQueryHooks";
 // import AddNotification from "pages/Notifications/components/AddNotification";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { Row } from "react-table";
 import AddCoupone from "./components/add-coupone";
@@ -9,8 +9,7 @@ import { Drawer } from "components/Drawer";
 import CouponeSideBar from "./components/sideBar";
 import { useAppDispatch } from "hooks/useRedux";
 import { setImageDelete } from "redux/slices/imageDelete";
-import useAxios from "hooks/useAxios";
-import { toast } from "react-toastify";
+import RequestsSidebar from "./components/request-side-bar";
 
 export default function Coupones() {
   const [active, setActive] = useState<number>(1);
@@ -68,64 +67,6 @@ export default function Coupones() {
     []
   );
 
-  const requestsColumns = React.useMemo(
-    () => [
-      {
-        Header: "الإسم",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return (
-            <div className="flex items-center gap-4">
-              <div className="avatar indicator">
-                <div className="w-12 h-12 rounded-full">
-                  <img
-                    src={row.original.image || "/images/img_rectangle347.png"}
-                  />
-                </div>
-              </div>
-              {row.original.user_name}
-            </div>
-          );
-        },
-      },
-
-      {
-        Header: "مشترك أم لا",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return (
-            <span className="flex items-center gap-4">
-              {row.original.is_subscriped ? "مشترك" : "غير مشترك"}
-            </span>
-          );
-        },
-      },
-
-      {
-        Header: "نوع المستخدم",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return (
-            <span className="flex items-center gap-4">
-              {row.original.user_gender === "male" ? "ذكر" : "انثي"}
-            </span>
-          );
-        },
-      },
-      {
-        Header: " ",
-        Cell: ({ row }: { row: Row<any> }) => {
-          return (
-            <Button
-              onClick={() => onAcceptRequest(row.original?.id)}
-              primaryBorder
-            >
-              قبول الطلب
-            </Button>
-          );
-        },
-      },
-    ],
-    []
-  );
-
   const cardData = [
     {
       label: "طلبات الكوبونات",
@@ -137,7 +78,7 @@ export default function Coupones() {
     },
   ];
 
-  const [activeCopoune, setActiveCopoune] = useState<number>();
+  const [activeCopoune, setActiveCopoune] = useState<any>();
 
   const dispatch = useAppDispatch();
 
@@ -146,28 +87,6 @@ export default function Coupones() {
 
     dispatch(setImageDelete(false));
   };
-
-  // on accepts copoune request ========================>
-  const axios = useAxios({});
-
-  const onAcceptRequest = async (id: number) => {
-    try {
-      await axios.post(`/accept-coupon-request/${id}`);
-
-      toast.success("تم قبول الطلب");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message);
-    }
-  };
-
-  // get coupones requests =================>
-  const getRequests = useMemo(() => {
-    const requests: any = [];
-
-    data.forEach((request: any) => requests.push(request?.requests));
-
-    return requests.flat(1);
-  }, [data]);
 
   return (
     <div>
@@ -182,36 +101,35 @@ export default function Coupones() {
           />
         ))}
       </div>
-
       {active === 1 ? (
-        <>
-          <Table
-            data={data ?? []}
-            columns={columns}
-            modalContent={<AddCoupone />}
-            rowOnClick={rowOnClick}
-            id="add-coupone"
-            modalTitle="إضافة كوبون"
-          />
-          {data.length === 0 && (
-            <div className="flex justify-center">
-              <Button
-                onClick={() => {
-                  document.getElementById("add-coupone")?.click();
-                }}
-                primary
-              >
-                إضافة كوبون
-              </Button>
-            </div>
-          )}
-        </>
+        <Table
+          data={data ?? []}
+          columns={columns}
+          modalContent={<AddCoupone />}
+          rowOnClick={rowOnClick}
+          id="add-coupone"
+          modalTitle="إضافة كوبون"
+        />
       ) : (
         <Table
-          data={getRequests ?? []}
-          columns={requestsColumns ?? []}
-          title="طلبات الإشتراك"
+          data={data ?? []}
+          columns={columns}
+          modalContent={<AddCoupone />}
+          rowOnClick={rowOnClick}
         />
+      )}
+
+      {data.length === 0 && (
+        <div className="flex justify-center">
+          <Button
+            onClick={() => {
+              document.getElementById("add-coupone")?.click();
+            }}
+            primary
+          >
+            إضافة كوبون
+          </Button>
+        </div>
       )}
 
       <Modal id="add-coupone">
@@ -219,7 +137,11 @@ export default function Coupones() {
       </Modal>
 
       <Drawer>
-        <CouponeSideBar couponeData={activeCopoune} />
+        {active === 1 ? (
+          <CouponeSideBar couponeData={activeCopoune} />
+        ) : (
+          <RequestsSidebar couponeData={activeCopoune} />
+        )}
       </Drawer>
     </div>
   );

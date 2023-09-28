@@ -85,11 +85,16 @@ function SidePar() {
       link: "/coupones",
       src: "/images/img_coupon3.png",
     },
-    // {
-    //   name: "المسؤلين",
-    //   link: "/admins",
-    //   src: "/images/img_setting1.png",
-    // },
+    {
+      name: "المسؤلين",
+      link: "/admins",
+      src: "/images/img_setting1.png",
+    },
+    {
+      name: "رسائل التواصل",
+      link: "/contacts",
+      src: "/images/img_mail11.png",
+    },
   ];
   return (
     <div className="bg-gray-900_01 relative h-full py-24 border border-blue_gray-900_01 border-solid flex flex-col items-center justify-start md:px-5 rounded-bl-[25px] rounded-tl-[25px] shadow-bs">

@@ -63,7 +63,6 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
 
   // get meal arabic name ================>
   const getMealName = (name: string) => {
-    console.log("name >>>> ", name);
     switch (name) {
       case "Breakfast":
         return "فطار";

@@ -11,6 +11,7 @@ interface SelectProps extends Props {
   options: Options[];
   isForm?: boolean;
   label?: string;
+  readOnly?: boolean;
 }
 
 function Select({
@@ -18,6 +19,7 @@ function Select({
   className = "",
   label,
   isForm = true,
+  readOnly = false,
   name = "",
   required,
   ...props

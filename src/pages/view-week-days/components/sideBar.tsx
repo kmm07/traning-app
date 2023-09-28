@@ -1,14 +1,5 @@
-import {
-  Button,
-  Card,
-  Img,
-  Input,
-  Modal,
-  Select,
-  Text,
-  UploadInput,
-} from "components";
-import { Formik } from "formik";
+import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
+import { Formik, useFormikContext } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
@@ -36,6 +27,8 @@ const SingleExercise = ({
   onDeleteEXercise,
   onEditExercise,
 }: SingleExerciseProps) => {
+  const { values, setFieldValue } = useFormikContext<any>();
+
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -64,10 +57,17 @@ const SingleExercise = ({
 
       <div className="flex items-center justify-between">
         <Text as="h5">وقت الراحة</Text>
-        <div className="flex items-center">
-          <div className="rounded-full border-[1px] p-2">
-            <span className="me-2">{exercise?.rest_sec}</span> ثانية
-          </div>
+        <div className="flex items-center gap-2 w-[120px]">
+          <Input
+            name="rest_sec"
+            isForm={false}
+            value={exercise?.rest_sec}
+            onChange={(e) => {
+              exercise.rest_sec = e.target.value;
+              setFieldValue("exercises", [...values.exercises]);
+            }}
+          />{" "}
+          <span>ثانية</span>
         </div>
       </div>
 
@@ -76,11 +76,9 @@ const SingleExercise = ({
           إضافة تمرين بديل
         </Button>
       )}
-      {onAddSpareExercise === undefined && (
-        <Button secondaryBorder onClick={onDeleteEXercise}>
-          <Img src="/images/trash.svg" />
-        </Button>
-      )}
+      <Button secondaryBorder onClick={onDeleteEXercise} className="!mt-4">
+        <Img src="/images/trash.svg" />
+      </Button>
     </div>
   );
 };
@@ -150,9 +148,14 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
           Object.entries(subData).forEach((item: any) => {
             if (item[0] === "children" && item[1].length > 0) {
               item[1]?.forEach((child: any, childIndex: number) => {
+                child.is_new === 0 &&
+                  formData.append(
+                    `exercises[${i}][children][${childIndex}][id]`,
+                    child.id
+                  );
                 formData.append(
                   `exercises[${i}][children][${childIndex}][exercise_id]`,
-                  child.exercise_id.value
+                  child.exercise_id?.value ?? child.exercise_id
                 );
 
                 formData.append(
@@ -191,6 +194,19 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                       `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][rest_sec]`,
                       session?.rest_sec
                     );
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][notes]`,
+                      session?.notes
+                    );
+                    formData.append(
+                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][is_new]`,
+                      session?.is_new
+                    );
+                    session?.is_new === 0 &&
+                      formData.append(
+                        `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][id]`,
+                        session?.id
+                      );
                   }
                 );
               });
@@ -220,10 +236,19 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
             } else
               item[1].forEach((item: any, sessionIndex: number) =>
                 Object.entries(item).forEach((session: any) => {
-                  formData.append(
-                    `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
-                    session[1] as any
-                  );
+                  if (session[0] !== "notes") {
+                    formData.append(
+                      `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
+                      session[1] as any
+                    );
+                  } else {
+                    session[0] === null
+                      ? ""
+                      : formData.append(
+                          `exercises[${i}][sessions][${sessionIndex}][notes]`,
+                          session[1] as any
+                        );
+                  }
                 })
               );
           });
@@ -296,6 +321,22 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     }
   );
 
+  const onDeleteMainExercise = (
+    exercise: any,
+    values: any,
+    setFieldValue: any
+  ) => {
+    const mainExercises = values.exercises?.filter(
+      (item: any) => item.parent_id === null
+    );
+    const filteredExercises = mainExercises.filter(
+      (exer: any) =>
+        (exer.id ?? exer.exercise_id?.value) !==
+        (exercise.id ?? exercise.exercise_id?.value)
+    );
+    setFieldValue("exercises", filteredExercises);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -324,14 +365,21 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                     className="!w-[200px] text-center font-bold text-[24px]"
                   />
                 </div>
-                <Select
+                {/* <Select
                   options={categories ?? []}
                   name="exercise_category_id"
                   label="فئة التمرين"
                   isForm={false}
                   onChange={(e) => setFieldValue("exercise_category_id", e)}
                   value={values.exercise_category_id}
-                />
+                /> */}
+
+                <div className="flex items-center gap-4 mt-6">
+                  <Text as="h1" className="!text-[24px]">
+                    اسم اليوم
+                  </Text>
+                  <Input name="name" />
+                </div>
               </div>
             </div>
           </div>
@@ -369,6 +417,9 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                         exercise={exercise}
                         onEditExercise={() => onEditExercise(exercise) as any}
                         onAddSpareExercise={() => onAddSpareExercise(exercise)}
+                        onDeleteEXercise={() =>
+                          onDeleteMainExercise(exercise, values, setFieldValue)
+                        }
                       />
                       <Text as="h5" className="!mb-2">
                         التمرينات البديلة:

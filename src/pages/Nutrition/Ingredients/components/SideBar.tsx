@@ -43,7 +43,6 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     }
   };
 
-  console.log(categoryId);
 
   const isEditing = ingredientData !== null;
 

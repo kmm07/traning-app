@@ -23,6 +23,8 @@ import Subscriptions from "pages/subscriptions";
 import UserSubscriptions from "pages/Users/subscriptions";
 import ViewWeekDay from "pages/view-week-days";
 import Coupones from "pages/coupones";
+import Admin from "pages/admin";
+import ContactsPage from "pages/contacts";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +33,7 @@ const router = createBrowserRouter(
 
       <Route path="/" element={<Layout />}>
         <Route path="/dashboard" element={<Messages />} />
+        <Route path="/admins" element={<Admin />} />
         <Route path="users" index element={<Users />} />
         <Route
           path="/users/:id/subscriptions"
@@ -56,6 +59,7 @@ const router = createBrowserRouter(
         <Route path="notifications" element={<Notifications />} />
 
         <Route path="coupones" element={<Coupones />} />
+        <Route path="contacts" element={<ContactsPage />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
