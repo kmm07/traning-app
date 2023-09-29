@@ -9,15 +9,15 @@ type Props = {
 function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
     new: {
-      src: "/images/img_checkmark.svg",
+      src: "/images/img_checkmark.png",
       name: "مشترك جديد",
     },
     renewal: {
-      src: "/images/img_clock5.svg",
+      src: "/images/img_clock5.png",
       name: "تجديد الإشتراك",
     },
     issue: {
-      src: "/images/img_error.png",
+      src: "/images/img_error.svg",
       name: "خطأ",
     },
     cancelled: {

@@ -131,6 +131,11 @@ function AddNotification({ active }: { active: number }) {
           )}
 
           <CheckBox name="private" label="إشعار خاص" />
+          <Input
+            name="private"
+            type={"hidden" as any}
+            value={active === 1 ? 1 : 0}
+          />
 
           <div>
             <Text as="h3">إضافة التفاصيل</Text>
