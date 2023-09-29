@@ -1,6 +1,6 @@
 import {
   Button,
-  CheckBox,
+  // CheckBox,
   Img,
   Input,
   Select,
@@ -130,7 +130,9 @@ function AddNotification({ active }: { active: number }) {
             />
           )}
 
-          <CheckBox name="private" label="إشعار خاص" />
+          <input name="private" type="hidden" value={active == 1 ? 1 : 0} />
+
+          {/* <CheckBox name="private" label="إشعار خاص" /> */}
 
           <div>
             <Text as="h3">إضافة التفاصيل</Text>
