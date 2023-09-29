@@ -1,6 +1,5 @@
 import {
   Button,
-  CheckBox,
   Img,
   Input,
   Select,
@@ -20,7 +19,6 @@ const initialValues = {
   details: [],
   users: [],
   image: "",
-  private: false,
 };
 
 function AddNotification({ active }: { active: number }) {
@@ -71,6 +69,8 @@ function AddNotification({ active }: { active: number }) {
         );
       }
     });
+
+    formData.append("private", active as any);
 
     try {
       await mutateAsync(formData as any);
@@ -130,12 +130,7 @@ function AddNotification({ active }: { active: number }) {
             />
           )}
 
-          <CheckBox name="private" label="إشعار خاص" />
-          <Input
-            name="private"
-            type={"hidden" as any}
-            value={active === 1 ? 1 : 0}
-          />
+          {/* <CheckBox name="private" label="إشعار خاص" /> */}
 
           <div>
             <Text as="h3">إضافة التفاصيل</Text>
