@@ -12,7 +12,7 @@ const initialValues = {
   muscle_image: "",
   internal_video: "",
   external_video: "",
-  video_type: "",
+  video_type: "internal",
 };
 
 function SideBar({ exerciseData, categoryData }: any) {
@@ -52,16 +52,11 @@ function SideBar({ exerciseData, categoryData }: any) {
 
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
-      if (values.external_video !== "") {
-        delete values.internal_video;
-      } else delete values.external_video;
-
       typeof values.muscle_image !== "object" && delete values.muscle_image;
 
       typeof values.image !== "object" && delete values.image;
 
       if (isEditing) {
-        delete values.video_type;
         await mutatExercise(
           formData({
             ...values,
@@ -150,9 +145,13 @@ function SideBar({ exerciseData, categoryData }: any) {
                     name="internal_video"
                     accept="video/*"
                     isForm={false}
-                    onChange={(e: any) =>
-                      setFieldValue("internal_video", e.target?.files[0])
-                    }
+                    onChange={(e: any) => {
+                      {
+                        console.log("e.target >>>> ", e.target);
+
+                        setFieldValue("internal_video", e.target?.files[0]);
+                      }
+                    }}
                   />
                 )}
               </div>
