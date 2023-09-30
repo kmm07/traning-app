@@ -145,13 +145,9 @@ function SideBar({ exerciseData, categoryData }: any) {
                     name="internal_video"
                     accept="video/*"
                     isForm={false}
-                    onChange={(e: any) => {
-                      {
-                        console.log("e.target >>>> ", e.target);
-
-                        setFieldValue("internal_video", e.target?.files[0]);
-                      }
-                    }}
+                    onChange={(e: any) =>
+                      setFieldValue("internal_video", e.target?.files[0])
+                    }
                   />
                 )}
               </div>
@@ -168,13 +164,17 @@ function SideBar({ exerciseData, categoryData }: any) {
             <TextArea name="notes" />
           </Card>
           <div className="flex justify-center">
-            <a
-              href={values.external_video ?? values.internal_video}
-              target="_blank"
-              className="p-4 bg-primary text-white rounded-lg"
+            <span
+              onClick={() => {
+                window.open(
+                  values.external_video || values.internal_video,
+                  "_blank"
+                );
+              }}
+              className="p-4 bg-primary text-white rounded-lg cursor-pointer"
             >
               تشغيل الفيديو
-            </a>
+            </span>
           </div>
           <div className="flex items-center justify-evenly mt-6">
             <Button
