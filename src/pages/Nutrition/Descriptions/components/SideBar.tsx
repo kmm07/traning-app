@@ -92,12 +92,12 @@ function SideBar({
       Math.trunc((fat += Number((meal.fat / 100) * meal.size)));
     });
 
-    formRef.current?.setFieldValue("carbohydrate", carbohydrate);
-    formRef.current?.setFieldValue("trans_fat", trans_fat);
-    formRef.current?.setFieldValue("protein", protein);
-    formRef.current?.setFieldValue("calories", calories);
-    formRef.current?.setFieldValue("sugar", sugar);
-    formRef.current?.setFieldValue("fat", fat);
+    formRef.current?.setFieldValue("carbohydrate", carbohydrate.toFixed(2));
+    formRef.current?.setFieldValue("trans_fat", trans_fat.toFixed(2));
+    formRef.current?.setFieldValue("protein", protein.toFixed(2));
+    formRef.current?.setFieldValue("calories", calories.toFixed(2));
+    formRef.current?.setFieldValue("sugar", sugar.toFixed(2));
+    formRef.current?.setFieldValue("fat", fat.toFixed(2));
 
     formRef.current?.setFieldValue("ingredients", [
       ...(formRef.current?.values.ingredients ?? []),
@@ -661,15 +661,14 @@ function SideBar({
                   إضافة خطوة
                 </Button>
               )}
-
-              <Modal id="add-step-empty" modalClassName="absolute">
-                <AddStep
-                  editData={stepsData}
-                  setEditData={setStepsData}
-                  isEmpty={true}
-                />
-              </Modal>
             </Card>
+            <Modal id="add-step-empty" modalClassName="absolute">
+              <AddStep
+                editData={stepsData}
+                setEditData={setStepsData}
+                isEmpty={true}
+              />
+            </Modal>
 
             <div className="flex items-center justify-evenly mt-6">
               <Button
