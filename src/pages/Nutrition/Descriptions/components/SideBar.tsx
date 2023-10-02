@@ -78,26 +78,27 @@ function SideBar({
     let sugar = 0;
     let fat = 0;
     mainMeals?.forEach((meal: any) => {
-      Math.trunc(
-        (carbohydrate += Number((meal.carbohydrate / 100) * meal.size))
-      );
-      Math.trunc((trans_fat += Number((meal.trans_fat / 100) * meal.size)));
+      carbohydrate += Number((meal.carbohydrate / 100) * meal.size);
+      trans_fat += Number((meal.trans_fat / 100) * meal.size);
 
-      Math.trunc((protein += Number((meal.protein / 100) * meal.size)));
+      protein += Number((meal.protein / 100) * meal.size);
 
-      Math.trunc((calories += Number((meal.calories / 100) * meal.size)));
+      calories += Number((meal.calories / 100) * meal.size);
 
-      Math.trunc((sugar += Number((meal.sugar / 100) * meal.size)));
+      sugar += Number((meal.sugar / 100) * meal.size);
 
-      Math.trunc((fat += Number((meal.fat / 100) * meal.size)));
+      fat += Number((meal.fat / 100) * meal.size);
     });
 
-    formRef.current?.setFieldValue("carbohydrate", carbohydrate);
-    formRef.current?.setFieldValue("trans_fat", trans_fat);
-    formRef.current?.setFieldValue("protein", protein);
-    formRef.current?.setFieldValue("calories", calories);
-    formRef.current?.setFieldValue("sugar", sugar);
-    formRef.current?.setFieldValue("fat", fat);
+    formRef.current?.setFieldValue(
+      "carbohydrate",
+      Math.round(Number(carbohydrate))
+    );
+    formRef.current?.setFieldValue("trans_fat", Math.round(Number(trans_fat)));
+    formRef.current?.setFieldValue("protein", Math.round(Number(protein)));
+    formRef.current?.setFieldValue("calories", Math.round(Number(calories)));
+    formRef.current?.setFieldValue("sugar", Math.round(Number(sugar)));
+    formRef.current?.setFieldValue("fat", Math.round(Number(fat)));
 
     formRef.current?.setFieldValue("ingredients", [
       ...(formRef.current?.values.ingredients ?? []),
@@ -293,12 +294,12 @@ function SideBar({
       initialValues={{
         ...initialValues,
         ...mealData,
-        calories: Number(mealData?.calories ?? 0).toFixed(2),
-        protein: Number(mealData?.protein ?? 0).toFixed(2),
-        fat: Number(mealData?.fat ?? 0).toFixed(2),
-        carbohydrate: Number(mealData?.carbohydrate ?? 0).toFixed(2),
-        sugar: Number(mealData?.calories ?? 0).toFixed(2),
-        trans_fat: Number(mealData?.trans_fat ?? 0).toFixed(2),
+        calories: Math.round(mealData?.calories ?? 0),
+        protein: Math.round(mealData?.protein ?? 0),
+        fat: Math.round(mealData?.fat ?? 0),
+        carbohydrate: Math.round(mealData?.carbohydrate ?? 0),
+        sugar: Math.round(mealData?.calories ?? 0),
+        trans_fat: Math.round(mealData?.trans_fat ?? 0),
         prepare: { ...mealData?.prepare, video_type: "internal" },
         diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
           meal: meals.find((meal) => meal.value === item.meal),

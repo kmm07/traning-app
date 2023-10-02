@@ -110,6 +110,7 @@ export default function ViewWeekDay() {
     category,
     weekNum = "sss",
   } = JSON.parse(localStorage.getItem("week-days") as any);
+
   return (
     <div className="w-full space-y-4">
       <div className="col-span-1 text-white space-y-2">

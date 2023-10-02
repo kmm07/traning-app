@@ -105,27 +105,27 @@ function TrainingView({ home, gender }: Props) {
     document.getElementById("add-new-exercise")?.click();
   };
 
-  const onView = (id: number, week_num: number) => {
-    const category = trainingCategories?.map(
-      (category: any) =>
-        exerciesCategory === category.id && <div>{category?.name}</div>
-    );
+  const onViewWeek = (id: number, week_num: number) => {
+    console.log(trainingCategories);
 
-    const trLevel = cardData.filter(
-      (item) => level === item.id && <div className="text-lg">{item.label}</div>
-    )[0].label;
-    //set local stoarge
-    localStorage.setItem(
-      "week-days",
-      JSON.stringify({
-        home,
-        gender,
-        daysNum,
-        trLevel,
-        category,
-        weekNum: week_num,
-      })
-    );
+    console.log(exerciesCategory);
+
+    // const category = trainingCategories?.find(
+    //   (category: any) => exerciesCategory === category.id
+    // );
+
+    // //set local stoarge
+    // localStorage.setItem(
+    //   "week-days",
+    //   JSON.stringify({
+    //     home: category?.home,
+    //     gender: category?.gender,
+    //     daysNum: category?.days_num,
+    //     level: category?.lvl,
+    //     category: category?.name,
+    //     weekNum: week_num,
+    //   })
+    // );
     navigate(`/exercises/week-days/${id}`);
   };
 
@@ -179,7 +179,7 @@ function TrainingView({ home, gender }: Props) {
           <TableActions
             onEdit={() => onEditWeek(row.original)}
             onDelete={() => onDeleteWeek(row.original.id)}
-            onView={() => onView(row.original.id, row.original.week_num)}
+            onView={() => onViewWeek(row.original.id, row.original.week_num)}
           />
         ),
       },
