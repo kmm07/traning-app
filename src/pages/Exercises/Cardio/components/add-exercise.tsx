@@ -1,4 +1,4 @@
-import { Button, Input } from "components";
+import { Button, Img, Input, Text } from "components";
 import { useFormikContext } from "formik";
 import { useState } from "react";
 
@@ -33,7 +33,23 @@ export default function AddCardio() {
           isForm={false}
         />
       </div>
-      <Button onClick={onAddExercise}>إضافة التمرين</Button>
+      <div className="flex items-center justify-center gap-6 mt-6">
+        <Button
+          primary
+          className="flex items-center gap-1"
+          onClick={onAddExercise}
+        >
+          <Img src="/images/plus.svg" />
+          <Text className="!text-white">إضافة</Text>
+        </Button>
+
+        <Button
+          danger
+          onClick={() => document.getElementById("cardio-exercise")?.click()}
+        >
+          إلغاء
+        </Button>
+      </div>
     </div>
   );
 }

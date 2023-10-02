@@ -1,5 +1,5 @@
 import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import SideBar from "./components/SideBar";
@@ -104,28 +104,31 @@ function TrainingView({ home, gender }: Props) {
 
     document.getElementById("add-new-exercise")?.click();
   };
+  const exerciesCategoryRef = useRef<any>();
+
+  const trainingCategoriesRef = useRef<any>();
+
+  exerciesCategoryRef.current = exerciesCategory;
+
+  trainingCategoriesRef.current = trainingCategories;
 
   const onViewWeek = (id: number, week_num: number) => {
-    console.log(trainingCategories);
-
-    console.log(exerciesCategory);
-
-    // const category = trainingCategories?.find(
-    //   (category: any) => exerciesCategory === category.id
-    // );
+    const category = trainingCategoriesRef.current?.find(
+      (category: any) => exerciesCategoryRef.current === category.id
+    );
 
     // //set local stoarge
-    // localStorage.setItem(
-    //   "week-days",
-    //   JSON.stringify({
-    //     home: category?.home,
-    //     gender: category?.gender,
-    //     daysNum: category?.days_num,
-    //     level: category?.lvl,
-    //     category: category?.name,
-    //     weekNum: week_num,
-    //   })
-    // );
+    localStorage.setItem(
+      "week-days",
+      JSON.stringify({
+        home: category?.home,
+        gender: category?.gender,
+        daysNum: category?.days_num,
+        level: category?.lvl,
+        category: category,
+        weekNum: week_num,
+      })
+    );
     navigate(`/exercises/week-days/${id}`);
   };
 

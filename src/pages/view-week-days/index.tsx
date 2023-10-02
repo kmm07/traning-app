@@ -6,7 +6,8 @@ import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
 import { Row } from "react-table";
 import WeekDayForm from "./components/weekdayForm";
-import WeekDaySideBar from "./components/sideBar";
+import WeekDayGymSideBar from "./components/gym-side-bar/sideBar";
+import WeekDayHomeSideBar from "./components/home-side-bar/sideBar";
 
 export default function ViewWeekDay() {
   const [active, setActive] = useState<any>(null);
@@ -123,7 +124,7 @@ export default function ViewWeekDay() {
         <div className="text-lg"> السبوع رقم {weekNum}</div>
         <div className="text-lg">{daysNum} أيام في الاسبوع</div>
 
-        <div>{category}</div>
+        <div>{category?.name}</div>
       </div>
       <Table
         data={data ?? []}
@@ -148,7 +149,11 @@ export default function ViewWeekDay() {
         <WeekDayForm />
       </Modal>
       <Drawer>
-        <WeekDaySideBar weekDayData={active} />
+        {home === 0 ? (
+          <WeekDayGymSideBar weekDayData={active} category={category} />
+        ) : (
+          <WeekDayHomeSideBar weekDayData={active} category={category} />
+        )}
       </Drawer>
     </div>
   );

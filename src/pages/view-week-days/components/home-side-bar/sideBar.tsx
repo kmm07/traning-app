@@ -1,5 +1,5 @@
 import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
-import { Formik, useFormikContext } from "formik";
+import { Formik } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
@@ -9,10 +9,11 @@ import { useAppSelector } from "hooks/useRedux";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
-import EditExerciseSessions from "./edit-exercise-session";
+import EditExerciseSessions from "../gym-side-bar/edit-exercise-session";
 
 interface SideBarProps {
   weekDayData: any;
+  category: any;
 }
 
 interface SingleExerciseProps {
@@ -22,53 +23,16 @@ interface SingleExerciseProps {
   onEditExercise?: (exercise: any) => void;
 }
 const SingleExercise = ({
-  exercise,
   onAddSpareExercise,
   onDeleteEXercise,
-  onEditExercise,
 }: SingleExerciseProps) => {
-  const { values, setFieldValue } = useFormikContext<any>();
+  // const { values, setFieldValue } = useFormikContext<any>();
 
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          <Img src={exercise?.exercise_muscle_image} alt="image" />
-          <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
-        </div>
-
-        <div className={"flex items-center"}>
-          <div
-            className={`rounded-full border-[1px] p-2  ${
-              exercise?.sessions?.length === 0
-                ? "text-red-600 !border-red-600"
-                : ""
-            }`}
-          >
-            الجلسات <span className="ms-4">{exercise?.sessions?.length}</span>
-          </div>
-          <div>
-            <Button onClick={onEditExercise as any}>
-              <Img src="/images/edit.svg" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Text as="h5">وقت الراحة</Text>
-        <div className="flex items-center gap-2 w-[120px]">
-          <Input
-            name="rest_sec"
-            isForm={false}
-            value={exercise?.rest_sec}
-            onChange={(e) => {
-              exercise.rest_sec = e.target.value;
-              setFieldValue("exercises", [...values.exercises]);
-            }}
-          />{" "}
-          <span>ثانية</span>
-        </div>
+      <div className="flex items-center gap-4 mb-4">
+        <Input isForm={false} name="count" label="العدد" />
+        <Input isForm={false} name="total" label="المجموع" />
       </div>
 
       {onAddSpareExercise !== undefined && (
@@ -92,7 +56,7 @@ const initialValues = {
   exercises: [],
 };
 
-function WeekDaySideBar({ weekDayData }: SideBarProps) {
+function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
   const { id } = useParams();
 
   const onClose = () => document.getElementById("my-drawer")?.click();
@@ -343,8 +307,8 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         ...initialValues,
         ...weekDayData,
         exercise_category_id: {
-          label: weekDayData?.exercise_category,
-          value: weekDayData?.exercise_category_id,
+          label: category?.name,
+          value: category?.id,
         },
       }}
       onSubmit={onSubmit}
@@ -407,6 +371,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   </Text>
                 </Text>
               </div>
+
               <div className="pb-4 border-b-[1px]">
                 {values.exercises
                   .filter((exercise: any) => exercise.parent_id === null)
@@ -474,6 +439,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
                   <Text> إضافة تمرين</Text>
                 </Button>
               </div>
+
               <Modal id="add-week-day-exercise" modalClassName="absolute">
                 <AddWeekDayExercise categories={categories} />
               </Modal>
@@ -520,4 +486,4 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   );
 }
 
-export default WeekDaySideBar;
+export default WeekDayHomeSideBar;

@@ -3,7 +3,7 @@ import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import AddWeekDayExercise from "./add-day-exercise";
+import AddWeekDayExercise from "./home-side-bar/add-day-exercise";
 const initialValues = {
   name: "",
   day_num: "",
