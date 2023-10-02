@@ -1,4 +1,5 @@
 import { Input } from "components";
+import { useFormikContext } from "formik";
 import React from "react";
 
 type Props = {
@@ -10,10 +11,16 @@ type Props = {
 };
 
 const RadialProgress = ({ percentage, className, body, name }: Props) => {
-
+  const { setFieldValue, values } = useFormikContext<any>();
   return (
     <div className="flex flex-col justify-center items-center w-fit gap-2">
       <Input
+        isForm={false}
+        onChange={(e) => {
+          setFieldValue(name ?? ("blank" as any), e.target.value);
+          setFieldValue("has_change_into_calories", 1);
+        }}
+        value={values[name ?? ("blank" as any)] ?? (percentage as any)}
         name={name ?? ("blank" as any)}
         className="text-center font-bold !text-[20px] w-[98px]"
       />

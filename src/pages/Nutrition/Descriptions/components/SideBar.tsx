@@ -662,15 +662,14 @@ function SideBar({
                   إضافة خطوة
                 </Button>
               )}
-
-              <Modal id="add-step-empty" modalClassName="absolute">
-                <AddStep
-                  editData={stepsData}
-                  setEditData={setStepsData}
-                  isEmpty={true}
-                />
-              </Modal>
             </Card>
+            <Modal id="add-step-empty" modalClassName="absolute">
+              <AddStep
+                editData={stepsData}
+                setEditData={setStepsData}
+                isEmpty={true}
+              />
+            </Modal>
 
             <div className="flex items-center justify-evenly mt-6">
               <Button

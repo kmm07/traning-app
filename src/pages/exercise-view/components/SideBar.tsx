@@ -12,7 +12,7 @@ const initialValues = {
   muscle_image: "",
   internal_video: "",
   external_video: "",
-  video_type: "",
+  video_type: "internal",
 };
 
 function SideBar({ exerciseData, categoryData }: any) {
@@ -52,16 +52,11 @@ function SideBar({ exerciseData, categoryData }: any) {
 
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
-      if (values.external_video !== "") {
-        delete values.internal_video;
-      } else delete values.external_video;
-
       typeof values.muscle_image !== "object" && delete values.muscle_image;
 
       typeof values.image !== "object" && delete values.image;
 
       if (isEditing) {
-        delete values.video_type;
         await mutatExercise(
           formData({
             ...values,
@@ -169,13 +164,17 @@ function SideBar({ exerciseData, categoryData }: any) {
             <TextArea name="notes" />
           </Card>
           <div className="flex justify-center">
-            <a
-              href={values.external_video ?? values.internal_video}
-              target="_blank"
-              className="p-4 bg-primary text-white rounded-lg"
+            <span
+              onClick={() => {
+                window.open(
+                  values.external_video || values.internal_video,
+                  "_blank"
+                );
+              }}
+              className="p-4 bg-primary text-white rounded-lg cursor-pointer"
             >
               تشغيل الفيديو
-            </a>
+            </span>
           </div>
           <div className="flex items-center justify-evenly mt-6">
             <Button

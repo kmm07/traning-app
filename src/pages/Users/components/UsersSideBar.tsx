@@ -20,6 +20,7 @@ const initialValues = {
   fat: "",
   calories: "",
   carbohydrates: "",
+  has_change_into_calories: 0,
 };
 
 function UsersSideBar({ activeUser }: { activeUser: any }) {
@@ -78,7 +79,9 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
       // helpers.resetForm();
 
       onClose();
-    } catch (error: any) {}
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   return (

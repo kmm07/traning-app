@@ -1,4 +1,4 @@
-import { Button, CheckBox, Input } from "components";
+import { Button, CheckBox, Input, UploadInput } from "components";
 import { Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { Form } from "react-router-dom";
@@ -16,6 +16,7 @@ const initialValues = {
   home: "",
   private: "",
   name: "",
+  image: "",
 };
 
 export default function ExerciseCategoryForm({
@@ -43,6 +44,7 @@ export default function ExerciseCategoryForm({
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
       if (isEditing) {
+        typeof values.image !== "object" && delete values.image;
         await mutateAsync(
           formData({
             ...values,
@@ -84,6 +86,8 @@ export default function ExerciseCategoryForm({
     >
       {({ submitForm }) => (
         <Form>
+          <UploadInput name="image" className="w-24 rounded-2xl" />
+
           <Input name="name" label="الإسم" />
           <div className="my-8 flex items-center justify-center gap-8">
             <CheckBox name="home" label="منزلي" />

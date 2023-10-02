@@ -26,7 +26,6 @@ function TrainingInfo() {
     ["", undefined, null].includes(value as string)
   );
 
-
   const url = `/training-categories?lvl=${trainingData?.selectValue?.value?.lvl}&gender=${trainingData?.selectValue?.value?.gender}&days_num=${trainingData?.daysNum?.value}&home=${trainingData?.selectValue?.value?.home}`;
 
   const { data: trainingCategories = [] }: UseQueryResult<any> = useGetQuery(
@@ -188,7 +187,7 @@ function TrainingInfo() {
           />
         </Card>
 
-        {/* <Text as="h2">نوع الجدول التدريبي</Text>
+        <Text as="h2">نوع الجدول التدريبي</Text>
         <Card className="p-3">
           <Select
             name="training_category_id"
@@ -198,7 +197,7 @@ function TrainingInfo() {
               value: values.category_id,
             }}
           />
-        </Card> */}
+        </Card>
         <div className="hidden">
           <Text as="h2">نوع الجدول التدريبي</Text>
           <Card className="p-3">

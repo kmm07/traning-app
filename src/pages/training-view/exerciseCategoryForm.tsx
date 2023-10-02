@@ -1,9 +1,7 @@
 import { Button, CheckBox, Input, Select, UploadInput } from "components";
 import { Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { useAppSelector } from "hooks/useRedux";
 import { Form } from "react-router-dom";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
@@ -46,8 +44,6 @@ export default function ExerciseCategoryForm({
     ? `/training-categories/${categoryData?.id}`
     : "/training-categories";
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   const { mutateAsync, isLoading: isAddLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
@@ -63,9 +59,7 @@ export default function ExerciseCategoryForm({
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
       if (isEditing) {
-        !isImageDelete && delete values.image;
-
-        values.image.startsWith("https") && delete values.image;
+        typeof values.image !== "object" && delete values.image;
 
         await mutateAsync(
           formData({
