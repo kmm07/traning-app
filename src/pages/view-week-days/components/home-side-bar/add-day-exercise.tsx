@@ -1,4 +1,4 @@
-import { Button,  Input, Select, Text } from "components";
+import { Button, Input, Select, Text } from "components";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
@@ -78,24 +78,24 @@ export default function AddWeekDayExercise({
             value={exercise?.exercise_id}
           />
           <Input
-            name="count"
+            name="counter"
             label="العدد"
             isForm={false}
             type={"number" as any}
             onChange={(e) =>
-              setExercise({ ...exercise, rest_sec: e.target.value })
+              setExercise({ ...exercise, counter: e.target.value })
             }
-            value={exercise?.rest_sec}
+            value={exercise?.counter}
           />
           <Input
-            name="total"
-            label="المجموع"
+            name="timer"
+            label="الوقت بالدقائق"
             isForm={false}
             type={"number" as any}
             onChange={(e) =>
-              setExercise({ ...exercise, rest_sec: e.target.value })
+              setExercise({ ...exercise, timer: e.target.value })
             }
-            value={exercise?.rest_sec}
+            value={exercise?.timer}
           />
         </div>
       </div>

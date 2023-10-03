@@ -1,5 +1,5 @@
 import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
-import { Formik } from "formik";
+import { Formik, useFormikContext } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
@@ -25,14 +25,41 @@ interface SingleExerciseProps {
 const SingleExercise = ({
   onAddSpareExercise,
   onDeleteEXercise,
+  exercise,
 }: SingleExerciseProps) => {
-  // const { values, setFieldValue } = useFormikContext<any>();
+  const { values, setFieldValue } = useFormikContext<any>();
 
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Img
+          src={exercise?.exercise_muscle_image}
+          alt="image"
+          className="!w-[150px]"
+        />
+        <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
+      </div>
       <div className="flex items-center gap-4 mb-4">
-        <Input isForm={false} name="count" label="العدد" />
-        <Input isForm={false} name="total" label="المجموع" />
+        <Input
+          isForm={false}
+          name="counter"
+          label="العدد"
+          value={exercise.counter}
+          onChange={(e) => {
+            exercise.counter = e.target.value;
+            setFieldValue("exercises", [...values.exercises]);
+          }}
+        />
+        <Input
+          isForm={false}
+          name="timer"
+          label="الوقت بالدقائق"
+          value={exercise.timer}
+          onChange={(e) => {
+            exercise.timer = e.target.value;
+            setFieldValue("exercises", [...values.exercises]);
+          }}
+        />
       </div>
 
       {onAddSpareExercise !== undefined && (
@@ -133,88 +160,39 @@ function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
                 );
 
                 formData.append(
-                  `exercises[${i}][children][${childIndex}][rest_sec]`,
-                  child.rest_sec
+                  `exercises[${i}][children][${childIndex}][counter]`,
+                  child.counter
                 );
 
                 formData.append(
-                  `exercises[${i}][children][${childIndex}][private]`,
-                  child?.private === true ? 1 : (0 as any)
+                  `exercises[${i}][children][${childIndex}][timer]`,
+                  child?.timer
                 );
-
-                child.sessions?.forEach(
-                  (session: any, sessionIndex: number) => {
-                    formData.append(
-                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][session_num]`,
-                      session?.session_num
-                    );
-
-                    formData.append(
-                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][counter]`,
-                      session?.counter
-                    );
-
-                    formData.append(
-                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][rest_sec]`,
-                      session?.rest_sec
-                    );
-                    formData.append(
-                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][notes]`,
-                      session?.notes
-                    );
-                    formData.append(
-                      `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][is_new]`,
-                      session?.is_new
-                    );
-                    session?.is_new === 0 &&
-                      formData.append(
-                        `exercises[${i}][children][${childIndex}][sessions][${sessionIndex}][id]`,
-                        session?.id
-                      );
-                  }
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][private]`,
+                  "1"
                 );
               });
 
               return;
             }
 
-            if (item[0] !== "sessions") {
-              if (item[0] === "parent_id") {
-                formData.append(
-                  `exercises[${i}][${item[0]}]`,
-                  item[1] === null ? "" : item[1]
-                );
-              } else {
-                formData.append(
-                  `exercises[${i}][${item[0]}]`,
-                  item[0] === "exercise_id"
-                    ? item[1].value ?? item[1]
-                    : item[0] === "private"
-                    ? item[1]
-                      ? 1
-                      : 0
-                    : item[1]
-                );
-              }
-              return;
-            } else
-              item[1].forEach((item: any, sessionIndex: number) =>
-                Object.entries(item).forEach((session: any) => {
-                  if (session[0] !== "notes") {
-                    formData.append(
-                      `exercises[${i}][sessions][${sessionIndex}][${session[0]}]`,
-                      session[1] as any
-                    );
-                  } else {
-                    session[0] === null
-                      ? ""
-                      : formData.append(
-                          `exercises[${i}][sessions][${sessionIndex}][notes]`,
-                          session[1] as any
-                        );
-                  }
-                })
+            if (item[0] === "parent_id") {
+              formData.append(
+                `exercises[${i}][${item[0]}]`,
+                item[1] === null ? "" : item[1]
               );
+            } else {
+              formData.append(
+                `exercises[${i}][${item[0]}]`,
+                item[0] === "exercise_id"
+                  ? item[1].value ?? item[1]
+                  : item[0] === "private"
+                  ? 1
+                  : item[1]
+              );
+            }
+            return;
           });
         });
       }
