@@ -183,14 +183,16 @@ function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
                 item[1] === null ? "" : item[1]
               );
             } else {
-              formData.append(
-                `exercises[${i}][${item[0]}]`,
-                item[0] === "exercise_id"
-                  ? item[1].value ?? item[1]
-                  : item[0] === "private"
-                  ? 1
-                  : item[1]
-              );
+              if (item[0] !== "sessions") {
+                formData.append(
+                  `exercises[${i}][${item[0]}]`,
+                  item[0] === "exercise_id"
+                    ? item[1].value ?? item[1]
+                    : item[0] === "private"
+                    ? 1
+                    : item[1]
+                );
+              }
             }
             return;
           });

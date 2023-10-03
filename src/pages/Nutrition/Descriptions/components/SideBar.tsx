@@ -443,7 +443,7 @@ function SideBar({
                           name={`ingredients.[${index}].size`}
                           className="text-center"
                           isForm={false}
-                          value={values.ingredients?.[index].size}
+                          value={ingredient.size}
                           onChange={(e) => {
                             ingredient.size = e.target.value;
 
