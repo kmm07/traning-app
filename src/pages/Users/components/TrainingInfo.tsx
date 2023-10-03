@@ -279,12 +279,13 @@ function TrainingInfo() {
               // @ts-ignore
               {
                 "--value":
-                  (values.program_progress / values.weekly_training) * 100,
+                  (values.program_progress_done / values.program_progress_all) *
+                  100,
               } as any
             }
           >
             <Text as="h5">
-              {values.weekly_training} / {values.program_progress}
+              {values.program_progress_done} / {values.program_progress_all}
             </Text>
           </div>
         </div>

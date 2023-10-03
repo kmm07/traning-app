@@ -1,4 +1,4 @@
-import { Button, Modal, SubState, Table, Text } from "components";
+import { Button, Modal, Table, Text } from "components";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
@@ -94,6 +94,9 @@ export default function UserSubscriptions({}: Props) {
     <div className="w-full space-y-4">
       <div className="w-fit">
         <Text as="h5" className="font-bold">
+          {subscriptions?.current?.name}
+        </Text>
+        <Text as="h5" className="font-bold my-4">
           {user?.name}
         </Text>
         <Text as="h5" className="font-bold my-4">
@@ -102,13 +105,12 @@ export default function UserSubscriptions({}: Props) {
         <Text as="h5" className="font-bold">
           {user?.phone}
         </Text>
-        <SubState state={user?.subscription_status as any} />
       </div>
 
       {!isLoading ? (
-        subscriptions.length !== 0 ? (
+        subscriptions?.subscriptions?.length !== 0 ? (
           <Table
-            data={subscriptions ?? []}
+            data={subscriptions?.subscriptions ?? []}
             columns={columns}
             modalTitle="اضافة إشتراك"
             modalContent={<AddUserSubscription />}

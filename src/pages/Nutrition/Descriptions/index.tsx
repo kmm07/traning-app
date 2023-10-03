@@ -47,6 +47,7 @@ function Descriptions() {
   }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: DescriptionType[] } }) =>
       data.data.map((item: DescriptionType) => ({
+        ...item,
         id: item.id,
         name: item.name,
         calories: item.calories,

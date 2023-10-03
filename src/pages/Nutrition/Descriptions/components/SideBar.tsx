@@ -63,7 +63,7 @@ function SideBar({
   };
 
   const getItemPercentage = (size: number, itemValue: number) => {
-    return Number((itemValue / 100) * size).toFixed(2);
+    return Number(itemValue * size).toFixed(2);
   };
 
   const reCalculateNutrationValues = () => {
@@ -77,27 +77,34 @@ function SideBar({
     let calories = 0;
     let sugar = 0;
     let fat = 0;
+
     mainMeals?.forEach((meal: any) => {
-      carbohydrate += Number((meal.carbohydrate / 100) * meal.size);
-      trans_fat += Number((meal.trans_fat / 100) * meal.size);
+      carbohydrate += Number(meal.one_size_carbohydrate) * meal.size;
 
-      protein += Number((meal.protein / 100) * meal.size);
+      trans_fat += Number(meal.one_size_trans_fat) * meal.size;
 
-      calories += Number((meal.calories / 100) * meal.size);
+      protein += Number(meal.one_size_protein) * meal.size;
 
-      sugar += Number((meal.sugar / 100) * meal.size);
+      calories += Number(meal.one_size_calories) * meal.size;
 
-      fat += Number((meal.fat / 100) * meal.size);
+      sugar += Number(meal.one_size_sugar) * meal.size;
+
+      fat += Number(meal.one_size_fat) * meal.size;
     });
 
     formRef.current?.setFieldValue(
       "carbohydrate",
       Math.round(Number(carbohydrate))
     );
+
     formRef.current?.setFieldValue("trans_fat", Math.round(Number(trans_fat)));
+
     formRef.current?.setFieldValue("protein", Math.round(Number(protein)));
+
     formRef.current?.setFieldValue("calories", Math.round(Number(calories)));
+
     formRef.current?.setFieldValue("sugar", Math.round(Number(sugar)));
+
     formRef.current?.setFieldValue("fat", Math.round(Number(fat)));
 
     formRef.current?.setFieldValue("ingredients", [
@@ -390,7 +397,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.calories
+                            ingredient?.one_size_calories
                           )}
                         </Text>
                       </div>
@@ -399,7 +406,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.carbohydrate
+                            ingredient?.one_size_carbohydrate
                           )}
                         </Text>
                       </div>
@@ -408,14 +415,17 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.protein
+                            ingredient?.one_size_protein
                           )}
                         </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">الدهون</Text>
                         <Text as="h5">
-                          {getItemPercentage(ingredient?.size, ingredient?.fat)}
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.one_size_fat
+                          )}
                         </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
@@ -423,7 +433,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.sugar
+                            ingredient?.one_size_sugar
                           )}
                         </Text>
                       </div>

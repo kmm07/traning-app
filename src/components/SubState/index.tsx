@@ -1,28 +1,29 @@
 import { Text } from "components";
 
 type Props = {
-  state: "new" | "renewal" | "issue" | "cancelled";
+  state: "subscriped" | "not_subscriped" | "issue" | "cancelled";
   className?: string;
   textClassName?: string;
 };
 
 function SubState({ state, className, textClassName }: Props) {
   const stateObj = {
-    new: {
-      src: "/images/img_checkmark.png",
+    subscriped: {
+      src: "/images/img_checkmark.svg",
       name: "مشترك جديد",
     },
-    renewal: {
-      src: "/images/img_clock5.png",
-      name: "تجديد الإشتراك",
-    },
-    issue: {
+
+    not_subscriped: {
       src: "/images/img_error.svg",
-      name: "خطأ",
+      name: "غير مشترك",
     },
     cancelled: {
       src: "/images/img_error.svg",
       name: "ملغي",
+    },
+    issue: {
+      src: "/images/img_error.svg",
+      name: "خطأ",
     },
   };
   return (

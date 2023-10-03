@@ -4,12 +4,12 @@ import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import AddWeekDayExercise from "../home-side-bar/add-day-exercise";
 import { useAppSelector } from "hooks/useRedux";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
 import EditExerciseSessions from "./edit-exercise-session";
+import AddWeekDayExercise from "./add-day-exercise";
 
 interface SideBarProps {
   weekDayData: any;
@@ -34,7 +34,11 @@ const SingleExercise = ({
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <Img src={exercise?.exercise_muscle_image} alt="image" />
+          <Img
+            src={exercise?.exercise_muscle_image}
+            alt="image"
+            className="!w-[150px]"
+          />
           <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
 
@@ -345,7 +349,7 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
         ...weekDayData,
         exercise_category_id: {
           label: category?.name,
-          value: category?.id,
+          value: weekDayData?.exercise_category_id,
         },
       }}
       onSubmit={onSubmit}
