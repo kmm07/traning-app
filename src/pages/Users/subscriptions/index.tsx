@@ -1,4 +1,4 @@
-import { Button, Modal, Table, Text } from "components";
+import { Button, Img, Modal, Table, Text } from "components";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
@@ -39,8 +39,8 @@ export default function UserSubscriptions({}: Props) {
     document.getElementById("add-new-subscription")?.click();
   };
 
-  const columns = React.useMemo(
-    () => [
+  const columns = React.useMemo(() => {
+    const coreColumns = [
       {
         Header: "الإشتراك",
         Cell: ({ row }: { row: Row<any> }) => {
@@ -86,9 +86,28 @@ export default function UserSubscriptions({}: Props) {
           return <span>{row.original.status}</span>;
         },
       },
-    ],
-    []
-  );
+    ];
+
+    const isCurrentSubscription = subscriptions.current?.id !== undefined;
+
+    return isCurrentSubscription
+      ? [
+          ...coreColumns,
+          {
+            id: "current subscription",
+            Cell: ({ row }: { row: Row<any> }) => {
+              return (
+                <>
+                  {row.original.id === subscriptions.current?.id && (
+                    <Img src="/images/img_checkmark.svg" />
+                  )}
+                </>
+              );
+            },
+          },
+        ]
+      : coreColumns;
+  }, [subscriptions]);
 
   return (
     <div className="w-full space-y-4">

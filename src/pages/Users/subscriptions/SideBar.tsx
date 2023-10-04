@@ -54,9 +54,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
 
       onClose();
 
-      queryClient.invalidateQueries(
-        `/exercises?exercise_category_id=${subscriptionData.id}`
-      );
+      await queryClient.invalidateQueries(`/user-subscriptions?user_id=${id}`);
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

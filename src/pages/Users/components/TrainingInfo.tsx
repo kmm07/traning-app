@@ -3,6 +3,7 @@ import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useEffect, useState } from "react";
 import { UseQueryResult } from "react-query";
+import { toast } from "react-toastify";
 
 const weekDaysNums = [
   { day_num: "1", day_name: "السبت" },
@@ -46,8 +47,16 @@ function TrainingInfo() {
       const filteredArray = values.rest_days.filter(
         (day: any) => day !== day_num
       );
+
       setFieldValue("rest_days", filteredArray);
-    } else setFieldValue("rest_days", [...values.rest_days, day_num]);
+    } else {
+      if (values.rest_days.length + Number(trainingData.daysNum.value) >= 7) {
+        return toast.error(
+          "يجب ان يكون مجموع أيام الراحة وأيام التدريب مساوي لعدد أيام الإسبوع"
+        );
+      }
+      setFieldValue("rest_days", [...values.rest_days, day_num]);
+    }
   };
 
   // get level options =================>
@@ -178,12 +187,18 @@ function TrainingInfo() {
             name=""
             options={weekDaysOptions}
             value={trainingData?.daysNum}
-            onChange={(e: any) =>
+            onChange={(e: any) => {
+              if (values.rest_days?.length + Number(e?.value) > 7) {
+                return toast.error(
+                  "يجب ان يكون مجموع أيام الراحة وأيام التدريب مساوي لعدد أيام الإسبوع"
+                );
+              }
+
               setTrainigData({
                 ...trainingData,
                 daysNum: e,
-              })
-            }
+              });
+            }}
           />
         </Card>
 

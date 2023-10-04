@@ -152,10 +152,7 @@ function TrainingView({ home, gender }: Props) {
           );
         },
       },
-      {
-        Header: "عدد اسابيع التكرار",
-        accessor: "repeat_week_num",
-      },
+
       {
         Header: "نص الهدف",
         accessor: "target_text",
@@ -191,8 +188,34 @@ function TrainingView({ home, gender }: Props) {
   );
 
   useEffect(() => {
-    setExerciseCategory(trainingCategories?.[0]?.id);
+    const storageLevel = JSON.parse(
+      localStorage.getItem(`${home}-${gender}`) as any
+    );
+
+    setDaysNum(storageLevel?.daysNum ?? 3);
+
+    setLevel(storageLevel?.level ?? "junior");
+
+    setExerciseCategory(
+      storageLevel?.exerciesCategory ?? trainingCategories?.[0]?.id
+    );
   }, [trainingCategories]);
+
+  const onChangeDayNum = (id: number) => {
+    setDaysNum(id);
+
+    const storageObject = JSON.parse(
+      localStorage.getItem(`${home}-${gender}`) as any
+    );
+
+    localStorage.setItem(
+      `${home}-${gender}`,
+      JSON.stringify({
+        ...storageObject,
+        daysNum: id,
+      })
+    );
+  };
 
   return (
     <div className="relative w-full space-y-4">
@@ -208,7 +231,20 @@ function TrainingView({ home, gender }: Props) {
                 key={index}
                 label={item.label}
                 active={level === item.id}
-                onClick={() => setLevel(item.id as any)}
+                onClick={() => {
+                  setLevel(item.id as any);
+                  const storageObject = JSON.parse(
+                    localStorage.getItem(`${home}-${gender}`) as any
+                  );
+
+                  localStorage.setItem(
+                    `${home}-${gender}`,
+                    JSON.stringify({
+                      ...storageObject,
+                      level: item.id,
+                    })
+                  );
+                }}
               />
             ))}
           </div>
@@ -233,35 +269,35 @@ function TrainingView({ home, gender }: Props) {
       <h2>عدد أيام التمرين</h2>
       <div className="flex gap-4">
         <Button
-          onClick={() => setDaysNum(2)}
+          onClick={() => onChangeDayNum(2)}
           primary={daysNum === 2}
           secondaryBorder={daysNum !== 2}
         >
           2 أيام في الاسبوع
         </Button>
         <Button
-          onClick={() => setDaysNum(3)}
+          onClick={() => onChangeDayNum(3)}
           primary={daysNum === 3}
           secondaryBorder={daysNum !== 3}
         >
           3 أيام في الاسبوع
         </Button>
         <Button
-          onClick={() => setDaysNum(4)}
+          onClick={() => onChangeDayNum(4)}
           primary={daysNum === 4}
           secondaryBorder={daysNum !== 4}
         >
           4 أيام في الاسبوع
         </Button>
         <Button
-          onClick={() => setDaysNum(5)}
+          onClick={() => onChangeDayNum(5)}
           primary={daysNum === 5}
           secondaryBorder={daysNum !== 5}
         >
           5 أيام في الاسبوع
         </Button>
         <Button
-          onClick={() => setDaysNum(6)}
+          onClick={() => onChangeDayNum(6)}
           primary={daysNum === 6}
           secondaryBorder={daysNum !== 6}
         >
@@ -281,7 +317,20 @@ function TrainingView({ home, gender }: Props) {
               key={category.id}
               label={category?.name}
               active={exerciesCategory === category.id}
-              onClick={() => setExerciseCategory(category.id)}
+              onClick={() => {
+                setExerciseCategory(category.id);
+                const storageObject = JSON.parse(
+                  localStorage.getItem(`${home}-${gender}`) as any
+                );
+
+                localStorage.setItem(
+                  `${home}-${gender}`,
+                  JSON.stringify({
+                    ...storageObject,
+                    exerciesCategory: category.id,
+                  })
+                );
+              }}
               className={
                 category.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
               }

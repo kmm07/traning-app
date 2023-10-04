@@ -169,6 +169,7 @@ function SideBar({
 
   const onClose = () => {
     formRef.current?.resetForm();
+    setMealData(null);
     document.getElementById("my-drawer")?.click();
   };
 
@@ -307,7 +308,18 @@ function SideBar({
         carbohydrate: Math.round(mealData?.carbohydrate ?? 0),
         sugar: Math.round(mealData?.calories ?? 0),
         trans_fat: Math.round(mealData?.trans_fat ?? 0),
-        prepare: { ...mealData?.prepare, video_type: "internal" },
+        prepare: {
+          ...mealData?.prepare,
+          video_type: mealData?.prepare?.video_type ?? "internal",
+          url:
+            mealData?.prepare?.video_type === "external"
+              ? mealData?.prepare?.video_path
+              : "",
+          video:
+            mealData?.prepare?.video_type === "internal"
+              ? mealData?.prepare?.video_path
+              : "",
+        },
         diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
           meal: meals.find((meal) => meal.value === item.meal),
           id: { label: item.category_name, value: item.id },
@@ -632,18 +644,24 @@ function SideBar({
                     values.prepare?.video_type === "external" ? (
                       <Input name="prepare.url" label={"رابط الفيديو"} />
                     ) : (
-                      <Input
-                        type={"file" as any}
-                        name="prepare.video"
-                        accept="video/*"
-                        isForm={false}
-                        onChange={(e: any) =>
-                          setFieldValue("prepare", {
-                            ...values.prepare,
-                            video: e.target?.files[0],
-                          })
-                        }
-                      />
+                      <div className="w-[300px]">
+                        <Input
+                          type={"file" as any}
+                          name="prepare.video"
+                          accept="video/*"
+                          isForm={false}
+                          onChange={(e: any) =>
+                            setFieldValue("prepare", {
+                              ...values.prepare,
+                              video: e.target?.files[0],
+                            })
+                          }
+                        />
+
+                        <p className="!break-words text-white">
+                          {values.prepare?.video}
+                        </p>
+                      </div>
                     )
                   ) : (
                     ""
