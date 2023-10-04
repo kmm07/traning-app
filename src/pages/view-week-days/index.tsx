@@ -65,12 +65,10 @@ export default function ViewWeekDay() {
       },
       {
         Header: "نوع التمارين",
-        accessor: "exercise_category",
+        accessor: "name",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
-            <div className="flex items-center gap-4">
-              {row.original?.exercise_category}
-            </div>
+            <div className="flex items-center gap-4">{row.original?.name}</div>
           );
         },
       },

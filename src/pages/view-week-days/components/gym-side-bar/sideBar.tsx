@@ -136,14 +136,16 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
+    delete values.exercise_category_id;
+
     const formattedData = Object.entries(values);
 
     formattedData.forEach((data: any) => {
-      if (data[0] === "exercise_category_id") {
-        formData.append("exercise_category_id", data?.[1].value as any);
+      // if (data[0] === "exercise_category_id") {
+      //   formData.append("exercise_category_id", data?.[1].value as any);
 
-        return;
-      }
+      //   return;
+      // }
       if (data[0] !== "exercises") {
         formData.append(data[0], data[1] as any);
       }

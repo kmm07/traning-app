@@ -234,7 +234,10 @@ function Descriptions() {
       {descriptionsList?.length === 0 && (
         <Button
           secondaryBorder
-          onClick={() => document.getElementById("my-drawer")?.click()}
+          onClick={() => {
+            setMealData(null);
+            document.getElementById("my-drawer")?.click();
+          }}
         >
           إضافة وصفة
         </Button>

@@ -154,6 +154,8 @@ function TrainingInfo() {
     setTrainigData({ selectValue: initialLevel, daysNum: initialDays });
   }, [values.training_place, values.type, values.lvl, values.training_days]);
 
+  console.log(values);
+
   return (
     <Card className="grid grid-cols-3 gap-10 p-4 mt-4">
       <div className="flex flex-col gap-4">
@@ -198,6 +200,8 @@ function TrainingInfo() {
                 ...trainingData,
                 daysNum: e,
               });
+
+              setFieldValue("weekly_training", Number(e.value));
             }}
           />
         </Card>
@@ -207,10 +211,9 @@ function TrainingInfo() {
           <Select
             name="training_category_id"
             options={trainingCategories ?? []}
-            defaultValue={{
-              label: values.category_name,
-              value: values.category_id,
-            }}
+            value={values.training_category_id}
+            isForm={false}
+            onChange={(e) => setFieldValue("training_category_id", e)}
           />
         </Card>
         <div className="hidden">
@@ -219,10 +222,9 @@ function TrainingInfo() {
             <Select
               name="training_category_id"
               options={trainingCategories ?? []}
-              defaultValue={{
-                label: values.category_name,
-                value: values.category_id,
-              }}
+              value={values.training_category_id}
+              isForm={false}
+              onChange={(e) => setFieldValue("training_category_id", e)}
             />
           </Card>
         </div>
