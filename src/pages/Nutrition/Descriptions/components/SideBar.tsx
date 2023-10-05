@@ -511,7 +511,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.calories
+                                  subIngredient?.one_size_calories
                                 )}
                               </Text>
                             </div>
@@ -520,7 +520,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.carbohydrate
+                                  subIngredient?.one_size_carbohydrate
                                 )}
                               </Text>
                             </div>
@@ -529,7 +529,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.protein
+                                  subIngredient?.one_size_protein
                                 )}
                               </Text>
                             </div>
@@ -538,7 +538,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.fat
+                                  subIngredient?.one_size_fat
                                 )}
                               </Text>
                             </div>
@@ -547,7 +547,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.sugar
+                                  subIngredient?.one_size_sugar
                                 )}
                               </Text>
                             </div>

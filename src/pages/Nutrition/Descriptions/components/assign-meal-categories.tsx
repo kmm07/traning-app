@@ -3,9 +3,7 @@ import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 
-type Props = {};
-
-export default function AssignMealCategories({}: Props) {
+export default function AssignMealCategories() {
   const { values, setFieldValue } = useFormikContext<any>();
 
   const meals = [
