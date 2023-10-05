@@ -1,10 +1,8 @@
 import { Button, Input, Select, UploadInput } from "components";
 import { Form, Formik } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { useAppSelector } from "hooks/useRedux";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 
 const initialValues = {
@@ -36,8 +34,6 @@ export default function EditIngredient({
 
   const url = isEditing ? `/meal-ingredients/${values.id}` : "meal-ingredients";
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   const { mutateAsync: addIngredient, isLoading: isAddLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
@@ -62,7 +58,7 @@ export default function EditIngredient({
   const onSubmit = async (values: any) => {
     try {
       if (isEditing) {
-        !isImageDelete && delete values.image;
+        typeof values.image !== "object" && delete values.image;
 
         await addIngredient(
           formData({

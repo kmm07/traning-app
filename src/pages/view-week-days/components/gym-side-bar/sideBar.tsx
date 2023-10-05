@@ -4,8 +4,6 @@ import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAppSelector } from "hooks/useRedux";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
 import EditExerciseSessions from "./edit-exercise-session";
@@ -119,8 +117,6 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
     }
   };
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   // on submit weekday data ======================>
   const isEditing = weekDayData !== null;
 
@@ -135,6 +131,8 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
 
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
+
+    typeof values.image !== "object" && delete values.image;
 
     delete values.exercise_category_id;
 
@@ -268,8 +266,6 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
     isEditing && formData.append("_method", "PUT" as any);
 
     try {
-      !isImageDelete && isEditing && formData.delete("image");
-
       await editWeekDay(formData as any);
 
       Helpers.resetForm();

@@ -54,6 +54,15 @@ function Notifications() {
           </div>
         ),
       },
+      {
+        Header: "المستخدمين",
+        accessor: "users_names",
+        Cell: ({ row }: any) => (
+          <div className="max-w-[300px] break-words">
+            {row.original.users_names}
+          </div>
+        ),
+      },
     ],
     []
   );

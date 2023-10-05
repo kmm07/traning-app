@@ -4,8 +4,6 @@ import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import formData from "util/formData";
-import { useAppSelector } from "hooks/useRedux";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 interface SideBarProps {
   ingredientData: any;
   categoryId: number;
@@ -50,7 +48,6 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     ? `/meal-ingredients/${ingredientData.id}`
     : "meal-ingredients";
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
 
   const { mutateAsync: addIngredient, isLoading: isAddLoading } = usePostQuery({
     url,
@@ -64,7 +61,7 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
   const onSubmit = async (values: any, helpers: any) => {
     try {
       if (isEditing) {
-        !isImageDelete && delete values.image;
+        typeof values.image !== "object" && delete values.image;
 
         await addIngredient(
           formData({
