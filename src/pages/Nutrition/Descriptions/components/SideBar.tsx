@@ -659,7 +659,7 @@ function SideBar({
                         />
 
                         <p className="!break-words text-white">
-                          {values.prepare?.video}
+                          {values.prepare?.video?.name ?? values.prepare?.video}{" "}
                         </p>
                       </div>
                     )

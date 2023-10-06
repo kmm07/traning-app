@@ -156,7 +156,7 @@ function SideBar({ exerciseData, categoryData }: any) {
                       }
                     />
                     <Text className="block !w-full">
-                      {values.internal_video}
+                      {values.internal_video?.name ?? values.internal_video}
                     </Text>
                   </div>
                 )}
