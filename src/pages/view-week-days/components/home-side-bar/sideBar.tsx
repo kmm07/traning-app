@@ -58,6 +58,16 @@ const SingleExercise = ({
             setFieldValue("exercises", [...values.exercises]);
           }}
         />
+        <Input
+          isForm={false}
+          name="rest_sec"
+          label="وقت الراحة بالثواني"
+          value={exercise.rest_sec}
+          onChange={(e) => {
+            exercise.rest_sec = e.target.value;
+            setFieldValue("exercises", [...values.exercises]);
+          }}
+        />
       </div>
 
       {onAddSpareExercise !== undefined && (
@@ -162,6 +172,11 @@ function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
                 formData.append(
                   `exercises[${i}][children][${childIndex}][counter]`,
                   child.counter
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][rest_sec]`,
+                  child.rest_sec
                 );
 
                 formData.append(

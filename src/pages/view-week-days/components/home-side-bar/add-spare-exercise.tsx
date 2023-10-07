@@ -114,6 +114,17 @@ export default function AddWeekSpareDayExercise({ parent }: Props) {
             }
             value={exercise?.timer}
           />
+
+          <Input
+            isForm={false}
+            name="rest_sec"
+            label="وقت الراحة بالثواني"
+            value={exercise.rest_sec}
+            onChange={(e) => {
+              exercise.rest_sec = e.target.value;
+              setFieldValue("exercises", [...values.exercises]);
+            }}
+          />
         </div>
       </div>
 
