@@ -49,7 +49,7 @@ export default function ExerciseCategoryForm({
           formData({
             ...values,
             home: values.home ? 1 : 0,
-            private: values.ptivate ? 1 : 0,
+            private: values.private ? 1 : 0,
             _method: "PUT",
           }) as any
         );
@@ -58,7 +58,7 @@ export default function ExerciseCategoryForm({
           formData({
             ...values,
             home: values.home ? 1 : 0,
-            private: values.ptivate ? 1 : 0,
+            private: values.private ? 1 : 0,
           }) as any
         );
       }
