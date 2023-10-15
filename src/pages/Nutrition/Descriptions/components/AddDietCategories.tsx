@@ -1,8 +1,6 @@
 import { Button, CheckBox, Input, UploadInput } from "components";
 import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { useAppSelector } from "hooks/useRedux";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 import * as Yap from "yup";
 const initialValues = {
@@ -18,7 +16,6 @@ const validationSchema = Yap.object().shape({
 
 function AddDietCategories({ values }: { values: any }) {
   const url = values ? `diet-categories/${values.id}` : "diet-categories";
-  const isImageDelete = useAppSelector(selectIsImageDelete);
   const { mutateAsync, isLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
@@ -27,7 +24,7 @@ function AddDietCategories({ values }: { values: any }) {
   function onSubmit(values: any, helpers: FormikHelpers<any>) {
     try {
       if (values.id) {
-        !isImageDelete && delete values.image;
+        typeof values.image !== "object" && delete values.image;
         mutateAsync(formData({ ...values, _method: "PUT" }) as any);
       } else {
         mutateAsync(formData(values) as any);

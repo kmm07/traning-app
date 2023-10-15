@@ -1,9 +1,7 @@
 import { Button, Input, TextArea, UploadInput } from "components";
 import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { useAppSelector } from "hooks/useRedux";
 import { useQueryClient } from "react-query";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import formData from "util/formData";
 import { toast } from "react-toastify";
 const initialValues = {
@@ -26,8 +24,6 @@ function AddExercise({ exercise_category_id, exerciseData = null }: Props) {
 
   const url = isEditing ? `/exercises/${exerciseData?.id}` : "/exercises";
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   const { mutateAsync } = usePostQuery({
     url,
     contentType: "multipart/form-data",
@@ -47,7 +43,8 @@ function AddExercise({ exercise_category_id, exerciseData = null }: Props) {
       } else delete values.external_video;
 
       if (isEditing) {
-        !isImageDelete && delete values.image;
+        typeof values.image === "string" && delete values.image;
+        typeof values.muscle_image === "string" && delete values.muscle_image;
 
         await mutateAsync(
           formData({

@@ -47,6 +47,7 @@ function Descriptions() {
   }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: DescriptionType[] } }) =>
       data.data.map((item: DescriptionType) => ({
+        ...item,
         id: item.id,
         name: item.name,
         calories: item.calories,
@@ -233,7 +234,10 @@ function Descriptions() {
       {descriptionsList?.length === 0 && (
         <Button
           secondaryBorder
-          onClick={() => document.getElementById("my-drawer")?.click()}
+          onClick={() => {
+            setMealData(null);
+            document.getElementById("my-drawer")?.click();
+          }}
         >
           إضافة وصفة
         </Button>

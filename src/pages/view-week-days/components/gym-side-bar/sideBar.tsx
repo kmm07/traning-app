@@ -4,15 +4,14 @@ import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Form, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import AddWeekDayExercise from "./add-day-exercise";
-import { useAppSelector } from "hooks/useRedux";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
 import EditExerciseSessions from "./edit-exercise-session";
+import AddWeekDayExercise from "./add-day-exercise";
 
 interface SideBarProps {
   weekDayData: any;
+  category: any;
 }
 
 interface SingleExerciseProps {
@@ -33,7 +32,11 @@ const SingleExercise = ({
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <Img src={exercise?.exercise_muscle_image} alt="image" />
+          <Img
+            src={exercise?.exercise_muscle_image}
+            alt="image"
+            className="!w-[150px]"
+          />
           <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
 
@@ -92,7 +95,7 @@ const initialValues = {
   exercises: [],
 };
 
-function WeekDaySideBar({ weekDayData }: SideBarProps) {
+function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
   const { id } = useParams();
 
   const onClose = () => document.getElementById("my-drawer")?.click();
@@ -114,8 +117,6 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     }
   };
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   // on submit weekday data ======================>
   const isEditing = weekDayData !== null;
 
@@ -131,14 +132,18 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   const onSubmit = async (values: any, Helpers: any) => {
     const formData = new FormData();
 
+    typeof values.image !== "object" && delete values.image;
+
+    delete values.exercise_category_id;
+
     const formattedData = Object.entries(values);
 
     formattedData.forEach((data: any) => {
-      if (data[0] === "exercise_category_id") {
-        formData.append("exercise_category_id", data?.[1].value as any);
+      // if (data[0] === "exercise_category_id") {
+      //   formData.append("exercise_category_id", data?.[1].value as any);
 
-        return;
-      }
+      //   return;
+      // }
       if (data[0] !== "exercises") {
         formData.append(data[0], data[1] as any);
       }
@@ -261,8 +266,6 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
     isEditing && formData.append("_method", "PUT" as any);
 
     try {
-      !isImageDelete && isEditing && formData.delete("image");
-
       await editWeekDay(formData as any);
 
       Helpers.resetForm();
@@ -343,7 +346,7 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
         ...initialValues,
         ...weekDayData,
         exercise_category_id: {
-          label: weekDayData?.exercise_category,
+          label: category?.name,
           value: weekDayData?.exercise_category_id,
         },
       }}
@@ -520,4 +523,4 @@ function WeekDaySideBar({ weekDayData }: SideBarProps) {
   );
 }
 
-export default WeekDaySideBar;
+export default WeekDayGymSideBar;

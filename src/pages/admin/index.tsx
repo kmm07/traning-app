@@ -71,7 +71,11 @@ export default function Admin() {
         Cell: ({ row }: { row: Row<any> }) => {
           return (
             <TableActions
-              onDelete={() => onDelete(row.original.id)}
+              onDelete={
+                row.original.id === 1
+                  ? undefined
+                  : () => onDelete(row.original.id)
+              }
               onEdit={() => onEdit(row.original)}
             />
           );

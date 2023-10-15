@@ -54,9 +54,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
 
       onClose();
 
-      queryClient.invalidateQueries(
-        `/exercises?exercise_category_id=${subscriptionData.id}`
-      );
+      await queryClient.invalidateQueries(`/user-subscriptions?user_id=${id}`);
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
@@ -96,15 +94,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
             </div>
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">حالة الإشتراك</Text>
-              <SubState state={userData.subscription_status} />
-            </div>
-            <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
-              <Text as="h5">تم إستهلاكة</Text>
-              <Text as="h5"> </Text>
-            </div>
-            <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
-              <Text as="h5">التفاصيل</Text>
-              <Text as="h5"> </Text>
+              <SubState state={subscriptionData.status} />
             </div>
           </Card>
 

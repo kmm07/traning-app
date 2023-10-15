@@ -14,8 +14,6 @@ import { useRef } from "react";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import AddCardio from "./add-exercise";
-import { useAppSelector } from "hooks/useRedux";
-import { selectIsImageDelete } from "redux/slices/imageDelete";
 const initialValues = {
   image: "",
   name: "",
@@ -55,8 +53,6 @@ function SideBar({
 
   const isEditing = cardioData !== null;
 
-  const isImageDelete = useAppSelector(selectIsImageDelete);
-
   const url = isEditing ? `/cardios/${cardioData?.id}` : "/cardios";
 
   const { mutateAsync: saveCardio } = usePostQuery({
@@ -66,6 +62,8 @@ function SideBar({
 
   async function onSubmit(values: any, helpers: FormikHelpers<any>) {
     const formData = new FormData();
+
+    typeof values.image !== "object" && delete values.image;
 
     const formattedValues = Object.entries(values);
 
@@ -84,8 +82,6 @@ function SideBar({
     isEditing && formData.append("_method", "PUT");
 
     try {
-      !isImageDelete && isEditing && formData.delete("image");
-
       saveCardio(formData as any);
 
       await queryClient.invalidateQueries("/cardios");

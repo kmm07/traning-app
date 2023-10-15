@@ -12,7 +12,7 @@ const initialValues = {
   muscle_image: "",
   internal_video: "",
   external_video: "",
-  video_type: "",
+  video_type: "internal",
 };
 
 function SideBar({ exerciseData, categoryData }: any) {
@@ -52,20 +52,15 @@ function SideBar({ exerciseData, categoryData }: any) {
 
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
     try {
-      if (values.external_video !== "") {
-        delete values.internal_video;
-      } else delete values.external_video;
-
       typeof values.muscle_image !== "object" && delete values.muscle_image;
 
       typeof values.image !== "object" && delete values.image;
 
       if (isEditing) {
-        delete values.video_type;
         await mutatExercise(
           formData({
             ...values,
-            exercise_category_id: categoryData.id,
+            exercise_category_id: categoryData?.id,
             _method: "PUT",
           }) as any
         );
@@ -73,7 +68,7 @@ function SideBar({ exerciseData, categoryData }: any) {
         await mutatExercise(
           formData({
             ...values,
-            exercise_category_id: exerciseData.exercise_category_id,
+            exercise_category_id: exerciseData?.exercise_category_id,
           }) as any
         );
       }
@@ -92,7 +87,12 @@ function SideBar({ exerciseData, categoryData }: any) {
   return (
     <Formik
       onSubmit={onSubmit}
-      initialValues={{ ...initialValues, ...exerciseData }}
+      initialValues={{
+        ...initialValues,
+        ...exerciseData,
+        video_type:
+          exerciseData?.internal_video !== undefined ? "internal" : "external",
+      }}
       enableReinitialize
     >
       {({ values, setFieldValue }) => (
@@ -145,15 +145,20 @@ function SideBar({ exerciseData, categoryData }: any) {
                 {values?.video_type === "external" ? (
                   <Input name="external_video" label={"رابط الفيديو"} />
                 ) : (
-                  <Input
-                    type={"file" as any}
-                    name="internal_video"
-                    accept="video/*"
-                    isForm={false}
-                    onChange={(e: any) =>
-                      setFieldValue("internal_video", e.target?.files[0])
-                    }
-                  />
+                  <div className="w-1/2">
+                    <Input
+                      type={"file" as any}
+                      name="internal_video"
+                      accept="video/*"
+                      isForm={false}
+                      onChange={(e: any) =>
+                        setFieldValue("internal_video", e.target?.files[0])
+                      }
+                    />
+                    <Text className="block !w-full">
+                      {values.internal_video?.name ?? values.internal_video}
+                    </Text>
+                  </div>
                 )}
               </div>
             </div>
@@ -169,13 +174,17 @@ function SideBar({ exerciseData, categoryData }: any) {
             <TextArea name="notes" />
           </Card>
           <div className="flex justify-center">
-            <a
-              href={values.external_video ?? values.internal_video}
-              target="_blank"
-              className="p-4 bg-primary text-white rounded-lg"
+            <span
+              onClick={() => {
+                window.open(
+                  values.external_video || values.internal_video,
+                  "_blank"
+                );
+              }}
+              className="p-4 bg-primary text-white rounded-lg cursor-pointer"
             >
               تشغيل الفيديو
-            </a>
+            </span>
           </div>
           <div className="flex items-center justify-evenly mt-6">
             <Button

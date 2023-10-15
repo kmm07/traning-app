@@ -20,6 +20,7 @@ export default function AddIngredient({
     {
       select: ({ data }: { data: { data: any[] } }) =>
         data.data.map((item: any) => ({
+          ...item,
           image: item.image,
           id: item.id,
           name: item.name,

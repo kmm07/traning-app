@@ -63,7 +63,7 @@ function SideBar({
   };
 
   const getItemPercentage = (size: number, itemValue: number) => {
-    return Number((itemValue / 100) * size).toFixed(2);
+    return Number(itemValue * size).toFixed(2);
   };
 
   const reCalculateNutrationValues = () => {
@@ -77,27 +77,35 @@ function SideBar({
     let calories = 0;
     let sugar = 0;
     let fat = 0;
+
     mainMeals?.forEach((meal: any) => {
-      Math.trunc(
-        (carbohydrate += Number((meal.carbohydrate / 100) * meal.size))
-      );
-      Math.trunc((trans_fat += Number((meal.trans_fat / 100) * meal.size)));
+      carbohydrate += Number(meal.one_size_carbohydrate) * meal.size;
 
-      Math.trunc((protein += Number((meal.protein / 100) * meal.size)));
+      trans_fat += Number(meal.one_size_trans_fat) * meal.size;
 
-      Math.trunc((calories += Number((meal.calories / 100) * meal.size)));
+      protein += Number(meal.one_size_protein) * meal.size;
 
-      Math.trunc((sugar += Number((meal.sugar / 100) * meal.size)));
+      calories += Number(meal.one_size_calories) * meal.size;
 
-      Math.trunc((fat += Number((meal.fat / 100) * meal.size)));
+      sugar += Number(meal.one_size_sugar) * meal.size;
+
+      fat += Number(meal.one_size_fat) * meal.size;
     });
 
-    formRef.current?.setFieldValue("carbohydrate", carbohydrate);
-    formRef.current?.setFieldValue("trans_fat", trans_fat);
-    formRef.current?.setFieldValue("protein", protein);
-    formRef.current?.setFieldValue("calories", calories);
-    formRef.current?.setFieldValue("sugar", sugar);
-    formRef.current?.setFieldValue("fat", fat);
+    formRef.current?.setFieldValue(
+      "carbohydrate",
+      Math.round(Number(carbohydrate))
+    );
+
+    formRef.current?.setFieldValue("trans_fat", Math.round(Number(trans_fat)));
+
+    formRef.current?.setFieldValue("protein", Math.round(Number(protein)));
+
+    formRef.current?.setFieldValue("calories", Math.round(Number(calories)));
+
+    formRef.current?.setFieldValue("sugar", Math.round(Number(sugar)));
+
+    formRef.current?.setFieldValue("fat", Math.round(Number(fat)));
 
     formRef.current?.setFieldValue("ingredients", [
       ...(formRef.current?.values.ingredients ?? []),
@@ -161,6 +169,7 @@ function SideBar({
 
   const onClose = () => {
     formRef.current?.resetForm();
+    setMealData(null);
     document.getElementById("my-drawer")?.click();
   };
 
@@ -293,13 +302,24 @@ function SideBar({
       initialValues={{
         ...initialValues,
         ...mealData,
-        calories: Number(mealData?.calories ?? 0).toFixed(2),
-        protein: Number(mealData?.protein ?? 0).toFixed(2),
-        fat: Number(mealData?.fat ?? 0).toFixed(2),
-        carbohydrate: Number(mealData?.carbohydrate ?? 0).toFixed(2),
-        sugar: Number(mealData?.calories ?? 0).toFixed(2),
-        trans_fat: Number(mealData?.trans_fat ?? 0).toFixed(2),
-        prepare: { ...mealData?.prepare, video_type: "internal" },
+        calories: Math.round(mealData?.calories ?? 0),
+        protein: Math.round(mealData?.protein ?? 0),
+        fat: Math.round(mealData?.fat ?? 0),
+        carbohydrate: Math.round(mealData?.carbohydrate ?? 0),
+        sugar: Math.round(mealData?.calories ?? 0),
+        trans_fat: Math.round(mealData?.trans_fat ?? 0),
+        prepare: {
+          ...mealData?.prepare,
+          video_type: mealData?.prepare?.video_type ?? "internal",
+          url:
+            mealData?.prepare?.video_type === "external"
+              ? mealData?.prepare?.video_path
+              : "",
+          video:
+            mealData?.prepare?.video_type === "internal"
+              ? mealData?.prepare?.video_path
+              : "",
+        },
         diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
           meal: meals.find((meal) => meal.value === item.meal),
           id: { label: item.category_name, value: item.id },
@@ -389,7 +409,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.calories
+                            ingredient?.one_size_calories
                           )}
                         </Text>
                       </div>
@@ -398,7 +418,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.carbohydrate
+                            ingredient?.one_size_carbohydrate
                           )}
                         </Text>
                       </div>
@@ -407,14 +427,17 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.protein
+                            ingredient?.one_size_protein
                           )}
                         </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">الدهون</Text>
                         <Text as="h5">
-                          {getItemPercentage(ingredient?.size, ingredient?.fat)}
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.one_size_fat
+                          )}
                         </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
@@ -422,7 +445,7 @@ function SideBar({
                         <Text as="h5">
                           {getItemPercentage(
                             ingredient?.size,
-                            ingredient?.sugar
+                            ingredient?.one_size_sugar
                           )}
                         </Text>
                       </div>
@@ -432,7 +455,7 @@ function SideBar({
                           name={`ingredients.[${index}].size`}
                           className="text-center"
                           isForm={false}
-                          value={values.ingredients?.[index].size}
+                          value={ingredient.size}
                           onChange={(e) => {
                             ingredient.size = e.target.value;
 
@@ -488,7 +511,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.calories
+                                  subIngredient?.one_size_calories
                                 )}
                               </Text>
                             </div>
@@ -497,7 +520,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.carbohydrate
+                                  subIngredient?.one_size_carbohydrate
                                 )}
                               </Text>
                             </div>
@@ -506,7 +529,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.protein
+                                  subIngredient?.one_size_protein
                                 )}
                               </Text>
                             </div>
@@ -515,7 +538,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.fat
+                                  subIngredient?.one_size_fat
                                 )}
                               </Text>
                             </div>
@@ -524,7 +547,7 @@ function SideBar({
                               <Text as="h5">
                                 {getItemPercentage(
                                   subIngredient?.size,
-                                  subIngredient?.sugar
+                                  subIngredient?.one_size_sugar
                                 )}
                               </Text>
                             </div>
@@ -621,18 +644,24 @@ function SideBar({
                     values.prepare?.video_type === "external" ? (
                       <Input name="prepare.url" label={"رابط الفيديو"} />
                     ) : (
-                      <Input
-                        type={"file" as any}
-                        name="prepare.video"
-                        accept="video/*"
-                        isForm={false}
-                        onChange={(e: any) =>
-                          setFieldValue("prepare", {
-                            ...values.prepare,
-                            video: e.target?.files[0],
-                          })
-                        }
-                      />
+                      <div className="w-[300px]">
+                        <Input
+                          type={"file" as any}
+                          name="prepare.video"
+                          accept="video/*"
+                          isForm={false}
+                          onChange={(e: any) =>
+                            setFieldValue("prepare", {
+                              ...values.prepare,
+                              video: e.target?.files[0],
+                            })
+                          }
+                        />
+
+                        <p className="!break-words text-white">
+                          {values.prepare?.video?.name ?? values.prepare?.video}{" "}
+                        </p>
+                      </div>
                     )
                   ) : (
                     ""
@@ -661,15 +690,14 @@ function SideBar({
                   إضافة خطوة
                 </Button>
               )}
-
-              <Modal id="add-step-empty" modalClassName="absolute">
-                <AddStep
-                  editData={stepsData}
-                  setEditData={setStepsData}
-                  isEmpty={true}
-                />
-              </Modal>
             </Card>
+            <Modal id="add-step-empty" modalClassName="absolute">
+              <AddStep
+                editData={stepsData}
+                setEditData={setStepsData}
+                isEmpty={true}
+              />
+            </Modal>
 
             <div className="flex items-center justify-evenly mt-6">
               <Button

@@ -5,12 +5,17 @@ import axios from "axios";
 import { useAppDispatch, useAppSelector } from "hooks/useRedux";
 import { selectCurrentToken, setCredentials } from "redux/slices/auth";
 import { useEffect } from "react";
+import { Button, Text } from "components";
 
 function Layout() {
   const dispatch = useAppDispatch();
   const push = useNavigate();
+
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const token: string | any = useAppSelector(selectCurrentToken);
+
+  const onGoBack = () => navigate(-1);
 
   useEffect(() => {
     const userLocalStorage = localStorage.getItem("userLogin");
@@ -43,6 +48,16 @@ function Layout() {
           <SidePar />
         </div>
         <div className="p-8 col-span-9 h-full bg-gray-900_01">
+          <div className="flex justify-end mb-10">
+            <Button
+              primary
+              className={"flex items-center gap-2"}
+              onClick={onGoBack}
+            >
+              <Text>عودة</Text>
+              <img src="/images/back.svg" width={25} className="mt-1" />
+            </Button>
+          </div>
           <Outlet />
         </div>
       </div>

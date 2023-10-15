@@ -3,6 +3,7 @@ import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useEffect, useState } from "react";
 import { UseQueryResult } from "react-query";
+import { toast } from "react-toastify";
 
 const weekDaysNums = [
   { day_num: "1", day_name: "السبت" },
@@ -26,7 +27,6 @@ function TrainingInfo() {
     ["", undefined, null].includes(value as string)
   );
 
-
   const url = `/training-categories?lvl=${trainingData?.selectValue?.value?.lvl}&gender=${trainingData?.selectValue?.value?.gender}&days_num=${trainingData?.daysNum?.value}&home=${trainingData?.selectValue?.value?.home}`;
 
   const { data: trainingCategories = [] }: UseQueryResult<any> = useGetQuery(
@@ -47,8 +47,16 @@ function TrainingInfo() {
       const filteredArray = values.rest_days.filter(
         (day: any) => day !== day_num
       );
+
       setFieldValue("rest_days", filteredArray);
-    } else setFieldValue("rest_days", [...values.rest_days, day_num]);
+    } else {
+      if (values.rest_days.length + Number(trainingData.daysNum.value) >= 7) {
+        return toast.error(
+          "يجب ان يكون مجموع أيام الراحة وأيام التدريب مساوي لعدد أيام الإسبوع"
+        );
+      }
+      setFieldValue("rest_days", [...values.rest_days, day_num]);
+    }
   };
 
   // get level options =================>
@@ -146,6 +154,8 @@ function TrainingInfo() {
     setTrainigData({ selectValue: initialLevel, daysNum: initialDays });
   }, [values.training_place, values.type, values.lvl, values.training_days]);
 
+  console.log(values);
+
   return (
     <Card className="grid grid-cols-3 gap-10 p-4 mt-4">
       <div className="flex flex-col gap-4">
@@ -179,36 +189,42 @@ function TrainingInfo() {
             name=""
             options={weekDaysOptions}
             value={trainingData?.daysNum}
-            onChange={(e: any) =>
+            onChange={(e: any) => {
+              if (values.rest_days?.length + Number(e?.value) > 7) {
+                return toast.error(
+                  "يجب ان يكون مجموع أيام الراحة وأيام التدريب مساوي لعدد أيام الإسبوع"
+                );
+              }
+
               setTrainigData({
                 ...trainingData,
                 daysNum: e,
-              })
-            }
+              });
+
+              setFieldValue("weekly_training", Number(e.value));
+            }}
           />
         </Card>
 
-        {/* <Text as="h2">نوع الجدول التدريبي</Text>
+        <Text as="h2">نوع الجدول التدريبي</Text>
         <Card className="p-3">
           <Select
             name="training_category_id"
             options={trainingCategories ?? []}
-            defaultValue={{
-              label: values.category_name,
-              value: values.category_id,
-            }}
+            value={values.training_category_id}
+            isForm={false}
+            onChange={(e) => setFieldValue("training_category_id", e)}
           />
-        </Card> */}
+        </Card>
         <div className="hidden">
           <Text as="h2">نوع الجدول التدريبي</Text>
           <Card className="p-3">
             <Select
               name="training_category_id"
               options={trainingCategories ?? []}
-              defaultValue={{
-                label: values.category_name,
-                value: values.category_id,
-              }}
+              value={values.training_category_id}
+              isForm={false}
+              onChange={(e) => setFieldValue("training_category_id", e)}
             />
           </Card>
         </div>
@@ -280,12 +296,13 @@ function TrainingInfo() {
               // @ts-ignore
               {
                 "--value":
-                  (values.program_progress / values.weekly_training) * 100,
+                  (values.program_progress_done / values.program_progress_all) *
+                  100,
               } as any
             }
           >
             <Text as="h5">
-              {values.weekly_training} / {values.program_progress}
+              {values.program_progress_done} / {values.program_progress_all}
             </Text>
           </div>
         </div>

@@ -2,10 +2,13 @@ import { Img } from "components";
 import NavItem from "./NavItem";
 import { useLocation, useNavigate } from "react-router-dom";
 import CollapseTree from "./collapse-tree";
-import { useAppDispatch } from "hooks/useRedux";
-import { logOut } from "redux/slices/auth";
+import { useAppDispatch, useAppSelector } from "hooks/useRedux";
+import { logOut, selectAuthData } from "redux/slices/auth";
 
 function SidePar() {
+  const data = useAppSelector(selectAuthData);
+  const isAdmin = data?.user.is_admin || false;
+
   const dispatch = useAppDispatch();
   const push = useNavigate();
   const { pathname } = useLocation();
@@ -85,17 +88,22 @@ function SidePar() {
       link: "/coupones",
       src: "/images/img_coupon3.png",
     },
-    {
-      name: "المسؤلين",
-      link: "/admins",
-      src: "/images/img_setting1.png",
-    },
+
     {
       name: "رسائل التواصل",
       link: "/contacts",
       src: "/images/img_mail11.png",
     },
   ];
+
+  isAdmin
+    ? naveItems.push({
+        name: "المسؤلين",
+        link: "/admins",
+        src: "/images/img_setting1.png",
+      })
+    : null;
+
   return (
     <div className="bg-gray-900_01 relative h-full py-24 border border-blue_gray-900_01 border-solid flex flex-col items-center justify-start md:px-5 rounded-bl-[25px] rounded-tl-[25px] shadow-bs">
       <div className="w-full flex flex-col h-full ">

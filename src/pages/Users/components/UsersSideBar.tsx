@@ -20,6 +20,7 @@ const initialValues = {
   fat: "",
   calories: "",
   carbohydrates: "",
+  has_change_into_calories: 0,
 };
 
 function UsersSideBar({ activeUser }: { activeUser: any }) {
@@ -65,6 +66,11 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
         return;
       }
 
+      if (item[0] === "training_category_id") {
+        formData.append("training_category_id", item[1]?.value);
+        return;
+      }
+
       formData.append(item[0], item[1] as any);
     });
 
@@ -78,7 +84,9 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
       // helpers.resetForm();
 
       onClose();
-    } catch (error: any) {}
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   return (
@@ -95,7 +103,10 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
         fat: activeUser?.fat?.all,
         calories: activeUser?.calories?.all,
         type: activeUser?.gender,
-        training_category_id: activeUser?.category_id,
+        training_category_id: {
+          label: activeUser?.category_name,
+          value: activeUser?.category_id,
+        },
         weekly_training: activeUser?.training_days,
         training_week_days: activeUser?.training_week_days,
       }}

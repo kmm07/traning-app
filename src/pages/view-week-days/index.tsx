@@ -6,7 +6,8 @@ import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
 import { Row } from "react-table";
 import WeekDayForm from "./components/weekdayForm";
-import WeekDaySideBar from "./components/sideBar";
+import WeekDayGymSideBar from "./components/gym-side-bar/sideBar";
+import WeekDayHomeSideBar from "./components/home-side-bar/sideBar";
 
 export default function ViewWeekDay() {
   const [active, setActive] = useState<any>(null);
@@ -64,12 +65,10 @@ export default function ViewWeekDay() {
       },
       {
         Header: "نوع التمارين",
-        accessor: "exercise_category",
+        accessor: "name",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
-            <div className="flex items-center gap-4">
-              {row.original?.exercise_category}
-            </div>
+            <div className="flex items-center gap-4">{row.original?.name}</div>
           );
         },
       },
@@ -110,6 +109,7 @@ export default function ViewWeekDay() {
     category,
     weekNum = "sss",
   } = JSON.parse(localStorage.getItem("week-days") as any);
+
   return (
     <div className="w-full space-y-4">
       <div className="col-span-1 text-white space-y-2">
@@ -122,7 +122,7 @@ export default function ViewWeekDay() {
         <div className="text-lg"> السبوع رقم {weekNum}</div>
         <div className="text-lg">{daysNum} أيام في الاسبوع</div>
 
-        <div>{category}</div>
+        <div>{category?.name}</div>
       </div>
       <Table
         data={data ?? []}
@@ -147,7 +147,11 @@ export default function ViewWeekDay() {
         <WeekDayForm />
       </Modal>
       <Drawer>
-        <WeekDaySideBar weekDayData={active} />
+        {home === 0 ? (
+          <WeekDayGymSideBar weekDayData={active} category={category} />
+        ) : (
+          <WeekDayHomeSideBar weekDayData={active} category={category} />
+        )}
       </Drawer>
     </div>
   );
