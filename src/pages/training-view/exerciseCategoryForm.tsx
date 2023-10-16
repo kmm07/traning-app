@@ -10,6 +10,7 @@ interface Props {
   categoryData: any;
   setCategoryData: any;
   gender?: string;
+  home?: string;
 }
 
 const initialValues = {
@@ -26,6 +27,7 @@ export default function ExerciseCategoryForm({
   categoryData,
   setCategoryData,
   gender = "male",
+  home = "0",
 }: Props) {
   const genderTypes = [
     { label: "ذكر", value: "male" },
@@ -80,7 +82,7 @@ export default function ExerciseCategoryForm({
       }
 
       await queryClient.invalidateQueries(
-        `/training-categories?lvl=junior&gender=${gender}&days_num=3&home=0`
+        `/training-categories?lvl=junior&gender=${gender}&days_num=3&home=${home}`
       );
 
       helpers.resetForm();

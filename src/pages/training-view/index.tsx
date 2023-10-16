@@ -397,6 +397,8 @@ function TrainingView({ home, gender }: Props) {
       <Modal id="add-new-exercise-category">
         <ExerciseCategoryForm
           categoryData={categoryData}
+          home={home as any}
+          gender={gender}
           setCategoryData={setCategoryData}
         />
       </Modal>
