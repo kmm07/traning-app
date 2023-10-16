@@ -291,6 +291,27 @@ function SideBar({
     }
   };
 
+  // on delete video =============>
+  const deleteVideoURL = `diet-meals-remove-video/${mealData?.id}`;
+
+  const { mutateAsync: deleteVideo, isLoading: isDeleteLoading } = usePostQuery(
+    { url: deleteVideoURL, withToast: false }
+  );
+  const onDeleteVideo = async () => {
+    await deleteVideo();
+
+    await queryClient.invalidateQueries(
+      `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`
+    );
+
+    toast.success("تم حذف الفيديو بنجاح");
+    onClose();
+    try {
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   useEffect(() => {
     if (refresher > 0) {
       reCalculateNutrationValues();
@@ -322,7 +343,7 @@ function SideBar({
         },
         diet_categories: mealData?.diet_mea_categories?.map((item: any) => ({
           meal: meals.find((meal) => meal.value === item.meal),
-          id: { label: item.category_name, value: item.id },
+          id: { label: item?.category_name, value: item?.id },
         })),
       }}
       onSubmit={onSubmit}
@@ -668,6 +689,15 @@ function SideBar({
                   )}
                 </div>
               </div>
+
+              <Button
+                danger
+                onClick={onDeleteVideo}
+                isLoading={isDeleteLoading}
+                className="!mb-6"
+              >
+                حذف الفيديو
+              </Button>
               {values?.prepare?.steps?.length > 0 ? (
                 <Table
                   noPagination

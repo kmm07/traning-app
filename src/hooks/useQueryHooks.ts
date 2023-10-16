@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 interface UrlContentType {
   url: string;
   contentType?: "application/json" | "multipart/form-data" | undefined;
+  withToast?: boolean;
 }
 
 /**
@@ -43,7 +44,11 @@ export function useGetQuery(name: string | any, url: string, options: any) {
  * @param contentType 'application/json' | 'multipart/form-data'
  * @param options {apiType} default is admin
  */
-export function usePostQuery({ url, contentType }: UrlContentType) {
+export function usePostQuery({
+  url,
+  contentType,
+  withToast = true,
+}: UrlContentType) {
   const axios = useAxios({ contentType });
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -56,7 +61,9 @@ export function usePostQuery({ url, contentType }: UrlContentType) {
       await queryClient.invalidateQueries(url + pageUrl);
       await queryClient.invalidateQueries(url + astricsUrl);
       await queryClient.invalidateQueries(url);
-      toast.success("تم الاضافة بنجاح");
+      if (withToast) {
+        toast.success("تم الاضافة بنجاح");
+      }
     },
     onError: (error: any) => {
       if (error?.response?.status === 401) {

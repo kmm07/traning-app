@@ -84,6 +84,27 @@ function SideBar({ exerciseData, categoryData }: any) {
     }
   };
 
+  // on delete video =============>
+  const deleteVideoURL = `exercises-remove-video/${exerciseData?.id}`;
+
+  const { mutateAsync: deleteVideo, isLoading: isDeleteLoading } = usePostQuery(
+    { url: deleteVideoURL, withToast: false }
+  );
+  const onDeleteVideo = async () => {
+    await deleteVideo();
+
+    await queryClient.invalidateQueries(
+      `/exercises?exercise_category_id=${categoryData.id}`
+    );
+
+    toast.success("تم حذف الفيديو بنجاح");
+    onClose();
+    try {
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <Formik
       onSubmit={onSubmit}
@@ -109,60 +130,72 @@ function SideBar({ exerciseData, categoryData }: any) {
               {categoryData?.name}
             </Card>
           </div>
-          <Card className="flex  gap-5 p-4">
-            <Text size="3xl">الفيديو </Text>
-            <hr />
-            <div className="flex gap-4 items-center">
-              <div>
-                <div className="flex gap-6">
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="internal" className="mb-2">
-                      رفع من الجهاز
-                    </label>
-                    <input
-                      id="internal"
-                      name="video_type"
-                      type="radio"
-                      checked={values.video_type === "internal"}
-                      onChange={() => setFieldValue("video_type", "internal")}
-                    />
+          <Card className="p-4">
+            <div className="flex gap-5">
+              <Text size="3xl">الفيديو </Text>
+              <hr />
+              <div className="flex gap-4 items-center">
+                <div>
+                  <div className="flex gap-6">
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="internal" className="mb-2">
+                        رفع من الجهاز
+                      </label>
+                      <input
+                        id="internal"
+                        name="video_type"
+                        type="radio"
+                        checked={values.video_type === "internal"}
+                        onChange={() => setFieldValue("video_type", "internal")}
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="external" className="mb-2">
+                        ادخال رابط
+                      </label>
+                      <input
+                        id="external"
+                        name="video_type"
+                        type="radio"
+                        checked={values.video_type === "external"}
+                        onChange={() => setFieldValue("video_type", "external")}
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="external" className="mb-2">
-                      ادخال رابط
-                    </label>
-                    <input
-                      id="external"
-                      name="video_type"
-                      type="radio"
-                      checked={values.video_type === "external"}
-                      onChange={() => setFieldValue("video_type", "external")}
-                    />
-                  </div>
+                  {values?.video_type === "external" ? (
+                    <Input name="external_video" label={"رابط الفيديو"} />
+                  ) : (
+                    <div className="w-1/2">
+                      <Input
+                        type={"file" as any}
+                        name="internal_video"
+                        accept="video/*"
+                        isForm={false}
+                        onChange={(e: any) =>
+                          setFieldValue("internal_video", e.target?.files[0])
+                        }
+                      />
+                      <Text className="block !w-full">
+                        {values.internal_video?.name ?? values.internal_video}
+                      </Text>
+                    </div>
+                  )}
                 </div>
-
-                {values?.video_type === "external" ? (
-                  <Input name="external_video" label={"رابط الفيديو"} />
-                ) : (
-                  <div className="w-1/2">
-                    <Input
-                      type={"file" as any}
-                      name="internal_video"
-                      accept="video/*"
-                      isForm={false}
-                      onChange={(e: any) =>
-                        setFieldValue("internal_video", e.target?.files[0])
-                      }
-                    />
-                    <Text className="block !w-full">
-                      {values.internal_video?.name ?? values.internal_video}
-                    </Text>
-                  </div>
-                )}
               </div>
             </div>
+
+            <Button
+              danger
+              onClick={onDeleteVideo}
+              isLoading={isDeleteLoading}
+              className="!my-6"
+            >
+              حذف الفيديو
+            </Button>
           </Card>
+
           <Card className="flex  gap-5 p-4">
             <Text size="3xl">صورة العضلة </Text>
             <hr />
