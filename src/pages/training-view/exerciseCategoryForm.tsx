@@ -82,7 +82,7 @@ export default function ExerciseCategoryForm({
       }
 
       await queryClient.invalidateQueries(
-        `/training-categories?lvl=junior&gender=${gender}&days_num=${categoryData.days_num}&home=${home}`
+        `/training-categories?lvl=${categoryData.lvl}&gender=${gender}&days_num=${categoryData.days_num}&home=${home}`
       );
 
       helpers.resetForm();
@@ -92,8 +92,6 @@ export default function ExerciseCategoryForm({
       toast.error(error.response.data.message);
     }
   };
-
-  console.log(categoryData);
 
   return (
     <Formik
