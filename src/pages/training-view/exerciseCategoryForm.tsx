@@ -82,7 +82,7 @@ export default function ExerciseCategoryForm({
       }
 
       await queryClient.invalidateQueries(
-        `/training-categories?lvl=junior&gender=${gender}&days_num=${categoryData.daysNum}&home=${home}`
+        `/training-categories?lvl=junior&gender=${gender}&days_num=${categoryData.days_num}&home=${home}`
       );
 
       helpers.resetForm();
