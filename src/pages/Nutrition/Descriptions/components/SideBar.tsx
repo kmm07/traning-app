@@ -327,7 +327,7 @@ function SideBar({
         protein: Math.round(mealData?.protein ?? 0),
         fat: Math.round(mealData?.fat ?? 0),
         carbohydrate: Math.round(mealData?.carbohydrate ?? 0),
-        sugar: Math.round(mealData?.calories ?? 0),
+        sugar: Math.round(mealData?.sugar ?? 0),
         trans_fat: Math.round(mealData?.trans_fat ?? 0),
         prepare: {
           ...mealData?.prepare,

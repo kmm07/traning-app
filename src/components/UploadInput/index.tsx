@@ -80,12 +80,14 @@ function UploadInput({ className = "", name, video, label }: Props) {
                 className={`w-20 ${values[name] === "" ? "hidden" : "block"}`}
               />
             ) : (
-              <Img
-                src={image}
-                className={`w-[150px] h-[130px] ${
-                  values[name] === "" ? "hidden" : "block"
-                }`}
-              />
+              <a href={image} target="_blank">
+                <Img
+                  src={image}
+                  className={`w-[150px] h-[130px] ${
+                    values[name] === "" ? "hidden" : "block"
+                  }`}
+                />
+              </a>
             ))}
           <button
             type="button"
