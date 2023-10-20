@@ -11,7 +11,7 @@ import useAxios from "hooks/useAxios";
 function Messages() {
   const [activeUser, setActiveUser] = useState<any>(null);
 
-  const url = "/users";
+  const url = "/users?chat=1";
 
   const { data: users = [], isLoading }: UseQueryResult<any> = useGetQuery(
     url,
@@ -88,7 +88,7 @@ function Messages() {
 
   const rowOnClick = async (e: any) => {
     try {
-      const { data } = await axios.get(`/users/${e.original.id as any}`);
+      const { data } = await axios.get(`/users/${e.original.id as any}?chat=1`);
 
       setActiveUser(data.data);
     } catch (error: any) {
