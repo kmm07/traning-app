@@ -78,6 +78,7 @@ function TrainingView({ home, gender }: Props) {
   const {
     data: trainingWeeks = [],
     isLoading: isWeeksLoading,
+    refetch,
   }: UseQueryResult<any> = useGetQuery(weeksURL, weeksURL, {
     select: ({ data }: { data: { data: [] } }) => data.data,
     enabled: ![null, undefined].includes(exerciesCategory as any),
@@ -91,7 +92,7 @@ function TrainingView({ home, gender }: Props) {
     try {
       await deleteWeek(`/training-weeks/${id}`);
 
-      await queryClient.invalidateQueries(weeksURL);
+      await refetch();
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
