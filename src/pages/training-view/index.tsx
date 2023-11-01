@@ -91,9 +91,7 @@ function TrainingView({ home, gender }: Props) {
     try {
       await deleteWeek(`/training-weeks/${id}`);
 
-      await queryClient.invalidateQueries(
-        `/training-weeks?category_id=${exerciesCategory}`
-      );
+      await queryClient.invalidateQueries(weeksURL);
     } catch (error: any) {
       toast.error(error.response.data.message);
     }
