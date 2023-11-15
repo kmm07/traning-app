@@ -462,6 +462,15 @@ function SideBar({
                         </Text>
                       </div>
                       <div className="flex flex-col items-center gap-2">
+                        <Text as="h5">الدهون المتحوله</Text>
+                        <Text as="h5">
+                          {getItemPercentage(
+                            ingredient?.size,
+                            ingredient?.one_size_trans_fat
+                          )}
+                        </Text>
+                      </div>
+                      <div className="flex flex-col items-center gap-2">
                         <Text as="h5">السكريات</Text>
                         <Text as="h5">
                           {getItemPercentage(
