@@ -154,8 +154,6 @@ function TrainingInfo() {
     setTrainigData({ selectValue: initialLevel, daysNum: initialDays });
   }, [values.training_place, values.type, values.lvl, values.training_days]);
 
-  console.log(values);
-
   return (
     <Card className="grid grid-cols-3 gap-10 p-4 mt-4">
       <div className="flex flex-col gap-4">
