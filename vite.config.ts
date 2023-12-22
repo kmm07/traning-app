@@ -12,7 +12,5 @@ export default defineConfig({
   build: {
     outDir: "build",
   },
-  plugins: [tsconfigPaths(), react({
-    include: "**/*.tsx",
-  })],
+  plugins: [tsconfigPaths(), react()],
 });
