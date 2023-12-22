@@ -5,11 +5,13 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   server: {
     port: 3000,
-    proxy :{ '/api/admin' : "https://thirsty-franklin.85-215-43-232.plesk.page/api/admin"},
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      "cache-control": "no-cache",
-      // Add other CORS headers as needed
+    proxy: {
+      '/api/admin': {
+        target: 'https://thirsty-franklin.85-215-43-232.plesk.page',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/admin/, ''),
+        
+      },
     },
   },
   build: {
