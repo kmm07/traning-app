@@ -4,13 +4,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   server: {
-    port: 3000,
-    watch: {
-      usePolling: true
-    }
+    port: 3000
   },
   build: {
     outDir: "build",
   },
-  plugins: [tsconfigPaths(), react()],
+  plugins: [tsconfigPaths(), react({
+    include: "**/*.tsx",
+  })],
 });
