@@ -16,11 +16,12 @@ const useAxios = ({ contentType = "application/json" }: Props) => {
     useAppSelector(selectCurrentToken);
 
   return axios.create({
-    baseURL: "https://thirsty-franklin.85-215-43-232.plesk.page/api/admin",
+    baseURL: "/api/admin",
     headers: {
       "Content-Type": contentType as string,
       accept: "application/json",
-      authorization: `Bearer ${access_token as string}`
+      authorization: `Bearer ${access_token as string}`,
+      'Access-Control-Allow-Origin': '*'
     },
   });
 };
