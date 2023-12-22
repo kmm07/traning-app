@@ -7,12 +7,16 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/admin': {
-        target: 'https://thirsty-franklin.85-215-43-232.plesk.page',
+        target: 'https://thirsty-franklin.85-215-43-232.plesk.page/api/admin',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/admin/, ''),
         
       },
     },
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      "cache-control": "no-cache",
+    }
   },
   build: {
     outDir: "build",
