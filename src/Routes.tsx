@@ -23,8 +23,8 @@ import Subscriptions from "pages/subscriptions";
 import UserSubscriptions from "pages/Users/subscriptions";
 import ViewWeekDay from "pages/view-week-days";
 import Coupones from "pages/coupones";
+import Admin from "pages/admin/Index";
 import ContactsPage from "pages/contacts";
-import Admin from "pages/admin";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
