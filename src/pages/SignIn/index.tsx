@@ -18,7 +18,7 @@ const SignInPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const push = useNavigate();
-  const URL = "/api/admin/login";
+  const URL = "/login";
   const onSubmit = async (
     values: FormValue,
     helpers: FormikHelpers<FormValue>

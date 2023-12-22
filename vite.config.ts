@@ -10,6 +10,7 @@ export default defineConfig({
         target: 'https://thirsty-franklin.85-215-43-232.plesk.page',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/admin/, ''),
+        
       },
     },
   },
