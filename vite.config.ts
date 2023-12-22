@@ -6,10 +6,10 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api/admin': {
-        target: 'https://thirsty-franklin.85-215-43-232.plesk.page/api/admin',
+      '/': {
+        target: 'https://thirsty-franklin.85-215-43-232.plesk.page',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/admin/, ''),
+        // rewrite: (path) => path.replace(/^\/api\/admin/, ''),
         
       },
     },
