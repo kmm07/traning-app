@@ -18,7 +18,7 @@ const SignInPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
   const push = useNavigate();
-  // const URL = "/login";
+  const URL = "/login";
   const onSubmit = async (
     values: FormValue,
     helpers: FormikHelpers<FormValue>
@@ -26,7 +26,7 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { data } = await customAxios().post("/login", values);
+      const { data } = await customAxios().post(URL, values);
 
       await dispatch(setCredentials(data.data));
 

@@ -20,7 +20,10 @@ const useAxios = ({ contentType = "application/json" }: Props) => {
     headers: {
       "Content-Type": contentType as string,
       accept: "application/json",
-      authorization: `Bearer ${access_token as string}`
+      authorization: `Bearer ${access_token as string}`,
+      "Access-Control-Allow-Origin": "*",
+      "cache-control": "no-cache",
+
     },
   });
 };
