@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "proxy": "https://thirsty-franklin.85-215-43-232.plesk.page",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
