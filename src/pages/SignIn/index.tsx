@@ -26,7 +26,7 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { data } = await customAxios().post("/api/admin/login", values);
+      const { data } = await customAxios().post("/login", values);
 
       await dispatch(setCredentials(data.data));
 
