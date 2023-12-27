@@ -7,9 +7,10 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/admin': {
-        target: 'https://personaltrainerkmm.com/api/admin/',
+        target: 'http://personaltrainerkmm.com/api/admin/',
         changeOrigin: true,
         secure: false,
+        ws: true,
         rewrite: (path) => path.replace(/^\/api\/admin/, '')
       },
     },
