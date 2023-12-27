@@ -7,9 +7,8 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/admin': {
-        target: 'https://personaltrainerkmm.com/',
+        target: 'http://personaltrainerkmm.com/',
         changeOrigin: true,
-        secure : false
       },
     },
     headers : {
