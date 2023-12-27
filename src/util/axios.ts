@@ -2,7 +2,7 @@ import axios from "axios";
 
 const customAxios = () =>
   axios.create({
-    baseURL:"/api/admin",
+    baseURL:"http://personaltrainerkmm.com/api/admin",
     headers: {
       "Content-Type": "application/json",
       accept: "application/json",
