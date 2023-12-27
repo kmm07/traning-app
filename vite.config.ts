@@ -9,6 +9,7 @@ export default defineConfig({
       '/api/admin': {
         target: 'http://personaltrainerkmm.com/',
         changeOrigin: true,
+        secure : false
       },
     },
     headers : {
