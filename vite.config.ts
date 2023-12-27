@@ -5,7 +5,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   server: {
     port: 3000,
-    proxy: {
+    // proxy: {
     //   '/api/admin': {
     //     target: 'http://personaltrainerkmm.com/api/admin/',
     //     changeOrigin: true,
