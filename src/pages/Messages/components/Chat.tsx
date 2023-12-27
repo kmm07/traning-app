@@ -12,22 +12,17 @@ function Chat({ userData }: { userData: any }) {
 
   const [messages, seMessages] = useState<any>([]);
 
-  const [pusher,setPusher] = useState<any>(null);
+  // const [pusher,setPusher] = useState<any>(null);
 
   const { mutateAsync, isLoading } = usePostQuery({
     url,
     contentType: "multipart/form-data",
   });
 
-  useEffect(() => {
-    const pusherConn = new Pusher("b48f98218c05a058e5a5", {
-      cluster: "eu",
-    });
-
-    setPusher(pusherConn);
-
-  },[]);
-
+  
+  const pusher = new Pusher("b48f98218c05a058e5a5", {
+    cluster: "eu",
+  });
 
   const messagesEndRef = useRef(null);
 
