@@ -6,10 +6,10 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': {
-        target: 'http://personaltrainerkmm.com/',
+      '/api/admin': {
+        target: 'http://personaltrainerkmm.com/api/admin',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // Remove the '/api' prefix for the proxy request
+        rewrite: (path) => path.replace(/^\/api\/admin/, ''), // Remove the '/api' prefix for the proxy request
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);
