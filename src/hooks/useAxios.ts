@@ -16,7 +16,7 @@ const useAxios = ({ contentType = "application/json" }: Props) => {
     useAppSelector(selectCurrentToken);
 
   return axios.create({
-    baseURL: "http://personaltrainerkmm.com/api/admin",
+    baseURL: "https://personaltrainerkmm.com/api/admin",
     headers: {
       "Content-Type": contentType as string,
       accept: "application/json",
