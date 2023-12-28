@@ -8,7 +8,7 @@ const customAxios = () =>
       accept: "application/json",
       "Access-Control-Allow-Origin": "*"
     },
-    withCredentials: false
+    withCredentials: true
   });
 
 export default customAxios;
