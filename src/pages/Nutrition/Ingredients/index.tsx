@@ -45,15 +45,15 @@ function Ingredients() {
     document.getElementById("add-new-nutrition")?.click();
   };
 
-  // get descriptions data list =================>
-  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}`;
+  const [currentPage, setCurrentPage] = useState(1);
+  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}`;
 
   const {
-    data: ingredientsList = [],
+    data: ingredientsData,
     isLoading: isListLoading,
   }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: any[] } }) =>
-      data.data.map((item: any) => ({
+    select: ({ data }: { data: { data: any[]; pagination: any } }) => ({
+      items: data.data.map((item: any) => ({
         id: item.id,
         name: item.name,
         calories: item.calories,
@@ -66,9 +66,13 @@ function Ingredients() {
         measure: item.measure,
         image: item.image,
       })),
-
+      pagination: data.pagination, // استخراج معلومات التصفح
+    }),
     refetchOnWindowFocus: false,
   });
+  
+  const ingredientsList = ingredientsData?.items ?? [];
+  const pagination = ingredientsData?.pagination ?? {};
 
   const columns = React.useMemo(
     () => [
@@ -205,6 +209,8 @@ function Ingredients() {
             rowOnClick={rowOnClick}
             opnSideBar="إضافة مكون"
             opnSideBarOpen={() => setIngredientData(null)}
+            setPage={setCurrentPage}
+            pagination={pagination}
           />
         ) : (
           <>loading...</>

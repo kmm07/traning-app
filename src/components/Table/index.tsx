@@ -40,6 +40,8 @@ const Table = <ColumnsType,>({
   modalTitle,
   rowOnClick,
   opnSideBarOpen,
+  setPage,
+  pagination,
   modalContent,
   modalOnDelete,
   onSave,
@@ -71,12 +73,16 @@ const Table = <ColumnsType,>({
     setCurrentItems(filterGlobal().slice(itemOffset, endOffset));
   }, [data, itemOffset, endOffset, searchValue]);
 
-  const pageCount = Math.ceil(data.length / itemsPerPage);
+  const pageCount = pagination?.total_pages ?? Math.ceil(data.length / itemsPerPage);
 
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected * itemsPerPage) % data.length;
-    setItemOffset(newOffset);
-    setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
+    if(pagination == null){
+      const newOffset = (event.selected * itemsPerPage) % data.length;
+      setItemOffset(newOffset);
+      setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
+    } else {
+      setPage!(event.selected + 1);
+    }
   };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -208,6 +214,7 @@ const Table = <ColumnsType,>({
           pageCount={pageCount}
           previousLabel="< سابق"
           renderOnZeroPageCount={null}
+          forcePage={pagination != null ? pagination.current_page - 1 : undefined}
         />
       </div>
     </div>
