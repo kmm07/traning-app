@@ -17,3 +17,4 @@ export { SettingCard } from "./SettingCard";
 export { TextArea } from "./TextArea";
 export { TrhButton } from "./TrhButton";
 export { Tabs } from "./Tabs";
+export { LoadingTable } from "./LoadingTable";

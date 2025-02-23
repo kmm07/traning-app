@@ -40,6 +40,8 @@ function Descriptions() {
 
   // get descriptions data list =================>
   const url = `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`;
+  
+  console.log(url);
 
   const {
     data: descriptionsList = [],

@@ -1,4 +1,4 @@
-import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
+import { Button, Card, Input, Img, Modal, SettingCard, LoadingTable, Text } from "components";
 import React, { useState, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -8,6 +8,7 @@ import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
 import { toast } from "react-toastify";
 import EditIngredient from "./components/editIngredient";
+import Loading from "components/Loader";
 
 function Ingredients() {
   const [categoryId, setCategoryId] = useState(1);
@@ -46,7 +47,8 @@ function Ingredients() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}`;
+  const [searchQuery, setSearchQuery] = useState("");
+  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}&search_query=${searchQuery.trim()}`;
 
   const {
     data: ingredientsData,
@@ -65,6 +67,8 @@ function Ingredients() {
         size: item.size,
         measure: item.measure,
         image: item.image,
+        code: item.code ?? "",
+        brand: item.brand ?? "",
       })),
       pagination: data.pagination, // استخراج معلومات التصفح
     }),
@@ -109,7 +113,7 @@ function Ingredients() {
         ),
       },
       {
-        Header: "الكاروبهيدرات",
+        Header: "الكاربوهيدرات",
         accessor: "carbohydrate",
         Cell: ({ row }: { row: Row<any> }) => (
           <span>{Number(row.original.carbohydrate).toFixed(2)}</span>
@@ -150,6 +154,13 @@ function Ingredients() {
           <span>{row.original.measure}</span>
         ),
       },
+      {
+        Header: "العلامة التجارية",
+        accessor: "brand",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span>{row.original.brand == "" ? "-" : row.original.brand}</span>
+        ),
+      },
     ],
     []
   );
@@ -164,7 +175,7 @@ function Ingredients() {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex gap-3 h-24 ">
+      <div className="flex gap-3 h-23 ">
         {!isCardsLoading ? (
           cardData?.map((item: any) => {
             return (
@@ -183,7 +194,7 @@ function Ingredients() {
             );
           })
         ) : (
-          <>loading...</>
+          <Loading />
         )}
 
         <Card className={`p-4 w-[180px] cursor-pointer`}>
@@ -201,22 +212,50 @@ function Ingredients() {
           </label>
         </Card>
       </div>
-      <div className="!mt-10">
+      <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
+      <div className=" flex gap-7 w-full justify-between items-center">
+        <div className="flex-1 flex items-center gap-7">
+          {
+            <div className="w-1/2">
+              <Input
+                name=""
+                isForm={false}
+                inputSize="large"
+                className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
+                onChange={(e) => setSearchQuery(e.target.value.trim())}
+              />
+            </div>
+          }
+        </div>
+
+        {
+          <div className="flex me-auto gap-4 items-center">
+            <Button
+              htmlFor="my-drawer"
+              onClick={() => setIngredientData(null)}
+              rounded={"full"}
+              primary
+            >
+              {"إضافة مكون"}
+            </Button>
+          </div>
+        }
+      </div>
+      <div className="!mt-10 w-full">
         {!isListLoading ? (
-          <Table
+          <LoadingTable
             data={ingredientsList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
-            opnSideBar="إضافة مكون"
-            opnSideBarOpen={() => setIngredientData(null)}
             setPage={setCurrentPage}
             pagination={pagination}
           />
         ) : (
-          <>loading...</>
+          <Loading />
         )}
       </div>
 
+      </div>
       {ingredientsList?.length === 0 && (
         <>
           <Modal id="add-new-ing">
@@ -239,7 +278,7 @@ function Ingredients() {
       </Modal>
 
       <Drawer>
-        <SideBar ingredientData={ingredientData} categoryId={categoryId} />
+        <SideBar ingredientData={ingredientData} categoryId={categoryId} currentPage={currentPage} searchQuery={searchQuery}/>
       </Drawer>
     </div>
   );

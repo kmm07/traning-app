@@ -7,6 +7,8 @@ import formData from "util/formData";
 interface SideBarProps {
   ingredientData: any;
   categoryId: number;
+  currentPage: number;
+  searchQuery: string;
 }
 
 const initialValues = {
@@ -21,9 +23,11 @@ const initialValues = {
   size: "",
   image: "",
   meal_ingredient_category_id: "",
+  code: "",
+  brand: "",
 };
 
-function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
+function SideBar({ ingredientData = [], categoryId, currentPage, searchQuery }: SideBarProps) {
   // ingredients actions =====================>
   const queryClient = useQueryClient();
 
@@ -34,7 +38,7 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
       await mutateAsync(`/meal-ingredients/${ingredientData.id}`);
 
       await queryClient.invalidateQueries(
-        `/meal-ingredients?meal_ingredient_category_id=${categoryId}`
+        `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}&search_query=${searchQuery.trim()}`
       );
     } catch (error: any) {
       toast.error(error.response.data.message);
@@ -62,7 +66,6 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     try {
       if (isEditing) {
         typeof values.image !== "object" && delete values.image;
-
         await addIngredient(
           formData({
             ...values,
@@ -80,7 +83,7 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
       }
 
       await queryClient.invalidateQueries(
-        `/meal-ingredients?meal_ingredient_category_id=${categoryId}`
+        `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}&search_query=${searchQuery.trim()}`
       );
 
       onClose();
@@ -108,7 +111,7 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     >
       <Form className="flex flex-col gap-10">
         <div className="flex justify-between">
-          <div className="flex gap-4">
+          <div className="flex w-[550px] gap-4">
             <UploadInput name="image" />
             <Input name="name" className="font-bold !text-2xl" />
           </div>
@@ -146,6 +149,24 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
             <div className="w-[200px]">
               <Input
                 name="measure"
+                className=" border rounded-full px-10 py-2 text-center border-[#CFFF0F]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-between p-4 border-b">
+            <Text size="3xl">Barcode</Text>
+            <div className="w-[200px]">
+              <Input
+                name="code"
+                className=" border rounded-full px-10 py-2 text-center border-[#CFFF0F]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-between p-4 border-b">
+            <Text size="3xl">العلامة التجارية</Text>
+            <div className="w-[200px]">
+              <Input
+                name="brand"
                 className=" border rounded-full px-10 py-2 text-center border-[#CFFF0F]"
               />
             </div>
