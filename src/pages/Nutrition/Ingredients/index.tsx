@@ -222,7 +222,11 @@ function Ingredients() {
                 isForm={false}
                 inputSize="large"
                 className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
-                onChange={(e) => setSearchQuery(e.target.value.trim())}
+                onChange= {(e) => {
+                  setSearchQuery(e.target.value.trim());
+                  setCurrentPage(1);
+                }
+              }
               />
             </div>
           }
