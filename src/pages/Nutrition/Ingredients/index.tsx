@@ -69,6 +69,12 @@ function Ingredients() {
         image: item.image,
         code: item.code ?? "",
         brand: item.brand ?? "",
+        one_size_calories: item.one_size_calories ?? 0,
+        one_size_protein: item.one_size_protein ?? 0,
+        one_size_carbohydrate: item.one_size_carbohydrate ?? 0,
+        one_size_fat: item.one_size_fat ?? 0,
+        one_size_trans_fat: item.one_size_trans_fat ?? 0,
+        one_size_sugar: item.one_size_sugar ?? 0,
       })),
       pagination: data.pagination, // استخراج معلومات التصفح
     }),

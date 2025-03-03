@@ -79,6 +79,7 @@ function SideBar({
     let fat = 0;
 
     mainMeals?.forEach((meal: any) => {
+      console.log(meal);
       carbohydrate += Number(meal.one_size_carbohydrate) * meal.size;
 
       trans_fat += Number(meal.one_size_trans_fat) * meal.size;
