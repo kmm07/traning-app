@@ -8,6 +8,7 @@ import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
 import EditExerciseSessions from "./edit-exercise-session";
 import AddWeekDayExercise from "./add-day-exercise";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 interface SideBarProps {
   weekDayData: any;
@@ -150,6 +151,7 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
 
       if (data[0] === "exercises") {
         (data[1] as any).forEach((subData: any, i: number) => {
+          formData.append(`exercises[${i}][sort]`, i.toString());
           Object.entries(subData).forEach((item: any) => {
             if (item[0] === "children" && item[1].length > 0) {
               item[1]?.forEach((child: any, childIndex: number) => {
@@ -266,6 +268,12 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
     isEditing && formData.append("_method", "PUT" as any);
 
     try {
+      console.log("---- FormData contents ----");
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+      console.log("---- End FormData ----");
+
       await editWeekDay(formData as any);
 
       Helpers.resetForm();
@@ -340,6 +348,13 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
     setFieldValue("exercises", filteredExercises);
   };
 
+  const reorder = (list: any[], startIndex: number, endIndex: number) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
   return (
     <Formik
       initialValues={{
@@ -411,61 +426,108 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
                 </Text>
               </div>
               <div className="pb-4 border-b-[1px]">
-                {values.exercises
-                  .filter((exercise: any) => exercise.parent_id === null)
-                  ?.map((exercise: any) => (
-                    <div className="border-[1px] rounded-lg p-4 !mb-6 ">
-                      <SingleExercise
-                        key={exercise?.name}
-                        exercise={exercise}
-                        onEditExercise={() => onEditExercise(exercise) as any}
-                        onAddSpareExercise={() => onAddSpareExercise(exercise)}
-                        onDeleteEXercise={() =>
-                          onDeleteMainExercise(exercise, values, setFieldValue)
-                        }
-                      />
-                      <Text as="h5" className="!mb-2">
-                        التمرينات البديلة:
-                      </Text>
-                      {values.exercises
-                        ?.filter((item: any) => item.parent_id === exercise?.id)
-                        ?.map((subExercise: any) => (
-                          <SingleExercise
-                            key={exercise?.name}
-                            exercise={subExercise}
-                            onEditExercise={() =>
-                              onEditExercise(subExercise) as any
-                            }
-                            onDeleteEXercise={() =>
-                              onDeleteSpareExercise(
-                                exercise,
-                                subExercise,
-                                setFieldValue,
-                                values
-                              )
-                            }
-                          />
-                        ))}
+                <DragDropContext
+                  onDragEnd={(result) => {
+                    if (!result.destination) return;
+                    const mainExercises = values.exercises.filter(
+                      (ex: any) => ex.parent_id === null
+                    );
+                    const reordered = reorder(
+                      mainExercises,
+                      result.source.index,
+                      result.destination.index
+                    );
 
-                      {exercise?.children?.map((subExercise: any) => (
-                        <SingleExercise
-                          key={exercise?.name}
-                          exercise={subExercise}
-                          onEditExercise={() =>
-                            onEditExercise(subExercise) as any
-                          }
-                          onDeleteEXercise={() =>
-                            onDeleteSpareExercise(
-                              exercise,
-                              subExercise,
-                              setFieldValue,
-                              values
-                            )
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
+                    // Keep children in place — merge back with spare exercises
+                    const others = values.exercises.filter(
+                      (ex: any) => ex.parent_id !== null
+                    );
+                    setFieldValue("exercises", [...reordered, ...others]);
+                  }}
+                >
+                  <Droppable droppableId="main-exercises">
+                    {(provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        style={{
+                          maxHeight: "1000px", // scrollable height
+                          overflowY: "auto",
+                        }}
+                      >
+                        {values.exercises
+                          .filter(
+                            (exercise: any) => exercise.parent_id === null
+                          )
+                          ?.map((exercise: any, index: number) => (
+                            <Draggable
+                              key={
+                                exercise.id ??
+                                exercise.exercise_id?.value ??
+                                index
+                              }
+                              draggableId={(
+                                exercise.id ??
+                                exercise.exercise_id?.value ??
+                                index
+                              ).toString()}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className="border-[1px] rounded-lg p-4 !mb-6"
+                                >
+                                  <SingleExercise
+                                    key={exercise?.name}
+                                    exercise={exercise}
+                                    onEditExercise={() =>
+                                      onEditExercise(exercise) as any
+                                    }
+                                    onAddSpareExercise={() =>
+                                      onAddSpareExercise(exercise)
+                                    }
+                                    onDeleteEXercise={() =>
+                                      onDeleteMainExercise(
+                                        exercise,
+                                        values,
+                                        setFieldValue
+                                      )
+                                    }
+                                  />
+                                  <Text as="h5" className="!mb-2">
+                                    التمرينات البديلة:
+                                  </Text>
+                                  {exercise?.children?.map(
+                                    (subExercise: any) => (
+                                      <SingleExercise
+                                        key={subExercise?.name}
+                                        exercise={subExercise}
+                                        onEditExercise={() =>
+                                          onEditExercise(subExercise) as any
+                                        }
+                                        onDeleteEXercise={() =>
+                                          onDeleteSpareExercise(
+                                            exercise,
+                                            subExercise,
+                                            setFieldValue,
+                                            values
+                                          )
+                                        }
+                                      />
+                                    )
+                                  )}
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
 
                 <Button
                   className="!mt-5 flex items-center gap-1"

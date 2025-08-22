@@ -3,8 +3,9 @@ import { useGetQuery } from "hooks/useQueryHooks";
 import React from "react";
 import { UseQueryResult } from "react-query";
 
-type Props = {};
+type Props = object;
 
+// eslint-disable-next-line no-empty-pattern
 export default function ContactsPage({}: Props) {
   // get users list ======================>
   const url = "/contacts";
