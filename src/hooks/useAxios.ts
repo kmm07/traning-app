@@ -7,6 +7,12 @@ interface Props {
 }
 
 /**
+ * جذر واجهة اللوحة — مُصدَّرٌ كي يستعمله من لا يستطيع استعمال axios نفسه:
+ * نداء `fetch(keepalive)` عند إغلاق التبويب (انظر useTrainerPresence).
+ */
+export const ADMIN_BASE_URL = "https://personaltrainerkmm.com/api/admin";
+
+/**
  * @param apiType default is admin
  * @param contentType default is 'application/json'
  * @returns axios
@@ -16,7 +22,7 @@ const useAxios = ({ contentType = "application/json" }: Props) => {
     useAppSelector(selectCurrentToken);
 
   return axios.create({
-    baseURL: "https://personaltrainerkmm.com/api/admin",
+    baseURL: ADMIN_BASE_URL,
     headers: {
       "Content-Type": contentType as string,
       accept: "application/json",

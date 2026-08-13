@@ -6,9 +6,14 @@ import { toast } from "react-toastify";
 import Pusher from "pusher-js";
 import { useQueryClient } from "react-query";
 import useAxios from "hooks/useAxios";
+import useTrainerPresence from "hooks/useTrainerPresence";
 
 function Chat({ userData }: { userData: any }) {
   const url = `/send-message/${userData?.id}`;
+
+  // حضور المدرّب على طريقة واتساب: نبضةٌ ما دامت هذه المحادثة مفتوحة أمامه،
+  // وإطفاءٌ فور إغلاقها. يقرؤها التطبيق في `/api/chat` تحت `trainer.available`.
+  useTrainerPresence(!!userData?.id);
 
   const [messages, seMessages] = useState<any>([]);
 
