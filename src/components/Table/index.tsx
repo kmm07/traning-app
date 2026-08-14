@@ -31,6 +31,7 @@ export interface TableProps<ColumnsType> {
   id?: string;
   opnSideBar?: string;
   withoutCloseDrawer?: boolean;
+  headerActions?: React.ReactNode;
 }
 
 const Table = <ColumnsType,>({
@@ -40,6 +41,8 @@ const Table = <ColumnsType,>({
   modalTitle,
   rowOnClick,
   opnSideBarOpen,
+  setPage,
+  pagination,
   modalContent,
   modalOnDelete,
   onSave,
@@ -47,6 +50,7 @@ const Table = <ColumnsType,>({
   search = true,
   id,
   withoutCloseDrawer = false,
+  headerActions,
 }: TableProps<ColumnsType>) => {
   const itemsPerPage = 25;
   const [itemOffset, setItemOffset] = useState(0);
@@ -71,12 +75,16 @@ const Table = <ColumnsType,>({
     setCurrentItems(filterGlobal().slice(itemOffset, endOffset));
   }, [data, itemOffset, endOffset, searchValue]);
 
-  const pageCount = Math.ceil(data.length / itemsPerPage);
+  const pageCount = pagination?.total_pages ?? Math.ceil(data.length / itemsPerPage);
 
   const handlePageClick = (event: any) => {
-    const newOffset = (event.selected * itemsPerPage) % data.length;
-    setItemOffset(newOffset);
-    setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
+    if(pagination == null){
+      const newOffset = (event.selected * itemsPerPage) % data.length;
+      setItemOffset(newOffset);
+      setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
+    } else {
+      setPage!(event.selected + 1);
+    }
   };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -119,16 +127,19 @@ const Table = <ColumnsType,>({
             </Button>
           </div>
         )}
-        {modalTitle && (
+        {(modalTitle || headerActions) && (
           <div className="flex me-auto gap-4 items-center">
-            <Modal
-              modalOnDelete={modalOnDelete}
-              onSave={onSave}
-              label={modalTitle}
-              id={id}
-            >
-              {modalContent}
-            </Modal>
+            {headerActions}
+            {modalTitle && (
+              <Modal
+                modalOnDelete={modalOnDelete}
+                onSave={onSave}
+                label={modalTitle}
+                id={id}
+              >
+                {modalContent}
+              </Modal>
+            )}
           </div>
         )}
       </div>
@@ -208,6 +219,7 @@ const Table = <ColumnsType,>({
           pageCount={pageCount}
           previousLabel="< سابق"
           renderOnZeroPageCount={null}
+          forcePage={pagination != null ? pagination.current_page - 1 : undefined}
         />
       </div>
     </div>

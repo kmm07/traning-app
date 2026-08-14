@@ -19,7 +19,24 @@ const initialValues = {
   details: [],
   users: [],
   image: "",
+  route: "",
 };
+
+// Deep-link destinations the Flutter app knows how to open (v1: section-level,
+// no id). MUST stay in sync with Notification::ROUTES on the backend and the
+// Flutter route handler.
+const routeOptions = [
+  { label: "بدون توجيه", value: "" },
+  { label: "المحادثة / الرسائل", value: "chat" },
+  { label: "الرئيسية", value: "home" },
+  { label: "الإحصائيات والتقدّم", value: "stats" },
+  { label: "جدول التمرين", value: "training" },
+  { label: "الكارديو", value: "cardio" },
+  { label: "الاشتراك والعروض", value: "subscription" },
+  { label: "تواصل معنا", value: "contact" },
+  { label: "سياسة الخصوصية", value: "privacy" },
+  { label: "الشروط والأحكام", value: "terms" },
+];
 
 function AddNotification({ active }: { active: number }) {
   const [detail, setDetail] = useState<string>("");
@@ -53,6 +70,12 @@ function AddNotification({ active }: { active: number }) {
     const formattedData = Object.entries(values);
 
     formattedData.forEach((value) => {
+      // Skip empty route so backend `nullable|in:...` validation passes
+      // (an empty string is neither null nor a valid route).
+      if (value[0] === "route" && !value[1]) {
+        return;
+      }
+
       if (!["users", "details"].includes(value[0])) {
         formData.append(value[0], value[1] as any);
       }
@@ -113,6 +136,16 @@ function AddNotification({ active }: { active: number }) {
 
             <Input name="description" label="الوصف" />
           </div>
+
+          <Select
+            name="route"
+            options={routeOptions}
+            isForm={false}
+            label="وجهة الإشعار (عند الضغط)"
+            value={routeOptions.filter((opt) => opt.value === values.route)}
+            onChange={(opt: any) => setFieldValue("route", opt?.value ?? "")}
+          />
+
           {active === 1 && (
             <Select
               name="users"

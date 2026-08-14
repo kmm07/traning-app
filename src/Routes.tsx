@@ -21,10 +21,14 @@ import HomeMen from "pages/Exercises/home-men";
 import HomeWomen from "pages/Exercises/home-women";
 import Subscriptions from "pages/subscriptions";
 import UserSubscriptions from "pages/Users/subscriptions";
+import UserPlan from "pages/Users/plan";
 import ViewWeekDay from "pages/view-week-days";
 import Coupones from "pages/coupones";
 import Admin from "pages/admin/Index";
 import ContactsPage from "pages/contacts";
+import SystemNotices from "pages/system-notices";
+import InsightRecommendations from "pages/insight-recommendations";
+import Analytics from "pages/analytics";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,12 +37,14 @@ const router = createBrowserRouter(
 
       <Route path="/" element={<Layout />}>
         <Route path="/dashboard" element={<Messages />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/admins" element={<Admin />} />
         <Route path="users" index element={<Users />} />
         <Route
           path="/users/:id/subscriptions"
           element={<UserSubscriptions />}
         />
+        <Route path="/users/:id/plan" element={<UserPlan />} />
         <Route path="subscriptions" index element={<Subscriptions />} />
         <Route path="/nutrition">
           <Route path="descriptions" element={<Descriptions />} />
@@ -60,6 +66,11 @@ const router = createBrowserRouter(
 
         <Route path="coupones" element={<Coupones />} />
         <Route path="contacts" element={<ContactsPage />} />
+        <Route path="system-notices" element={<SystemNotices />} />
+        <Route
+          path="insight-recommendations"
+          element={<InsightRecommendations />}
+        />
       </Route>
 
       <Route path="*" element={<NotFound />} />

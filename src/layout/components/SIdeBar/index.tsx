@@ -94,14 +94,33 @@ function SidePar() {
       link: "/contacts",
       src: "/images/img_mail11.png",
     },
+
+    {
+      name: "رسائل النظام",
+      link: "/system-notices",
+      src: "/images/img_notification3.png",
+    },
+
+    {
+      name: "توصيات المدرب",
+      link: "/insight-recommendations",
+      src: "/images/img_weight3.png",
+    },
   ];
 
   isAdmin
-    ? naveItems.push({
-        name: "المسؤلين",
-        link: "/admins",
-        src: "/images/img_setting1.png",
-      })
+    ? naveItems.push(
+        {
+          name: "التحليلات",
+          link: "/analytics",
+          src: "/images/img_weight3.png",
+        },
+        {
+          name: "المسؤلين",
+          link: "/admins",
+          src: "/images/img_setting1.png",
+        }
+      )
     : null;
 
   return (

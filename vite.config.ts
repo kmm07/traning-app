@@ -21,9 +21,9 @@ export default defineConfig({
     //     },
     //   },
     // },
-    headers : {
-      "Access-Control-Allow-Origin": "*"
-    }
+  //  headers : {
+  //    "Access-Control-Allow-Origin": "*"
+  //  }
   },
   build: {
     outDir: "build"

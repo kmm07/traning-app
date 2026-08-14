@@ -7,6 +7,7 @@ import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
 import ExerciseCategoryForm from "./exerciseCategoryForm";
 import WeekForm from "./createWeek";
+import GenerateScheduleForm from "./generateSchedule";
 import TableActions from "components/Table/actions";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -216,6 +217,37 @@ function TrainingView({ home, gender }: Props) {
     );
   };
 
+  // بعد إنشاء جدول تلقائياً: انتقِل لمستوى/أيام الجدول الجديد واعرضه
+  const onGenerated = async (data: {
+    category_id: number;
+    lvl: "junior" | "mid" | "senior";
+    days_num: number;
+  }) => {
+    setLevel(data.lvl);
+    setDaysNum(data.days_num);
+    setExerciseCategory(data.category_id);
+
+    const storageObject = JSON.parse(
+      localStorage.getItem(`${home}-${gender}`) as any
+    );
+    localStorage.setItem(
+      `${home}-${gender}`,
+      JSON.stringify({
+        ...storageObject,
+        level: data.lvl,
+        daysNum: data.days_num,
+        exerciesCategory: data.category_id,
+      })
+    );
+
+    await queryClient.invalidateQueries(
+      `/training-categories?lvl=${data.lvl}&gender=${gender}&days_num=${data.days_num}&home=${home}`
+    );
+    await queryClient.invalidateQueries(
+      `/training-weeks?category_id=${data.category_id}`
+    );
+  };
+
   return (
     <div className="relative w-full space-y-4">
       <div className="grid grid-cols-7 gap-5">
@@ -360,6 +392,16 @@ function TrainingView({ home, gender }: Props) {
           columns={columns}
           modalTitle="اضافة اسبوع"
           id="add-new-exercise"
+          headerActions={
+            <Button
+              primary
+              onClick={() =>
+                document.getElementById("generate-schedule")?.click()
+              }
+            >
+              إنشاء جدول تدريب
+            </Button>
+          }
           modalContent={
             <WeekForm
               trainingWeeks={trainingWeeks}
@@ -377,7 +419,7 @@ function TrainingView({ home, gender }: Props) {
       )}
 
       {trainingWeeks.length === 0 && (
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-4">
           <Button
             secondaryBorder
             onClick={() =>
@@ -385,6 +427,14 @@ function TrainingView({ home, gender }: Props) {
             }
           >
             إضافة إسبوع
+          </Button>
+          <Button
+            primary
+            onClick={() =>
+              document.getElementById("generate-schedule")?.click()
+            }
+          >
+            إنشاء جدول تدريب
           </Button>
         </div>
       )}
@@ -410,6 +460,17 @@ function TrainingView({ home, gender }: Props) {
             document.getElementById("add-new-exercise-empty")?.click();
             setWeekData(null);
           }}
+        />
+      </Modal>
+      <Modal id="generate-schedule">
+        <GenerateScheduleForm
+          defaultGender={gender}
+          defaultLevel={level}
+          defaultDays={daysNum}
+          onGenerated={onGenerated}
+          onClose={() =>
+            document.getElementById("generate-schedule")?.click()
+          }
         />
       </Modal>
     </div>

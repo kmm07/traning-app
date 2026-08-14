@@ -19,12 +19,20 @@ interface SingleExerciseProps {
   onAddSpareExercise?: () => void;
   onDeleteEXercise?: () => void;
   onEditExercise?: (exercise: any) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }
 const SingleExercise = ({
   exercise,
   onAddSpareExercise,
   onDeleteEXercise,
   onEditExercise,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
 }: SingleExerciseProps) => {
   const { values, setFieldValue } = useFormikContext<any>();
 
@@ -32,6 +40,28 @@ const SingleExercise = ({
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
+          {onMoveUp !== undefined && (
+            <div className="flex flex-col gap-1">
+              <Button
+                type="button"
+                secondaryBorder
+                disabled={!canMoveUp}
+                onClick={onMoveUp as any}
+                className="!px-2 !py-0"
+              >
+                ▲
+              </Button>
+              <Button
+                type="button"
+                secondaryBorder
+                disabled={!canMoveDown}
+                onClick={onMoveDown as any}
+                className="!px-2 !py-0"
+              >
+                ▼
+              </Button>
+            </div>
+          )}
           <Img
             src={exercise?.exercise_muscle_image}
             alt="image"
@@ -136,6 +166,23 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
 
     delete values.exercise_category_id;
 
+    // إسناد ترتيب (sort) متسلسل حسب الترتيب الحالي المعروض: كل تمرين رئيسي ثم بدائله.
+    // هذا ما يقرأه التطبيق (فلاتر) لعرض التمارين بنفس ترتيب الأدمن.
+    let sortCounter = 0;
+    values.exercises
+      ?.filter((e: any) => e.parent_id === null)
+      ?.forEach((main: any) => {
+        main.sort = sortCounter++;
+        values.exercises
+          ?.filter((c: any) => c.parent_id === main.id)
+          ?.forEach((c: any) => {
+            c.sort = sortCounter++;
+          });
+        main.children?.forEach((c: any) => {
+          c.sort = sortCounter++;
+        });
+      });
+
     const formattedData = Object.entries(values);
 
     formattedData.forEach((data: any) => {
@@ -176,6 +223,11 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
                 formData.append(
                   `exercises[${i}][children][${childIndex}][rest_sec]`,
                   child.rest_sec
+                );
+
+                formData.append(
+                  `exercises[${i}][children][${childIndex}][sort]`,
+                  child.sort ?? 0
                 );
 
                 formData.append(
@@ -340,6 +392,27 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
     setFieldValue("exercises", filteredExercises);
   };
 
+  // تحريك تمرين رئيسي لأعلى/أسفل — يبدّل موضعه مع جاره الرئيسي مع بقاء بدائله ملتصقة به.
+  const onMoveMainExercise = (
+    exercise: any,
+    direction: "up" | "down",
+    values: any,
+    setFieldValue: any
+  ) => {
+    const arr = [...values.exercises];
+    const mainIndices = arr
+      .map((e: any, idx: number) => (e.parent_id === null ? idx : -1))
+      .filter((idx: number) => idx >= 0);
+    const pos = mainIndices.findIndex((idx: number) => arr[idx] === exercise);
+    if (pos === -1) return;
+    const targetPos = direction === "up" ? pos - 1 : pos + 1;
+    if (targetPos < 0 || targetPos >= mainIndices.length) return;
+    const a = mainIndices[pos];
+    const b = mainIndices[targetPos];
+    [arr[a], arr[b]] = [arr[b], arr[a]];
+    setFieldValue("exercises", arr);
+  };
+
   return (
     <Formik
       initialValues={{
@@ -413,15 +486,35 @@ function WeekDayGymSideBar({ weekDayData, category }: SideBarProps) {
               <div className="pb-4 border-b-[1px]">
                 {values.exercises
                   .filter((exercise: any) => exercise.parent_id === null)
-                  ?.map((exercise: any) => (
-                    <div className="border-[1px] rounded-lg p-4 !mb-6 ">
+                  ?.map((exercise: any, mainIndex: number, mainArr: any[]) => (
+                    <div
+                      key={
+                        exercise?.id ??
+                        exercise?.exercise_id?.value ??
+                        exercise?.exercise_id ??
+                        mainIndex
+                      }
+                      className="border-[1px] rounded-lg p-4 !mb-6 "
+                    >
                       <SingleExercise
-                        key={exercise?.name}
                         exercise={exercise}
                         onEditExercise={() => onEditExercise(exercise) as any}
                         onAddSpareExercise={() => onAddSpareExercise(exercise)}
                         onDeleteEXercise={() =>
                           onDeleteMainExercise(exercise, values, setFieldValue)
+                        }
+                        canMoveUp={mainIndex > 0}
+                        canMoveDown={mainIndex < mainArr.length - 1}
+                        onMoveUp={() =>
+                          onMoveMainExercise(exercise, "up", values, setFieldValue)
+                        }
+                        onMoveDown={() =>
+                          onMoveMainExercise(
+                            exercise,
+                            "down",
+                            values,
+                            setFieldValue
+                          )
                         }
                       />
                       <Text as="h5" className="!mb-2">

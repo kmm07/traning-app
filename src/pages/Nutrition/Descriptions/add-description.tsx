@@ -11,7 +11,7 @@ import { Form, Formik } from "formik";
 import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import { toast } from "react-toastify";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const initialValues = {
   name: "",
@@ -26,7 +26,23 @@ export default function AddDescription({
 }: {
   emptyData?: boolean;
 }) {
-  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${0}`;
+  // البحث خادميّ: القائمة كانت تحمل الصفحة الأولى وحدها (٢٤ مكوّناً) من
+  // كتالوجٍ فيه أكثر من ١٧ ألفاً، فيبدو أن أغلب المكوّنات غير موجودة.
+  const [ingredientSearch, setIngredientSearch] = useState("");
+
+  const [ingredientQuery, setIngredientQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setIngredientQuery(ingredientSearch.trim()),
+      350
+    );
+    return () => clearTimeout(timer);
+  }, [ingredientSearch]);
+
+  const ingredientsURL = `/meal-ingredients?meal_ingredient_category_id=${0}&per_page=25${
+    ingredientQuery ? `&search_query=${encodeURIComponent(ingredientQuery)}` : ""
+  }`;
 
   const { data: ingredientsList = [] }: UseQueryResult<any> = useGetQuery(
     ingredientsURL,
@@ -37,6 +53,7 @@ export default function AddDescription({
           value: item.id,
           label: item.name,
         })),
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -183,6 +200,13 @@ export default function AddDescription({
                   )
                 )
               }
+              // الخادم هو من يبحث، فلا يُعاد ترشيح نتائجه محلياً
+              onInputChange={(value: string, meta: any) => {
+                if (meta?.action === "input-change") setIngredientSearch(value);
+              }}
+              filterOption={() => true}
+              placeholder="اكتب للبحث في كل المكوّنات..."
+              noOptionsMessage={() => "لا نتائج"}
               isMulti
               isForm={false}
             />

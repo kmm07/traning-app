@@ -1,10 +1,11 @@
 import { Button, Modal, Table } from "components";
 import { Drawer } from "components/Drawer";
-import { useGetQuery } from "hooks/useQueryHooks";
+import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
 import { Row } from "react-table";
+import { toast } from "react-toastify";
 import WeekDayForm from "./components/weekdayForm";
 import WeekDayGymSideBar from "./components/gym-side-bar/sideBar";
 import WeekDayHomeSideBar from "./components/home-side-bar/sideBar";
@@ -17,10 +18,32 @@ export default function ViewWeekDay() {
   // get notifications data =================>
   const url = `/training-week-days?training_week_id=${id}`;
 
-  const { data = [] }: UseQueryResult<any> = useGetQuery(url, url, {
+  const { data = [], refetch }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: [] } }) => data.data,
     refetchOnWindowFocus: false,
   });
+
+  // إعادة ترتيب الأيام: إرسال قائمة المعرّفات بالترتيب الجديد للباك إند
+  const { mutateAsync: reorderDays, isLoading: isReordering } = usePostQuery({
+    url: "/training-week-days/reorder",
+    withToast: false,
+  });
+
+  const moveDay = async (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= data.length || isReordering) return;
+
+    const dayIds = data.map((day: any) => day.id);
+    [dayIds[index], dayIds[target]] = [dayIds[target], dayIds[index]];
+
+    await reorderDays({
+      training_week_id: Number(id),
+      day_ids: dayIds,
+    } as any);
+
+    toast.success("تم تحديث ترتيب الأيام");
+    await refetch();
+  };
 
   const columns = React.useMemo(
     () => [
@@ -72,8 +95,37 @@ export default function ViewWeekDay() {
           );
         },
       },
+      {
+        Header: "الترتيب",
+        accessor: "reorder",
+        Cell: ({ row }: { row: Row<any> }) => {
+          return (
+            <div
+              className="flex items-center gap-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="btn btn-xs btn-outline"
+                disabled={row.index === 0 || isReordering}
+                onClick={() => moveDay(row.index, -1)}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline"
+                disabled={row.index === data.length - 1 || isReordering}
+                onClick={() => moveDay(row.index, 1)}
+              >
+                ↓
+              </button>
+            </div>
+          );
+        },
+      },
     ],
-    []
+    [data, isReordering]
   );
 
   const rowOnClick = (

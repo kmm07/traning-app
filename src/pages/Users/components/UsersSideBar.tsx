@@ -3,7 +3,7 @@ import NutritionInfo from "./NutritionInfo";
 import HeathInfo from "./HeathInfo";
 import TrainingInfo from "./TrainingInfo";
 import { Formik } from "formik";
-import { Form } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { Button } from "components";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
@@ -24,6 +24,21 @@ const initialValues = {
 };
 
 function UsersSideBar({ activeUser }: { activeUser: any }) {
+  const navigate = useNavigate();
+
+  // تخصيص الخطة: صفحة كاملة لتحرير تغذية وتدريب هذا المستخدم
+  const onOpenPlan = () => {
+    document.getElementById("my-drawer")?.click();
+    navigate(`/users/${activeUser?.id}/plan`);
+  };
+
+  // فتح محادثة المستخدم في صفحة الرسائل (مصافحة localStorage)
+  const onOpenChat = () => {
+    localStorage.setItem("open_chat_user_id", String(activeUser?.id));
+    document.getElementById("my-drawer")?.click();
+    navigate("/dashboard");
+  };
+
   const getTargetText = (target: string) => {
     return target === "decrease"
       ? "إنقاص الوزن"
@@ -116,6 +131,15 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
       {({ submitForm }) => (
         <Form>
           <UsersInfo showUserInfo={false} activeUser={activeUser} />
+
+          <div className="flex gap-3 mt-4">
+            <Button primary size="small" onClick={onOpenPlan}>
+              تخصيص الخطة (تغذية وتدريب)
+            </Button>
+            <Button secondaryBorder size="small" onClick={onOpenChat}>
+              محادثة المستخدم
+            </Button>
+          </div>
 
           <HeathInfo />
 
