@@ -114,6 +114,15 @@ export function usePutQuery({ url, contentType }: UrlContentType) {
 /**
  * @param options {apiType} default is admin
  */
+/**
+ * صيغتان: نصٌّ كما كان حرفياً، أو `{ url, data }` حين يحتاج الحذف **جسماً**.
+ *
+ * أُضيفت الثانية لأن `DELETE /meal-ingredients/{id}` صار يقبل `replace_with_id`
+ * و`force` — والمكوّن المستعمل يُردّ بـ422 حتى يُرسل أحدهما. وكلُّ المستدعين
+ * القدامى يمرّون بالصيغة النصّية بلا سطرٍ معدَّل.
+ */
+type DeleteArg = string | { url: string; data?: Record<string, unknown> };
+
 export function useDeleteQuery() {
   const axios = useAxios({
     contentType: "application/json",
@@ -122,13 +131,23 @@ export function useDeleteQuery() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (url: string) => {
-      await axios.delete(url);
+    async (arg: DeleteArg) => {
+      const url = typeof arg === "string" ? arg : arg.url;
+      const body = typeof arg === "string" ? undefined : arg.data;
+
+      // axios يرسل جسم DELETE عبر `config.data` — ولارافيل يقرؤه بـ`$request`
+      // مهما كان الفعل.
+      const response = await axios.delete(url, body ? { data: body } : undefined);
+
       const pageUrl = "?page=1";
       const astricsUrl = "?page=*";
       await queryClient.invalidateQueries(url.split("/")[0]);
       await queryClient.invalidateQueries(url.split("/")[0] + pageUrl);
       await queryClient.invalidateQueries(url.split("/")[0] + astricsUrl);
+
+      // يُعاد الردّ ليقرأ المستدعي `replaced_in_recipes` — إضافةٌ صرفة، فمن
+      // كان يتجاهل العائد يبقى كما هو.
+      return response;
     },
     {
       onSuccess: () => {

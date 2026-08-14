@@ -401,14 +401,31 @@ function SideBar({
             </Card>
 
             <Card className="relative px-4 pb-4">
-              <div className="flex justify-between py-3">
+              <div className="flex justify-between items-center py-3">
                 <Text size="3xl">المكونات</Text>
+                {(values as any)?.has_missing_ingredients && (
+                  <span className="px-4 py-1 rounded-full bg-red-500/20 border border-red-500 text-red-400 text-sm">
+                    وصفة ناقصة — {(values as any).missing_ingredients_count}{" "}
+                    مكوّن محذوف
+                  </span>
+                )}
               </div>
 
               {values?.ingredients
                 ?.filter(({ parent_id }: any) => parent_id === null)
                 ?.map((ingredient: any, index: number) => (
-                  <div className="mb-6 border-[1px] p-4 rounded-md">
+                  <div
+                    className={`mb-6 p-4 rounded-md ${
+                      // 🔴 مكوّنٌ حُذف من الكتالوج وصفُّ ربطه باقٍ: **المولّد
+                      // يُسقطه** فلا يصل المستخدم، وكانت هذه الشاشة تعرضه
+                      // مكوّناً سليماً ⇒ المدرّب يظنّ الوصفة كاملة. يُبرَز الآن
+                      // بالأحمر (ولا تُحتسب سعراته في مجاميع الوصفة أعلاه —
+                      // الخادم يستثنيها).
+                      ingredient?.is_deleted
+                        ? "border-2 border-red-500 bg-red-500/10"
+                        : "border-[1px]"
+                    }`}
+                  >
                     <div className="grid grid-cols-7">
                       <div className="flex flex-col items-center gap-2 w-[100px]">
                         <div className="avatar indicator">
@@ -424,6 +441,11 @@ function SideBar({
                         <Text as="h5" className="!w-full overflow-hidden">
                           {ingredient?.name}
                         </Text>
+                        {ingredient?.is_deleted && (
+                          <span className="text-[11px] leading-tight text-red-400 text-center">
+                            محذوف من الكتالوج — لا يصل المستخدم
+                          </span>
+                        )}
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <Text as="h5">السعرات</Text>

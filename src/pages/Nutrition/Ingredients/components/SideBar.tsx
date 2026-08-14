@@ -4,6 +4,10 @@ import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { Form, Formik } from "formik";
 import formData from "util/formData";
+import { useState } from "react";
+import DeleteIngredientDecision, {
+  InUsePayload,
+} from "./DeleteIngredientDecision";
 interface SideBarProps {
   ingredientData: any;
   categoryId: number;
@@ -29,17 +33,47 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
 
   const { mutateAsync, isLoading } = useDeleteQuery();
 
-  const onDeleteItem = async () => {
+  const onClose = () => {
+    document.getElementById("my-drawer")?.click();
+  };
+
+  // 🔴 الحذف صار **قراراً لا فعلاً واحداً**: الخادم يردّ 422 `ingredient_in_use`
+  // على مكوّنٍ تستعمله وصفات، ومعه عددُها وقائمتُها. فتُلتقط الحمولة ويُعرض
+  // حوارُ القرار بدل توست خطأٍ لا مخرج منه.
+  const [inUse, setInUse] = useState<InUsePayload | null>(null);
+
+  const removeIngredient = async (body?: Record<string, unknown>) => {
     try {
-      await mutateAsync(`/meal-ingredients/${ingredientData.id}`);
+      await mutateAsync(
+        body
+          ? { url: `/meal-ingredients/${ingredientData.id}`, data: body }
+          : `/meal-ingredients/${ingredientData.id}`
+      );
 
       await queryClient.invalidateQueries(
         `/meal-ingredients?meal_ingredient_category_id=${categoryId}`
       );
+
+      setInUse(null);
+      onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      const data = error?.response?.data;
+
+      if (data?.error_code === "ingredient_in_use") {
+        setInUse({
+          usage_count: data.usage_count,
+          recipes: data.recipes ?? [],
+        });
+
+        return;
+      }
+
+      // `invalid_replacement` وغيرُه يُعرضان برسالة الخادم — وهي عربيةٌ جاهزة.
+      toast.error(data?.message ?? "تعذّر الحذف");
     }
   };
+
+  const onDeleteItem = () => removeIngredient();
 
 
   const isEditing = ingredientData !== null;
@@ -54,9 +88,6 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     contentType: "multipart/form-data",
   });
 
-  const onClose = () => {
-    document.getElementById("my-drawer")?.click();
-  };
 
   const onSubmit = async (values: any, helpers: any) => {
     try {
@@ -107,6 +138,20 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
       enableReinitialize
     >
       <Form className="flex flex-col gap-10">
+        {inUse && ingredientData && (
+          <DeleteIngredientDecision
+            name={ingredientData.name}
+            id={ingredientData.id}
+            payload={inUse}
+            isLoading={isLoading}
+            onCancel={() => setInUse(null)}
+            onReplace={(replacementId) =>
+              void removeIngredient({ replace_with_id: replacementId })
+            }
+            onForce={() => void removeIngredient({ force: true })}
+          />
+        )}
+
         <div className="flex justify-between">
           <div className="flex gap-4">
             <UploadInput name="image" />

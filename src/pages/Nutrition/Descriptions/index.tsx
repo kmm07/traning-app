@@ -96,6 +96,16 @@ function Descriptions() {
                 </div>
               </div>
               {row.original.name}
+              {/* شارةٌ تُقرأ بلا فتح الوصفة: مكوّنٌ محذوف يعني أنها تُبنى
+                  ناقصةً لكل مستخدم في فئتها. */}
+              {row.original.has_missing_ingredients && (
+                <span
+                  title={`${row.original.missing_ingredients_count} مكوّن محذوف من الكتالوج`}
+                  className="px-2 py-[2px] rounded-full bg-red-500/20 border border-red-500 text-red-400 text-xs whitespace-nowrap"
+                >
+                  ناقصة ({row.original.missing_ingredients_count})
+                </span>
+              )}
             </div>
           );
         },
