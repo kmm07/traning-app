@@ -39,10 +39,18 @@ function UsersInfo({
   activeUser,
   showUserInfo = true,
   location = "users",
+  onShowDetails,
 }: {
   showUserInfo?: boolean;
   activeUser: any;
   location?: string;
+  /**
+   * عرضُ بيانات المستخدم **في مكانه** (تبويبٌ في الدرج نفسه).
+   *
+   * وحين لا يُمرَّر يبقى السلوك القديم — مصافحةُ `localStorage` والانتقال
+   * إلى `/users` — كي لا ينكسر مستدعٍ خارج الدرج المبوَّب.
+   */
+  onShowDetails?: () => void;
 }) {
   const navigate = useNavigate();
 
@@ -50,6 +58,11 @@ function UsersInfo({
     navigate(`/users/${activeUser?.id}/subscriptions`);
 
   const onShowUserDetails = async () => {
+    if (onShowDetails) {
+      onShowDetails();
+      return;
+    }
+
     await localStorage.setItem("user_id_From_messages", activeUser?.id);
     navigate(`/users`);
   };

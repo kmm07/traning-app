@@ -23,7 +23,19 @@ const initialValues = {
   has_change_into_calories: 0,
 };
 
-function UsersSideBar({ activeUser }: { activeUser: any }) {
+function UsersSideBar({
+  activeUser,
+  onOpenChat: onOpenChatInPlace,
+}: {
+  activeUser: any;
+  /**
+   * فتحُ المحادثة **في مكانها** (تبويبٌ في الدرج نفسه) — يمرّره
+   * [`UserDrawerTabs`](src/shared/UserDrawerTabs.tsx).
+   *
+   * وبلاه يبقى السلوك القديم: انتقالٌ إلى `/dashboard`.
+   */
+  onOpenChat?: () => void;
+}) {
   const navigate = useNavigate();
 
   // تخصيص الخطة: صفحة كاملة لتحرير تغذية وتدريب هذا المستخدم
@@ -32,8 +44,13 @@ function UsersSideBar({ activeUser }: { activeUser: any }) {
     navigate(`/users/${activeUser?.id}/plan`);
   };
 
-  // فتح محادثة المستخدم في صفحة الرسائل (مصافحة localStorage)
   const onOpenChat = () => {
+    if (onOpenChatInPlace) {
+      onOpenChatInPlace();
+      return;
+    }
+
+    // مسارُ التوافق — والمفتاح يقرؤه الآن `pages/Messages` فيفتح المحادثة.
     localStorage.setItem("open_chat_user_id", String(activeUser?.id));
     document.getElementById("my-drawer")?.click();
     navigate("/dashboard");

@@ -2,7 +2,7 @@ import { Card, SubState, Table, Text } from "components";
 import React, { useState, useMemo, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
-import UsersSideBar from "./components/UsersSideBar";
+import UserDrawerTabs from "shared/UserDrawerTabs";
 import { UseQueryResult } from "react-query";
 import { useGetQuery } from "hooks/useQueryHooks";
 import useAxios from "hooks/useAxios";
@@ -188,7 +188,7 @@ function Users() {
       />
 
       <Drawer>
-        <UsersSideBar activeUser={activeUser} />
+        <UserDrawerTabs activeUser={activeUser} initialTab="details" />
       </Drawer>
     </div>
   );

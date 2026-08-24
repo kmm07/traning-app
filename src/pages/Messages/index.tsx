@@ -1,15 +1,26 @@
 import { SubState, Table } from "components";
-import React, { useState } from "react";
-import MessagesSideBAr from "./components/SideBar";
+import React, { useCallback, useEffect, useState } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import { toast } from "react-toastify";
 import useAxios from "hooks/useAxios";
+import UserDrawerTabs from "shared/UserDrawerTabs";
 
 function Messages() {
   const [activeUser, setActiveUser] = useState<any>(null);
+
+  /**
+   * المحادثات التي فتحها المدرّب في هذه الجلسة.
+   *
+   * الخادم يختم رسائل المستخدم مقروءةً لحظة `GET /users/{id}?chat=1`، لكن
+   * **قائمةَ الشاشة لا تُعاد جلبتها** بعد الفتح، فتبقى الشارة القديمة معروضة
+   * حتى تحديثٍ يدويّ. وإبطالُ الاستعلام كان يعيد جلب **كل المستخدمين**
+   * (مسارٌ ثقيل: كل مستخدمٍ برسائله) في كل فتح محادثة — فالتصفير محلّيٌّ
+   * والقيمة الصادقة تصل من الخادم في الجلبة التالية.
+   */
+  const [opened, setOpened] = useState<Set<number>>(new Set());
 
   const url = "/users?chat=1";
 
@@ -27,12 +38,19 @@ function Messages() {
         Header: "الاسم",
         accessor: "name",
         Cell: ({ row }: { row: Row<any> }) => {
+          // صفرٌ لا يُعرض: شارةٌ بـ«0» ضجيجٌ يُقرأ إشعاراً من طرف العين.
+          const badge = opened.has(row.original.id)
+            ? 0
+            : Number(row.original.chat_badge ?? 0);
+
           return (
             <div className="flex items-center gap-4">
               <div className="avatar indicator">
-                <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
-                  {row.original.chat_badge}
-                </span>
+                {badge > 0 && (
+                  <span className="indicator-item badge-sm h-6 rounded-full badge badge-warning">
+                    {badge}
+                  </span>
+                )}
                 <div className="w-12 h-12 rounded-full">
                   <img
                     src={row.original.image || "/images/img_rectangle347.png"}
@@ -81,20 +99,46 @@ function Messages() {
         accessor: "provider",
       },
     ],
-    []
+    [opened]
   );
 
   const axios = useAxios({});
 
-  const rowOnClick = async (e: any) => {
-    try {
-      const { data } = await axios.get(`/users/${e.original.id as any}?chat=1`);
+  /** `?chat=1` هو ما يختم رسائل المستخدم مقروءةً على الخادم. */
+  const openConversation = useCallback(
+    async (userId: number) => {
+      try {
+        const { data } = await axios.get(`/users/${userId}?chat=1`);
 
-      setActiveUser(data.data);
-    } catch (error: any) {
-      toast.error(`${error.response.data.message}`);
+        setActiveUser(data.data);
+        setOpened((prev) => new Set(prev).add(Number(userId)));
+      } catch (error: any) {
+        toast.error(`${error.response.data.message}`);
+      }
+    },
+    [axios]
+  );
+
+  const rowOnClick = async (e: any) => openConversation(e.original.id);
+
+  /**
+   * قادمٌ من صفحة «تخصيص الخطة» بزرّ «محادثة المستخدم».
+   *
+   * كان المفتاح يُكتب هناك **ولا يقرؤه أحد** في المستودع كلّه، فيهبط المدرّب
+   * على القائمة ولا تُفتح محادثة. *(وأزرارُ الدرج نفسه لم تعد تمرّ من هنا —
+   * صارت تبديلَ تبويبٍ في مكانها.)*
+   */
+  useEffect(() => {
+    const pending = localStorage.getItem("open_chat_user_id");
+
+    if (pending) {
+      localStorage.removeItem("open_chat_user_id");
+
+      void openConversation(Number(pending)).then(() =>
+        document.getElementById("my-drawer")?.click()
+      );
     }
-  };
+  }, [openConversation]);
 
   if (isLoading) {
     return <div>loading...</div>;
@@ -109,7 +153,7 @@ function Messages() {
       />
 
       <Drawer>
-        <MessagesSideBAr userData={activeUser} />
+        <UserDrawerTabs activeUser={activeUser} initialTab="chat" />
       </Drawer>
     </div>
   );
