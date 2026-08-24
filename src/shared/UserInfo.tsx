@@ -126,13 +126,21 @@ function UsersInfo({
               className="p-4 gap-2 divide-x-2 divide-violet-500 flex"
             >
               <div className="px-2">
-                <Text size="xs">تاريخ اخر ظهور : </Text>
+                <Text size="xs">اخر ظهور : </Text>
+                {/*
+                  النصّ النسبيّ من الخادم (`LastSeen::human`) — والدرجُ
+                  والجدولُ فوقه يقرآن **الحقل نفسه**، فلا يعطيان رقمين
+                  لسؤالٍ واحد. والتاريخ المطلق في `title`.
+                */}
                 <Text size="sm">
-                  {activeUser?.last_attendance !== "No Attendance"
-                    ? moment(new Date(activeUser?.last_attendance)).format(
-                        "YYYY-MM-DD HH:mm"
-                      )
-                    : "لا يوجد حضور"}
+                  <span title={activeUser?.last_seen_at ?? ""}>
+                    {activeUser?.last_seen_human ??
+                      (activeUser?.last_attendance !== "No Attendance"
+                        ? moment(new Date(activeUser?.last_attendance)).format(
+                            "YYYY-MM-DD HH:mm"
+                          )
+                        : "لا يوجد حضور")}
+                  </span>
                 </Text>
               </div>
               <div className="px-2">

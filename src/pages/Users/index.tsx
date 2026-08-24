@@ -86,6 +86,18 @@ function Users() {
       {
         Header: "آخر ظهور",
         accessor: "last_viewed",
+        Cell: ({ row }: { row: Row<any> }) => {
+          // نصٌّ نسبيّ يبنيه الخادم (`LastSeen::human`) — لا يُشتقّ هنا كي لا
+          // يفترق جوابان لسؤالٍ واحد. والتاريخ المطلق في `title` لمن أراد
+          // الدقّة، و`last_login_at` تسجيلُ الدخول وهو **شيءٌ آخر**.
+          const seen = row.original.last_seen_human as string | undefined;
+
+          return (
+            <span title={row.original.last_seen_at ?? ""}>
+              {seen ?? row.original.last_viewed ?? "—"}
+            </span>
+          );
+        },
       },
       {
         Header: "مزود الدخول",
