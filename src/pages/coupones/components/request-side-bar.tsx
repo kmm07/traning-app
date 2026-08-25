@@ -106,12 +106,17 @@ export default function RequestsSidebar({ couponeData }: any) {
         </Card>
       </Card>
 
-      <Card className="p-6">
-        <Text as="h5">الكود</Text>
-        <Text as="h2" className="text-center">
-          {couponeData?.code}
-        </Text>
-      </Card>
+      {/*
+        ⛔ **نُزعت بطاقة «الكود»** — كانت تقرأ `couponeData?.code` من كائن
+        **كتالوج**، والعمود `coupons.code` محذوفٌ بهجرة ٢٠٢٣ و`CouponResource`
+        لا يُصدّره ⇒ **البطاقة تُعرض فارغةً منذ ذلك الحين** (وهي أصلُ BUG-18).
+        وبقرار خالد (٢٥ أغسطس) صارت كلُّ الكوبونات **مطالبةً يدوية لا كوداً**
+        ⇒ لم تعد فارغةً فحسب بل **مضلِّلة**: تُوحي بأن للكوبونات أكواداً في
+        نموذجٍ ألغاها.
+        ⚠️ **ولا يُستبدَل بها `user_coupon.code`** — الصفوف القديمة تحمله
+        (٤٣ صفّاً على الإنتاج) والجديدة `''` ⇒ عمودٌ نصفُه فارغ يسأل عنه
+        المدرّب، وهو أسوأ من غيابٍ صريح.
+      */}
 
       <Card className="p-6">
         <Card className="!w-fit p-2">
