@@ -6,10 +6,12 @@ import moment from "moment";
 import { useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 const initialValues = {};
 
 function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
+  const confirm = useConfirm();
   const { id } = useParams();
 
   const onClose = () => {
@@ -22,16 +24,25 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
   const { mutateAsync, isLoading } = useDeleteQuery();
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف اشتراك المستخدم؟",
+        message:
+          "المجانيّ يُحذف. والمدفوع **يبقى سجلّاً** ويسقط وصولُه فوراً — " +
+          "فيظهر في القائمة بعد الحذف، وهو مقصود (الدليل الماليّ لا يُمحى).",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/user-subscriptions/${subscriptionData?.id}`);
 
       await queryClient.invalidateQueries(`/user-subscriptions?user_id=${id}`);
 
       onClose();
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message ?? "تعذّر حذف الاشتراك — راجع الاتصال."
-      );
+    } catch {
+      // الرسالة من `useDeleteQuery.onError`.
     }
   };
 

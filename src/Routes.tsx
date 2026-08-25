@@ -29,13 +29,20 @@ import ContactsPage from "pages/contacts";
 import SystemNotices from "pages/system-notices";
 import InsightRecommendations from "pages/insight-recommendations";
 import Analytics from "pages/analytics";
+import RouteError from "components/ErrorBoundary/RouteError";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/">
+    /*
+      `errorElement` على الجذر يلتقط استثناءَ الرسم في أيّ صفحةٍ تحته — وكان
+      غيابُه يعني **شاشةً بيضاء بلا أثر**. ويُكرَّر على `Layout` كي يبقى
+      الشريطُ الجانبيّ قائماً حين تسقط صفحةٌ واحدة، فلا يفقد المدرّب تنقّله
+      كلَّه لأجل شاشةٍ واحدة.
+    */
+    <Route path="/" errorElement={<RouteError />}>
       <Route path="/" element={<SignInPage />} />
 
-      <Route path="/" element={<Layout />}>
+      <Route path="/" element={<Layout />} errorElement={<RouteError />}>
         <Route path="/dashboard" element={<Messages />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/admins" element={<Admin />} />
@@ -74,8 +81,8 @@ const router = createBrowserRouter(
       </Route>
 
       <Route path="*" element={<NotFound />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;

@@ -7,6 +7,7 @@ import { setCredentials } from "redux/slices/auth";
 import customAxios from "util/axios";
 import setFieldsError from "util/setFieldsError";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 export interface FormValue {
   email: string;
@@ -37,14 +38,14 @@ const SignInPage: React.FC = () => {
       push("/dashboard");
     } catch (error: any) {
       if (error.response.status === 400) {
-        console.log(error.response.data.message);
+        console.error(apiErrorMessage(error));
       } else if (error.response.status === 412) {
         void push("/unauthenticated");
       } else {
         console.log("Login Failed");
       }
       setIsLoading(false);
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
       setFieldsError(error, helpers);
     }
   };

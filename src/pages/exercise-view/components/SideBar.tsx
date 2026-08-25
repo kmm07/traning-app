@@ -4,6 +4,8 @@ import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import formData from "util/formData";
+import { apiErrorMessage } from "util/apiError";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 const initialValues = {
   name: "",
@@ -16,6 +18,7 @@ const initialValues = {
 };
 
 function SideBar({ exerciseData, categoryData }: any) {
+  const confirm = useConfirm();
   const isEditing = exerciseData?.exercise_category_id === undefined;
 
   const onClose = () => {
@@ -30,6 +33,15 @@ function SideBar({ exerciseData, categoryData }: any) {
   const { mutateAsync, isLoading } = useDeleteQuery();
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف التمرين؟",
+        message: `«${exerciseData?.name ?? ""}» يُحذف من الكتالوج.`,
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/exercises/${exerciseData.id}`);
 
@@ -38,8 +50,8 @@ function SideBar({ exerciseData, categoryData }: any) {
       );
 
       onClose();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 
@@ -80,7 +92,7 @@ function SideBar({ exerciseData, categoryData }: any) {
         `/exercises?exercise_category_id=${categoryData.id}`
       );
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -101,7 +113,7 @@ function SideBar({ exerciseData, categoryData }: any) {
     onClose();
     try {
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

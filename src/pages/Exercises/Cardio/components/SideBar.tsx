@@ -14,6 +14,8 @@ import { useRef } from "react";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import AddCardio from "./add-exercise";
+import { apiErrorMessage } from "util/apiError";
+import { useConfirm } from "components/ConfirmDialog/context";
 const initialValues = {
   image: "",
   name: "",
@@ -27,6 +29,8 @@ function SideBar({
   cardioData: any;
   setCardioData: any;
 }) {
+  const confirm = useConfirm();
+
   // cardio actions =====================>
   const queryClient = useQueryClient();
 
@@ -38,14 +42,24 @@ function SideBar({
   };
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف تمرين الكارديو؟",
+        message: "لن يظهر في اختيارات المستخدمين بعد الحذف.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/cardios/${cardioData?.id}`);
 
       await queryClient.invalidateQueries(`/cardios`);
 
       onClose();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `useDeleteQuery.onError` — نقطةُ القرار الواحدة.
+      // والالتقاط هنا يمنع إغلاقَ الدرج بعد فشل، لا أكثر.
     }
   };
 
@@ -90,7 +104,7 @@ function SideBar({
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   }
 

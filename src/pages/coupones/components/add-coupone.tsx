@@ -4,6 +4,7 @@ import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { apiErrorMessage } from "util/apiError";
 
 const initialValues = {
   details: [],
@@ -11,7 +12,6 @@ const initialValues = {
   points: "",
   description: "",
   image: "",
-  code: "",
 };
 
 export default function AddCoupone() {
@@ -38,7 +38,16 @@ export default function AddCoupone() {
       if (value[0] !== "details") {
         formData.append(value[0], value[1] as any);
       } else {
-        formData.append("details[]", value[1] as any);
+        /**
+         * ⛔ كان `formData.append("details[]", value[1])` — والقيمة **مصفوفة**
+         * فتُحوَّل إلى نصٍّ واحد `"أ,ب,ج"` ⇒ تصل الخادم **عنصراً واحداً**
+         * ملصوقاً، و`'details'=>'required|array'` تقبله فلا يظهر خطأ:
+         * عطبُ بياناتٍ صامت لا رفضٌ ظاهر.
+         * والصيغة الصحيحة موجودةٌ في المستودع نفسه (`shared/UserInfo.tsx`).
+         */
+        ((value[1] as any) ?? []).forEach((detail: any, index: number) =>
+          formData.append(`details[${index}]`, detail)
+        );
       }
     });
 
@@ -51,7 +60,7 @@ export default function AddCoupone() {
 
       helpers.resetForm();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -71,7 +80,12 @@ export default function AddCoupone() {
 
             <Input name="points" type={"number" as any} label="نقاط الكوبون" />
 
-            <Input name="code" label="كود الكوبون" />
+            {/*
+              ⛔ نُزع حقل «كود الكوبون» — كان يُملأ ويُرسَل و**يتجاهله الخادم**:
+              العمود `coupons.code` محذوفٌ منذ هجرة ٢٠٢٣ (وهو أصلُ BUG-18).
+              وبقرار خالد (٢٥ أغسطس) صارت كلُّ الكوبونات **مطالبةً يدوية لا
+              كوداً** ⇒ الحقل لا وجهةَ له ولا معنى.
+            */}
           </div>
 
           <TextArea
@@ -83,7 +97,10 @@ export default function AddCoupone() {
           <Text as="h5">إضافة تفاصيل الكوبون:</Text>
           <div>
             <TextArea
-              name="description"
+              /* ⛔ كان `name="description"` — **الاسمَ عينه** لحقل الوصف أعلاه.
+                 غيرُ ضارٍّ اليوم لأن `isForm={false}` يجعله محكوماً بـ`detail`،
+                 لكنه لغمٌ ينفجر لحظة ربطه بـformik. */
+              name="detail-draft"
               label="تفاصيل الكوبون"
               className="border-[1px]"
               isForm={false}

@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { useRef } from "react";
+import { apiErrorMessage } from "util/apiError";
 
 function Info({ activeUser }: { activeUser: any }) {
   return (
@@ -242,7 +243,7 @@ function NutritionModal({ activeUser }: any) {
 
       document.getElementById("special-notify")?.click();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

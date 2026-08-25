@@ -4,6 +4,7 @@ import { Row } from "react-table";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddSystemNotice from "./components/AddSystemNotice";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 // شارة الأكشن كما يراها المستخدم في شريط الهوم
 const actionLabels: Record<string, string> = {
@@ -13,6 +14,7 @@ const actionLabels: Record<string, string> = {
 };
 
 function SystemNotices() {
+  const confirm = useConfirm();
   // دفعات رسائل النظام مع إحصاء المشاهدة =================>
   const url = "/user-notices";
 
@@ -25,15 +27,26 @@ function SystemNotices() {
   const { mutateAsync: deleteBatch, isLoading: isDeleting } = useDeleteQuery();
 
   const onDelete = async (batch: string) => {
+    // ⛔ كان `window.confirm` — يحجب الخيط، وزرّاه لا يُعرَّبان، ويظهر باسم
+    // النطاق فيُقرأ رسالةَ متصفّحٍ لا رسالةَ لوحة. وُحِّد على حوار اللوحة.
     if (
-      !window.confirm("سحب هذه الرسالة؟ ستختفي فورًا من الهوم لكل المستلمين.")
+      !(await confirm({
+        title: "سحب هذه الرسالة؟",
+        message: "تختفي فوراً من الهوم لكل المستلمين.",
+        confirmLabel: "سحب",
+      }))
     ) {
       return;
     }
 
-    await deleteBatch(`/user-notices/${batch}`);
+    try {
+      await deleteBatch(`/user-notices/${batch}`);
 
-    await queryClient.invalidateQueries(url);
+      await queryClient.invalidateQueries(url);
+    } catch {
+      // ⛔ وكان **بلا `catch`** ⇒ فشلُ السحب وعدٌ مرفوضٌ بلا معالج.
+      // الرسالة الآن من `useDeleteQuery.onError`.
+    }
   };
 
   const columns = React.useMemo(

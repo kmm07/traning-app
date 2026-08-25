@@ -4,6 +4,7 @@ import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import formData from "util/formData";
+import { apiErrorMessage } from "util/apiError";
 
 const initialValues = {
   name: "",
@@ -79,7 +80,7 @@ export default function EditIngredient({
 
       // helpers.resetForm();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

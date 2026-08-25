@@ -1,10 +1,10 @@
 import { Button, CheckBox, Input, Select, UploadInput } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { Form } from "react-router-dom";
 import formData from "util/formData";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   categoryData: any;
@@ -89,7 +89,7 @@ export default function ExerciseCategoryForm({
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

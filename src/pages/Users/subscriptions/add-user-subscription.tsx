@@ -1,11 +1,12 @@
 import { Button, Select } from "components";
 import DateInput from "components/dateInput";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import moment from "moment";
 import { UseQueryResult, useQueryClient } from "react-query";
-import { Form, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   subscriptionData?: any;
@@ -88,7 +89,7 @@ export default function AddUserSubscription({
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

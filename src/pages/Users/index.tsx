@@ -7,6 +7,7 @@ import { UseQueryResult } from "react-query";
 import { useGetQuery } from "hooks/useQueryHooks";
 import useAxios from "hooks/useAxios";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 interface UserType {
   country: string;
@@ -116,7 +117,7 @@ function Users() {
       console.log("data >>>> ", data);
       setActiveUser(data.data);
     } catch (error: any) {
-      toast.error(`${error.response.data.message}`);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -158,7 +159,7 @@ function Users() {
 
           document.getElementById("my-drawer")?.click();
         } catch (error: any) {
-          toast.error(`${error.response.data.message}`);
+          toast.error(apiErrorMessage(error));
         }
       };
       getUserData();

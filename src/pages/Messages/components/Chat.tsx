@@ -7,6 +7,7 @@ import Pusher from "pusher-js";
 import { useQueryClient } from "react-query";
 import useAxios from "hooks/useAxios";
 import useTrainerPresence from "hooks/useTrainerPresence";
+import { apiErrorMessage } from "util/apiError";
 
 function Chat({ userData }: { userData: any }) {
   const url = `/send-message/${userData?.id}`;
@@ -81,7 +82,7 @@ function Chat({ userData }: { userData: any }) {
 
       resetForm();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -93,7 +94,7 @@ function Chat({ userData }: { userData: any }) {
     try {
       await axios.post(`/mark-chat-as-read/${userData?.id}`, {});
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

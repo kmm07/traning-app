@@ -9,8 +9,8 @@ import ExerciseCategoryForm from "./exerciseCategoryForm";
 import WeekForm from "./createWeek";
 import GenerateScheduleForm from "./generateSchedule";
 import TableActions from "components/Table/actions";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface Props {
   home: number;
@@ -18,6 +18,7 @@ interface Props {
 }
 
 function TrainingView({ home, gender }: Props) {
+  const confirm = useConfirm();
   const [level, setLevel] = useState<"junior" | "mid" | "senior">("junior");
 
   const [daysNum, setDaysNum] = useState<number>(3);
@@ -57,14 +58,25 @@ function TrainingView({ home, gender }: Props) {
   const queryClient = useQueryClient();
 
   const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف فئة التدريب؟",
+        message:
+          "⚠️ قد يكون عليها مستخدمون بخططٍ جارية — وحذفُها يترك خططَهم بلا " +
+          "فئة حتى يُعاد ربطُهم. لا تحذفها إلا وأنت متأكّد أنها غير مستعمَلة.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/training-categories/${id}`);
 
       await queryClient.invalidateQueries(
         `/training-categories?lvl=${level}&gender=male&days_num=${daysNum}&home=${home}`
       );
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 
@@ -90,12 +102,21 @@ function TrainingView({ home, gender }: Props) {
   const { mutateAsync: deleteWeek } = useDeleteQuery();
 
   const onDeleteWeek = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف أسبوع التدريب؟",
+        message: "تُحذف معه أيامُه وتماريُنها المرتَّبة.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await deleteWeek(`/training-weeks/${id}`);
 
       await refetch();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

@@ -4,10 +4,11 @@ import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Row } from "react-table";
-import { toast } from "react-toastify";
 import AddNewSubscription from "./components/addSubscription";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 export default function Subscriptions() {
+  const confirm = useConfirm();
   const [subscription, setSubscription] = useState<any>();
 
   // get exercises categories ======================>
@@ -23,12 +24,21 @@ export default function Subscriptions() {
   const queryClient = useQueryClient();
 
   const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف باقة الاشتراك؟",
+        message: "لا تعود معروضةً للشراء. واشتراكاتُ من اشترك بها لا تتأثّر.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/subscriptions/${id}`);
 
       await queryClient.invalidateQueries("/subscriptions");
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

@@ -12,6 +12,7 @@ import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import { toast } from "react-toastify";
 import { useState, useRef, useEffect } from "react";
+import { apiErrorMessage } from "util/apiError";
 
 const initialValues = {
   name: "",
@@ -156,7 +157,7 @@ export default function AddDescription({
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

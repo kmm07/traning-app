@@ -12,6 +12,7 @@ import { useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 const initialValues = {
   title: "",
@@ -106,7 +107,7 @@ function AddNotification({ active }: { active: number }) {
 
       document.getElementById("add-notification")?.click();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

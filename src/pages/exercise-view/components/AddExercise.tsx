@@ -4,6 +4,7 @@ import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
 import formData from "util/formData";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 const initialValues = {
   name: "",
   image: "",
@@ -70,7 +71,7 @@ function AddExercise({ exercise_category_id, exerciseData = null }: Props) {
         `/exercises?exercise_category_id=${exercise_category_id}`
       );
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

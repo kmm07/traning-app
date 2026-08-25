@@ -8,6 +8,8 @@ import { useState } from "react";
 import DeleteIngredientDecision, {
   InUsePayload,
 } from "./DeleteIngredientDecision";
+import { apiErrorMessage } from "util/apiError";
+import { useConfirm } from "components/ConfirmDialog/context";
 interface SideBarProps {
   ingredientData: any;
   categoryId: number;
@@ -28,10 +30,15 @@ const initialValues = {
 };
 
 function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
+  const confirm = useConfirm();
   // ingredients actions =====================>
   const queryClient = useQueryClient();
 
-  const { mutateAsync, isLoading } = useDeleteQuery();
+  // ⚠️ التوست العامّ مُطفأ هنا وحده: 422 `ingredient_in_use` يُعالَج بحوار
+  // قرارٍ أغنى، وتوستُ «فشل» فوقه يناقض شاشةً تعرض مخرجاً.
+  const { mutateAsync, isLoading } = useDeleteQuery({
+    suppressErrorToast: true,
+  });
 
   const onClose = () => {
     document.getElementById("my-drawer")?.click();
@@ -73,7 +80,19 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
     }
   };
 
-  const onDeleteItem = () => removeIngredient();
+  const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف المكوّن؟",
+        message:
+          "إن كانت تستعمله وصفاتٌ فسيعرض الخادم خياراتِ الاستبدال بدل الحذف.",
+      }))
+    ) {
+      return;
+    }
+
+    await removeIngredient();
+  };
 
 
   const isEditing = ingredientData !== null;
@@ -118,7 +137,7 @@ function SideBar({ ingredientData = [], categoryId }: SideBarProps) {
 
       helpers.resetForm();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

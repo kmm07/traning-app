@@ -14,11 +14,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Row } from "react-table";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
-import { Formik } from "formik";
-import { Form } from "react-router-dom";
+import { Form, Formik } from "formik";
 import AddStep from "./addStep";
 import AddIngredient from "./add-ingredients";
 import AssignMealCategories from "./assign-meal-categories";
+import { apiErrorMessage } from "util/apiError";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface SideBarProps {
   mealData: any;
@@ -42,6 +43,8 @@ function SideBar({
   categoryId,
   meal,
 }: SideBarProps) {
+  const confirm = useConfirm();
+
   const [refresher, setRefresher] = useState<any>(0);
 
   // list actions ======================>
@@ -50,6 +53,15 @@ function SideBar({
   const queryClient = useQueryClient();
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف هذه الوصفة؟",
+        message: `«${mealData?.name ?? ""}» تُحذف من الكتالوج بمكوّناتها.`,
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/diet-meals/${mealData.id}`);
       document.getElementById("my-drawer")?.click();
@@ -57,8 +69,8 @@ function SideBar({
       queryClient.invalidateQueries(
         `/diet-meals?diet_category_id=${categoryId}&meal=${meal}`
       );
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `useDeleteQuery.onError`.
     }
   };
 
@@ -287,7 +299,7 @@ function SideBar({
 
       document.getElementById("my-drawer")?.click();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -308,7 +320,7 @@ function SideBar({
     onClose();
     try {
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

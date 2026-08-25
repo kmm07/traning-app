@@ -7,6 +7,7 @@ import { UseQueryResult } from "react-query";
 import { toast } from "react-toastify";
 import useAxios from "hooks/useAxios";
 import UserDrawerTabs from "shared/UserDrawerTabs";
+import { apiErrorMessage } from "util/apiError";
 
 function Messages() {
   const [activeUser, setActiveUser] = useState<any>(null);
@@ -125,7 +126,7 @@ function Messages() {
         setActiveUser(data.data);
         setOpened((prev) => new Set(prev).add(Number(userId)));
       } catch (error: any) {
-        toast.error(`${error.response.data.message}`);
+        toast.error(apiErrorMessage(error));
       }
     },
     [axios]

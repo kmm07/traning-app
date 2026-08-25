@@ -4,10 +4,11 @@ import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import React, { useState } from "react";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { Row } from "react-table";
-import { toast } from "react-toastify";
 import AddAdmin from "./components/addAdmin";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 export default function Admin() {
+  const confirm = useConfirm();
   const [admins, setAdmins] = useState<any>();
 
   // get exercises categories ======================>
@@ -27,12 +28,21 @@ export default function Admin() {
   const queryClient = useQueryClient();
 
   const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف حساب المسؤول؟",
+        message: "يفقد الوصول إلى اللوحة فوراً.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/admins/${id}`);
 
       await queryClient.invalidateQueries("/admins");
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

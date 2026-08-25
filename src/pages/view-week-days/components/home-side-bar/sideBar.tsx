@@ -1,13 +1,14 @@
 import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
-import { Formik, useFormikContext } from "formik";
+import { Form, Formik, useFormikContext } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
-import { Form, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AddWeekDayExercise from "./add-day-exercise";
 import { useState } from "react";
 import AddWeekSpareDayExercise from "./add-spare-exercise";
 import EditExerciseSessions from "../gym-side-bar/edit-exercise-session";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface SideBarProps {
   weekDayData: any;
@@ -122,6 +123,7 @@ const initialValues = {
 };
 
 function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
+  const confirm = useConfirm();
   const { id } = useParams();
 
   const onClose = () => document.getElementById("my-drawer")?.click();
@@ -131,6 +133,15 @@ function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
   const { mutateAsync, isLoading } = useDeleteQuery();
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف يوم التدريب؟",
+        message: "تُحذف معه تماريُنه المرتَّبة.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/training-week-days/${weekDayData?.id}`);
 
@@ -138,8 +149,8 @@ function WeekDayHomeSideBar({ weekDayData, category }: SideBarProps) {
         `/training-week-days?training_week_id=${id}`
       );
       onClose();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

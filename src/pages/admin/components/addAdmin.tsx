@@ -1,9 +1,9 @@
 import { Button, Input } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
-import { Form } from "react-router-dom";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   adminsData?: any;
@@ -52,7 +52,7 @@ const AddAdmin = ({ adminsData = null, setAdminsData }: Props) => {
 
       queryClient.invalidateQueries("/admins");
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

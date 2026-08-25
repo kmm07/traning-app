@@ -1,9 +1,9 @@
 import { Button, Input, Select } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
-import { Form } from "react-router-dom";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   subscriptionData?: any;
@@ -59,7 +59,7 @@ const AddNewSubscription = ({
 
       queryClient.invalidateQueries("/subscriptions");
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 

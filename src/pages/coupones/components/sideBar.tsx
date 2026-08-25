@@ -1,12 +1,13 @@
 // import React from "react";
 import { Button, Card, Input, Text, TextArea, UploadInput } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
 import { useAppSelector } from "hooks/useRedux";
 import { useQueryClient } from "react-query";
-import { Form } from "react-router-dom";
 import { selectIsImageDelete } from "redux/slices/imageDelete";
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface Props {
   couponeData: any;
@@ -18,10 +19,10 @@ const initialValues = {
   points: "",
   description: "",
   image: "",
-  code: "",
 };
 
 export default function CouponeSideBar({ couponeData }: Props) {
+  const confirm = useConfirm();
   const url = `/coupons/${couponeData?.id}`;
 
   const isImageDelete = useAppSelector(selectIsImageDelete);
@@ -48,7 +49,16 @@ export default function CouponeSideBar({ couponeData }: Props) {
       if (value[0] !== "details") {
         formData.append(value[0], value[1] as any);
       } else {
-        formData.append("details[]", value[1] as any);
+        /**
+         * ⛔ كان `formData.append("details[]", value[1])` — والقيمة **مصفوفة**
+         * فتُحوَّل إلى نصٍّ واحد `"أ,ب,ج"` ⇒ تصل الخادم **عنصراً واحداً**
+         * ملصوقاً، و`'details'=>'required|array'` تقبله فلا يظهر خطأ:
+         * عطبُ بياناتٍ صامت لا رفضٌ ظاهر.
+         * والصيغة الصحيحة موجودةٌ في المستودع نفسه (`shared/UserInfo.tsx`).
+         */
+        ((value[1] as any) ?? []).forEach((detail: any, index: number) =>
+          formData.append(`details[${index}]`, detail)
+        );
       }
     });
 
@@ -65,7 +75,7 @@ export default function CouponeSideBar({ couponeData }: Props) {
 
       helpers.resetForm();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
@@ -74,14 +84,23 @@ export default function CouponeSideBar({ couponeData }: Props) {
     useDeleteQuery();
 
   const onDeleteItem = async () => {
+    if (
+      !(await confirm({
+        title: "حذف الكوبون؟",
+        message: "لا يعود قابلاً للمطالبة، ومن طالب به سابقاً لا يتأثّر.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await deleteCoupone(`/coupons/${couponeData.id}`);
 
       await queryClient.invalidateQueries("/coupons");
 
       onClose();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 
@@ -130,14 +149,9 @@ export default function CouponeSideBar({ couponeData }: Props) {
             <Text as="h5">تفاصيل الكوبون</Text>
             <ul>
               {values.details?.map((_detail: any, index: number) => (
-                <Input name={`details[${index}]`} />
+                <Input key={index} name={`details[${index}]`} />
               ))}
             </ul>
-          </Card>
-
-          <Card className="p-6">
-            <Text as="h5">الكود</Text>
-            <Input name="code" className="text-[35px] text-center" />
           </Card>
 
           <div className="flex items-center justify-evenly mt-6">

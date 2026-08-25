@@ -5,15 +5,16 @@ import { Row } from "react-table";
 import SideBar from "./components/SideBar";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
-import { toast } from "react-toastify";
 import ExerciseCategoryForm from "./components/exerciseCategoryForm";
 import AddExercise from "./components/AddExercise";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface Props {
   home: number;
 }
 
 function ExercisesView({ home }: Props) {
+  const confirm = useConfirm();
   const [categoryData, setCategoryData] = useState<any>(null);
 
   // get exercises categories ======================>
@@ -34,12 +35,21 @@ function ExercisesView({ home }: Props) {
   const queryClient = useQueryClient();
 
   const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف فئة التمارين؟",
+        message: "تماريُنها تتبعها.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`/exercise-categories/${id}`);
 
       await queryClient.invalidateQueries("/exercise-categories");
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

@@ -6,6 +6,7 @@ import SideBar from "./components/SideBar";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
 import AddDietCategories from "./components/AddDietCategories";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 interface DescriptionType {
   calories: number;
@@ -23,6 +24,7 @@ interface DescriptionType {
 }
 
 function Descriptions() {
+  const confirm = useConfirm();
   const [categoryId, setCategoryId] = useState();
 
   const [meal, setMeal] = useState("Lunch");
@@ -72,8 +74,24 @@ function Descriptions() {
     setMealData(item.original);
   };
 
-  const onDelete = (id: number) => {
-    mutateAsync(`diet-categories/${id}`);
+  const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف فئة الحمية؟",
+        message: "وصفاتُها تتبعها ولا تعود تظهر للمستخدمين.",
+      }))
+    ) {
+      return;
+    }
+
+    // ⛔ كان `mutateAsync(...)` **بلا `await` وبلا `catch`** ⇒ فشلُ الحذف
+    // يصير **وعداً مرفوضاً بلا معالج** (`unhandled rejection`) — لا رسالةَ
+    // ولا أثر. والمعالجة الآن في `useDeleteQuery.onError`.
+    try {
+      await mutateAsync(`diet-categories/${id}`);
+    } catch {
+      // الرسالة من `onError`.
+    }
   };
   const onEdit = (value: any) => {
     setValuesItem(value);

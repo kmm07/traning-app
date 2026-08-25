@@ -6,10 +6,11 @@ import SideBar from "./components/SideBar";
 import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
-import { toast } from "react-toastify";
 import EditIngredient from "./components/editIngredient";
+import { useConfirm } from "components/ConfirmDialog/context";
 
 function Ingredients() {
+  const confirm = useConfirm();
   const [categoryId, setCategoryId] = useState(1);
 
   const [ingredientData, setIngredientData] = useState<any>(null);
@@ -31,12 +32,21 @@ function Ingredients() {
   const queryClient = useQueryClient();
 
   const onDelete = async (id: number) => {
+    if (
+      !(await confirm({
+        title: "حذف فئة المكوّنات؟",
+        message: "مكوّناتُها تتبعها ولا تعود تظهر في البحث ولا في الوصفات.",
+      }))
+    ) {
+      return;
+    }
+
     try {
       await mutateAsync(`meal-ingredient-categories/${id}`);
 
       await queryClient.invalidateQueries("/meal-ingredient-categories");
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch {
+      // الرسالة من `onError`.
     }
   };
 

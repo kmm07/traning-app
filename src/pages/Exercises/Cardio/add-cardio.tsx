@@ -1,11 +1,11 @@
 import { Button, Img, Input, Text, UploadInput } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
 import { useQueryClient } from "react-query";
-import { Form } from "react-router-dom";
 
 import { toast } from "react-toastify";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   cardioData: any;
@@ -56,7 +56,7 @@ export default function CardioForm({ cardioData, setCardioData }: Props) {
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   }
 

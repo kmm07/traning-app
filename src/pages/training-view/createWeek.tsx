@@ -1,11 +1,11 @@
 import { Button, Input, Select, Text, TextArea, UploadInput } from "components";
-import { Formik, FormikHelpers } from "formik";
+import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
-import { Form } from "react-router-dom";
 import formData from "util/formData";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
 import { useMemo } from "react";
+import { apiErrorMessage } from "util/apiError";
 
 interface Props {
   weekData?: any;
@@ -83,7 +83,7 @@ export default function WeekForm({
         `/training-weeks?category_id=${exerciesCategory}`
       );
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(apiErrorMessage(error));
     }
   };
 
