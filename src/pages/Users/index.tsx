@@ -1,4 +1,4 @@
-import { Card, SubState, Table, Text } from "components";
+import { Card, Input, SubState, Table, Text } from "components";
 import React, { useState, useMemo, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -29,11 +29,46 @@ function Users() {
 
   const [activeState, setActiveState] = useState<string>("all");
 
-  // get users list ======================>
-  const url = "/users";
+  // ═══════════════════════════════════════════════════════════════════
+  // [٢٥ أغسطس ٢٠٢٦ · خطة ٤-٣] الترقيمُ والبحثُ والترشيحُ صارت **خادمية**.
+  //
+  // كانت الشاشة تجلب **كلَّ** مستخدمٍ (٩٠٧ KB خاماً · ٢٢٠٣ صفّاً) وترشّح
+  // وتبحث محلياً. والقياس على الخادم: ذروةُ **62.5 MB** من `memory_limit`
+  // البالغ 128M ⇒ **خطأٌ قاتل عند ≈٩٠٠٠ مستخدم**.
+  //
+  // ⚠️ **والترشيحُ المحلّيّ كان يصير كذباً لحظة الترقيم** — يرشّح المدرّب
+  // صفحةً ويظنّه ترشيحَ الكلّ. ولذلك انتقل الثلاثة **دفعةً واحدة**: الترقيمُ
+  // والبحثُ والترشيح. (وهو عينُ ما وقع في شاشة المكوّنات: بحثٌ محلّيّ يغطّي
+  // ٢٥ من ١٧٬٤٢٨.)
+  //
+  // 📌 **والبطاقاتُ تبقى على المجموع** — يرسلها الخادم محسوبةً على كل
+  // المستخدمين لا على الصفحة، فالنقرُ عليها ترشيحٌ لا إعادةُ عدّ.
+  // ═══════════════════════════════════════════════════════════════════
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
 
-  const { data: users = [] }: UseQueryResult<any> = useGetQuery(url, url, {
-    select: ({ data }: { data: { data: [] } }) => data.data,
+  // debounce — وإلا نداءٌ لكل حرف. (نفس ٣٥٠ ms في شاشة المكوّنات.)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setQuery(search.trim());
+      setCurrentPage(1);
+    }, 350);
+
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // تبديلُ الشريحة يعيد إلى الصفحة الأولى — وإلا بقي المدرّب على صفحةٍ
+  // رقمُها أكبر من صفحات الشريحة الجديدة فرأى جدولاً فارغاً.
+  useEffect(() => setCurrentPage(1), [activeState]);
+
+  const url = `/users?per_page=25&page=${currentPage}${
+    activeState !== "all" ? `&state=${activeState}` : ""
+  }${query ? `&search_query=${encodeURIComponent(query)}` : ""}`;
+
+  const { data: users }: UseQueryResult<any> = useGetQuery(url, url, {
+    select: ({ data }: { data: { data: any } }) => data.data,
+    keepPreviousData: true,
   });
 
   const columns = React.useMemo(
@@ -139,12 +174,26 @@ function Users() {
   // filter by category =====================>
   const onChangeCategory = (category: string) => setActiveState(category);
 
-  const filteredUsers = useMemo(() => {
-    return users?.users?.filter(
-      (user: any) =>
-        user?.subscription_status === activeState || activeState === "all"
-    );
-  }, [activeState, users]);
+  const pagination = users?.pagination;
+
+  // ⚖️ **الترشيحُ المحلّيّ لم يُنزع بل صار احتياطياً — وهو تأمينُ ترتيبِ نشر.**
+  //
+  // وصولُ `pagination` هو **دليلُ أن الخادم يفهم `state=`**: عقدُ الترقيم
+  // والترشيح نُشرا معاً. فإن غاب المفتاح فالخادمُ قديم ⇒ يعود الترشيح محلياً
+  // ويعرض `Table` كلَّ الصفوف بترقيمه الداخليّ — **أي أن اللوحة تعمل على
+  // الخادمين**، فلا يصير ترتيبُ النشر شرطَ سلامة.
+  //
+  // ⛔ وهو **ليس ترشيحاً مزدوجاً**: متى وصل `pagination` كان الخادم قد رشّح،
+  // فتُقرأ الصفوف كما هي. وإعادةُ ترشيحها هنا كانت ستُخفي صفوفاً صحيحة.
+  const rows = useMemo(() => {
+    const list = users?.users ?? [];
+
+    if (pagination != null || activeState === "all") {
+      return list;
+    }
+
+    return list.filter((u: any) => u?.subscription_status === activeState);
+  }, [users, pagination, activeState]);
 
   // open sidebar if is coming from messages ===============>
   useEffect(() => {
@@ -193,11 +242,29 @@ function Users() {
         })}
       </div>
 
+      {/* ⚖️ **شرطُ العرض هو عينُ شرط `Table` مقلوباً** — يعرض بحثَه المحلّيّ
+          متى كان `pagination == null`. فيبقى **حقلٌ واحدٌ عاملٌ دائماً**:
+          الخادميُّ متى فهم الخادمُ `search_query`، والمحلّيُّ إن كان قديماً.
+          ولولا الشرط لظهر حقلان أحدهما لا يفعل شيئاً في النافذة الانتقالية. */}
+      {pagination != null && (
+      <Input
+        name=""
+        isForm={false}
+        inputSize="large"
+        placeholder="ابحث بالاسم أو البريد أو الهاتف..."
+        value={search}
+        className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl border-slate-800"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      )}
+
       <Table
-        data={(filteredUsers as any) ?? []}
+        data={rows as any}
         columns={columns}
         rowOnClick={rowOnClick}
         title="جميع المستخدمين"
+        pagination={pagination}
+        setPage={setCurrentPage}
       />
 
       <Drawer>
