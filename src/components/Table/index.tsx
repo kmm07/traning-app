@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTable, useFilters, useGlobalFilter, Column } from "react-table";
 import NoDataFounded from "../NoData";
 import PaginationType from "./paginationType";
@@ -54,34 +54,71 @@ const Table = <ColumnsType,>({
 }: TableProps<ColumnsType>) => {
   const itemsPerPage = 25;
   const [itemOffset, setItemOffset] = useState(0);
+
+  /**
+   * [٢٥ أغسطس ٢٠٢٦ · خطة إصلاح لوحة المدرّب · ٤-١]
+   *
+   * حقلان لا واحد: `searchInput` ما يكتبه المدرّب، و`searchValue` ما يُرشَّح
+   * به بعد سكونٍ ٣٠٠ms. ⛔ **وكان واحداً** ⇒ كلُّ ضغطةِ حرفٍ تُعيد مسحَ
+   * **كلِّ صفٍّ في كلِّ عمود** (`Object.keys(row).some`) ثم تُعيد رسمَ
+   * الجدول كلِّه.
+   */
+  const [searchInput, setSearchInput] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  const filterGlobal = () => {
-    return data.filter((row: any) => {
-      return Object.keys(row).some((key) => {
-        return String(row[key])
-          .toLowerCase()
-          .includes(String(searchValue).toLowerCase());
-      });
-    });
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchValue(searchInput.trim());
+      // ⛔ **والإزاحة تُصفَّر مع البحث** — وكانت تبقى: من بحث وهو في الصفحة
+      // الخامسة كان يُقطَّع له من الموضع ١٠٠ في نتيجةٍ فيها ثلاثة صفوف
+      // ⇒ **جدولٌ فارغ على بحثٍ ناجح**.
+      setItemOffset(0);
+    }, 300);
 
-  const endOffset = itemOffset + itemsPerPage;
-  const [currentItems, setCurrentItems] = useState(
-    data?.slice(itemOffset, endOffset)
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  /** الترشيح على الحمولة كلِّها — ويُعاد حسابُه عند تبدّلها أو تبدّل البحث فقط. */
+  const filteredData = useMemo(() => {
+    if (!searchValue) return data;
+
+    const needle = searchValue.toLowerCase();
+
+    return data.filter((row: any) =>
+      Object.keys(row).some((key) =>
+        String(row[key]).toLowerCase().includes(needle)
+      )
+    );
+  }, [data, searchValue]);
+
+  /**
+   * ⛔ **ولا تُقطَّع الحمولة في الوضع الخادميّ** — `data` هناك **صفحةٌ
+   * جاهزة**، وتقطيعُها بـ`itemsPerPage` المكوَّد كان يُسقط الصفوف بصمت لو
+   * صار `per_page` أكبر من ٢٥. لغمٌ نائم: القيمتان متساويتان اليوم بالصدفة.
+   */
+  const currentItems = useMemo(
+    () =>
+      pagination != null
+        ? filteredData
+        : filteredData.slice(itemOffset, itemOffset + itemsPerPage),
+    [filteredData, itemOffset, pagination]
   );
 
-  useEffect(() => {
-    setCurrentItems(filterGlobal().slice(itemOffset, endOffset));
-  }, [data, itemOffset, endOffset, searchValue]);
-
-  const pageCount = pagination?.total_pages ?? Math.ceil(data.length / itemsPerPage);
+  /**
+   * ⛔ **وكان يُحسب على `data.length` لا على المُرشَّح** ⇒ يبحث المدرّب فتبقى
+   * أمامه أرقامُ صفحاتِ القائمة الكاملة، فيضغط «٣» على نتيجةٍ من صفحةٍ واحدة
+   * ويرى فراغاً.
+   */
+  const pageCount =
+    pagination?.total_pages ?? Math.ceil(filteredData.length / itemsPerPage);
 
   const handlePageClick = (event: any) => {
-    if(pagination == null){
-      const newOffset = (event.selected * itemsPerPage) % data.length;
-      setItemOffset(newOffset);
-      setCurrentItems(filterGlobal().slice(newOffset, newOffset + itemsPerPage));
+    if (pagination == null) {
+      // القسمة على `filteredData.length` لا `data.length` — وبحراسةٍ من
+      // القسمة على صفر حين لا تُطابق النتيجةُ شيئاً.
+      const total = filteredData.length || 1;
+
+      setItemOffset((event.selected * itemsPerPage) % total);
     } else {
       setPage!(event.selected + 1);
     }
@@ -102,14 +139,26 @@ const Table = <ColumnsType,>({
       <div className=" flex gap-7 w-full justify-between items-center">
         <div className="flex-1 flex items-center gap-7">
           <Text size="2xl">{title}</Text>
-          {search && (
+          {/*
+            ⛔ **ولا يُعرض بحثٌ محلّيٌّ فوق ترقيمٍ خادميّ.** `data` هناك
+            **صفحةٌ واحدة (٢٥ صفّاً)**، والحقل يرشّحها وحدها بينما يقرؤه
+            المدرّب بحثاً في القائمة كلِّها ⇒ **يبحث في ٢٥ من ١٧٬٩٢٣ ويظنّ
+            أنه بحث في الكلّ، فيستنتج أن المكوّن غير موجود ويُنشئ مكرَّراً**.
+            وليست فرضيّة: هي بعينها العلّة التي عولجت في `add-ingredients`
+            (٩ أغسطس) بباحثٍ خادميّ، وهذا الشرط يمنع عودتها بالبناء.
+            ⚖️ والشاشةُ الخادميّة تضع حقلَها **فوق** الجدول لا داخله — كي
+            يبقى ظاهراً حين تردّ النتيجة صفراً، وإلا حُبس المدرّب في بحثٍ
+            لا يستطيع مسحه.
+          */}
+          {search && pagination == null && (
             <div className="w-1/2">
               <Input
                 name=""
                 isForm={false}
                 inputSize="large"
+                value={searchInput}
                 className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={(e) => setSearchInput(e.target.value)}
               />
             </div>
           )}
@@ -153,7 +202,7 @@ const Table = <ColumnsType,>({
             <tr
               className="w-full border-0 border-y-2 border-y-[#26243F]"
               {...headerGroup.getHeaderGroupProps()}
-              key={headerGroup?.id ?? Math.random().toString()}
+              key={headerGroup.getHeaderGroupProps().key}
             >
               {headerGroup.headers.map((column) => (
                 <th
@@ -163,7 +212,7 @@ const Table = <ColumnsType,>({
                     (column?.className as string) ?? ""
                   }`}
                   {...column.getHeaderProps()}
-                  key={column.id ?? Math.random().toString()}
+                  key={column.id}
                 >
                   {column.render("Header")}
                 </th>
@@ -178,7 +227,7 @@ const Table = <ColumnsType,>({
               <tr
                 className="border-y-2 border-b-[#26243F] duration-200  hover:bg-[#26243FA6]"
                 {...row.getRowProps()}
-                key={row.id ?? Math.random().toString()}
+                key={row.id}
                 onClick={
                   rowOnClick
                     ? () => {
@@ -195,7 +244,17 @@ const Table = <ColumnsType,>({
                     <td
                       className="py-5 text-white font-bold cursor-pointer "
                       {...cell.getCellProps()}
-                      key={Math.random().toString()}
+                      /*
+                        ⛔ كان `key={Math.random().toString()}` — **بلا سقوطٍ
+                        ولا شرط**. ومفتاحٌ جديدٌ في كل رسمٍ يمنع React من
+                        مطابقة الخلية بسابقتها ⇒ **تُهدَم كلُّ `<td>` وتُبنى
+                        من جديد** في كل رسمة (٢٥ صفّاً × أعمدتها)، ومعها يضيع
+                        تركيزُ أيّ حقلٍ داخلها وحالةُ أيّ مكوّنٍ فيها.
+                        و`cell.column.id` فريدٌ داخل الصفّ ومستقرٌّ عبر الرسمات.
+                        📌 والثلاثةُ الأخرى كانت `?? Math.random()` — سقوطاً لا
+                        يقع أصلاً (react-table يضمن `id`)، فالضررُ كان هنا وحده.
+                      */
+                      key={cell.column.id}
                     >
                       {cell.render("Cell")}
                     </td>
@@ -219,7 +278,18 @@ const Table = <ColumnsType,>({
           pageCount={pageCount}
           previousLabel="< سابق"
           renderOnZeroPageCount={null}
-          forcePage={pagination != null ? pagination.current_page - 1 : undefined}
+          /*
+            ⛔ **والصفحة المُبرَزة تتبع الإزاحة في الوضع المحلّيّ أيضاً.**
+            كانت `forcePage` للوضع الخادميّ وحده، و`ReactPaginate` يحتفظ
+            باختياره داخلياً ⇒ بعد أن صار البحث **يصفّر الإزاحة**، كان
+            المدرّب يرى بيانات الصفحة الأولى و**الرقم ٥ مُبرَزاً** —
+            تناقضٌ يصنعه الإصلاح نفسه لو تُرك.
+          */
+          forcePage={
+            pagination != null
+              ? pagination.current_page - 1
+              : Math.floor(itemOffset / itemsPerPage)
+          }
         />
       </div>
     </div>

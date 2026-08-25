@@ -1,4 +1,13 @@
-import { Button, Card, Img, Modal, SettingCard, Table, Text } from "components";
+import {
+  Button,
+  Card,
+  Img,
+  Input,
+  Modal,
+  SettingCard,
+  Table,
+  Text,
+} from "components";
 import React, { useState, useEffect } from "react";
 import { Drawer } from "components/Drawer";
 import { Row } from "react-table";
@@ -56,7 +65,48 @@ function Ingredients() {
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}`;
+
+  /**
+   * [٢٥ أغسطس ٢٠٢٦ · خطة إصلاح لوحة المدرّب · ٤-٢]
+   *
+   * ⛔ **البحث خادميٌّ لا محلّيّ.** كان `Table` يعرض حقلَ بحثٍ يرشّح **الصفحة
+   * المحمَّلة وحدها (٢٥ صفّاً)** والكتالوج **١٧٬٩٢٣ مكوّناً** ⇒ يبحث المدرّب
+   * عن «طحينة» فلا يجدها **فيُنشئ مكرَّراً** — والمكوّن موجودٌ في صفحةٍ أخرى.
+   * ⚖️ **وليس بناءً جديداً**: الخادم يدعم `search_query` أصلاً
+   * ([`MealIngredientController::index`]) وهي عينُ الرقعة المنشورة في
+   * `add-ingredients` منذ ٩ أغسطس — يُنقَل نمطُها لا يُخترع ثانٍ.
+   *
+   * 📌 **والحقل فوق الجدول لا داخله** — كي يبقى ظاهراً حين تردّ النتيجةُ
+   * صفراً؛ ولو كان داخل `Table` لاختفى مع الجدول (`data.length === 0`)
+   * فحُبس المدرّب في بحثٍ لا يستطيع مسحه.
+   *
+   * ⚠️ **والبحث داخل الفئة المختارة** لا في الكتالوج كلِّه — لأن الخادم
+   * يطبّق قيد الفئة قبل `LIKE` (مقيسٌ على الكود)، وهي دلالةُ هذه الشاشة.
+   */
+  const [search, setSearch] = useState("");
+
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(search.trim());
+      setCurrentPage(1);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // ⛔ وتبديلُ الفئة يُصفّر البحث والصفحة معاً — وإلا بقي بحثٌ من فئةٍ سابقة
+  //    مطبَّقاً على فئةٍ جديدة فتبدو فارغة.
+  useEffect(() => {
+    setSearch("");
+    setQuery("");
+    setCurrentPage(1);
+  }, [categoryId]);
+
+  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}${
+    query ? `&search_query=${encodeURIComponent(query)}` : ""
+  }`;
 
   const {
     data: ingredientsData,
@@ -212,6 +262,18 @@ function Ingredients() {
         </Card>
       </div>
       <div className="!mt-10">
+        <div className="mb-4">
+          <Input
+            name=""
+            isForm={false}
+            inputSize="large"
+            placeholder="ابحث في مكوّنات هذه الفئة..."
+            value={search}
+            className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl border-slate-800"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
         {!isListLoading ? (
           <Table
             data={ingredientsList ?? []}
