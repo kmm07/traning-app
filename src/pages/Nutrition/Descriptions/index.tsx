@@ -62,7 +62,7 @@ function Descriptions() {
         diet_mea_categories: item.diet_mea_categories,
       })),
     refetchOnWindowFocus: false,
-    enabeld: categoryId !== undefined,
+    enabled: categoryId !== undefined,
   });
 
   // categories actions ======================>

@@ -23,9 +23,23 @@ function TrainingInfo() {
     daysNum: { label: "", value: "" },
   });
 
-  const isNoValidToGetData = Object.values(trainingData).some((value) =>
-    ["", undefined, null].includes(value as string)
-  );
+  /**
+   * ⛔ كان: `Object.values(trainingData).some(v => ["",undefined,null].includes(v))`
+   * و`Object.values` تُنتج **كائنين** (`selectValue` و`daysNum`) لا نصّين
+   * ⇒ الشرط **كاذبٌ أبداً** ⇒ `enabled` صادقةٌ دائماً ⇒ ينطلق الطلب بـ
+   * `lvl=&gender=&days_num=&home=` فيردّ الخادم **422**. مقيسٌ في سجلّ
+   * الإنتاج: **٣٢ طلباً فاشلاً** — يقع عند كل فتحٍ لدرج مستخدم.
+   *
+   * ⚠️ والفحص على **الأوراق** لا على الكائنات — و`home` قيمتُه `0` مشروعةً
+   * (صالة) ⇒ أيُّ فحصٍ بـ`!value` أو `Boolean(value)` يكسر «الصالة» ويترك
+   * «المنزل» يعمل: عطلٌ أخبثُ من الأصل لأنه يعمل نصفَ الوقت.
+   */
+  const isNoValidToGetData = [
+    trainingData?.selectValue?.value?.lvl,
+    trainingData?.selectValue?.value?.gender,
+    trainingData?.selectValue?.value?.home,
+    trainingData?.daysNum?.value,
+  ].some((value) => value === "" || value === undefined || value === null);
 
   const url = `/training-categories?lvl=${trainingData?.selectValue?.value?.lvl}&gender=${trainingData?.selectValue?.value?.gender}&days_num=${trainingData?.daysNum?.value}&home=${trainingData?.selectValue?.value?.home}`;
 

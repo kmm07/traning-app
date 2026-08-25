@@ -29,7 +29,9 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
 
       onClose();
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error?.response?.data?.message ?? "تعذّر حذف الاشتراك — راجع الاتصال."
+      );
     }
   };
 
@@ -40,13 +42,44 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
       url,
     });
 
+  /**
+   * صفُّ التجربة (`FREE`) لا `subscription_id` له — و`UserSubscriptionResource`
+   * يُخرجه **`0`** (`?? 0`) بينما `update` يشترط `exists:subscriptions,id`
+   * ⇒ **422 مضمونة**. ومداه ليس حالةً طرفية: **2459 من 3162 صفّاً (٧٨٪)**
+   * على الإنتاج بلا `subscription_id`.
+   *
+   * ⛔ ولا يُعالَج بجعل الحقل اختيارياً في الخادم — `expire_date` على صفّ
+   * `FREE` **بلا أثرٍ على الوصول عمداً** (منصوصٌ في `app/Support/FreeGate.php`:
+   * التجربة تنتهي بالإنجاز أو بالسقف الزمنيّ، لا بذلك العمود) ⇒ «إصلاحُه»
+   * كان يبني زرّاً يكتب عموداً لا يقرؤه قرارُ وصولٍ واحد.
+   */
+  const isTrialRow = !Number(subscriptionData?.subscription_id);
+
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
+    if (isTrialRow) {
+      toast.info(
+        "صفُّ التجربة لا يُعدَّل — تنتهي التجربة بإتمام اليوم الأول أو بمضيّ سقفها الزمنيّ، لا بهذا التاريخ."
+      );
+      return;
+    }
+
     try {
+      /**
+       * ⛔ **الحمولة تُبنى ولا تُعاد.** كانت `{...values}` تردّ إلى الخادم كلَّ
+       * ما وصلها من `UserSubscriptionResource` — ومنه **`status`** وهو
+       * **قيمةُ عرضٍ** (`SUBSCRIPED`/`CANCELED`/`FREE`) لا حالةَ قاعدة، بينما
+       * `update` يشترط `Rule::in(GRANTS_ACCESS)` ⇒ **422 على كل صفّ**.
+       *
+       * ⚖️ والحارس الخادميّ **سليمٌ ومقصود** (BUG-73: يمنع إحياء اشتراكٍ
+       * منتهٍ بتصحيح تاريخ)، والعطل في شكل الحمولة وحده. و`status` **اختياريٌّ
+       * بالتصميم** («الغياب = لا تغيّر» — منصوصٌ في المتحكّم)، وهذه الشاشة
+       * **لا تعرض له عنصر تحكّم أصلاً** (`SubState` عرضٌ لا إدخال) ⇒ إسقاطُه
+       * هو التعبير الصحيح عن نيّة الشاشة لا التفافٌ على الحارس.
+       */
       await editSubscription({
-        ...values,
+        subscription_id: Number(values.subscription_id),
         start_date: moment(new Date(values.start_date)).format("YYYY-MM-DD"),
         expire_date: moment(new Date(values.expire_date)).format("YYYY-MM-DD"),
-        subscription_id: Number(values.subscription_id),
         _method: "PUT",
       } as any);
 
@@ -56,7 +89,9 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
 
       await queryClient.invalidateQueries(`/user-subscriptions?user_id=${id}`);
     } catch (error: any) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error?.response?.data?.message ?? "تعذّر حفظ الاشتراك — راجع الاتصال."
+      );
     }
   };
 
@@ -96,6 +131,23 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
               <Text as="h5">حالة الإشتراك</Text>
               <SubState state={subscriptionData.status} />
             </div>
+
+            {/*
+              ⚠️ يُقال للمدرّب صراحةً بدل أن يضغط «حفظ» فيصمت الزرّ. وصفُّ
+              التجربة ليس حالةً نادرة — **٧٨٪ من الصفوف**.
+            */}
+            {isTrialRow && (
+              <Text
+                as="p"
+                size="sm"
+                /* ⚠️ `Text` يخبز `whitespace-nowrap w-fit` في صنفه الأساس
+                   ⇒ نصٌّ من سطرين يفيض بلا `!whitespace-normal`. */
+                className="!whitespace-normal !w-full !text-yellow-400 leading-relaxed"
+              >
+                صفُّ تجربةٍ — تاريخاه سجلٌّ لا بوّابة، ولا يُعدَّلان من هنا.
+                تنتهي التجربة بإتمام اليوم الأول أو بمضيّ سقفها الزمنيّ.
+              </Text>
+            )}
           </Card>
 
           <div className="flex items-center justify-evenly mt-6">
@@ -104,6 +156,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
               primary
               onClick={submitForm}
               isLoading={isEditLoading}
+              disabled={isTrialRow}
             >
               حفظ
             </Button>
