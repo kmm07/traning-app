@@ -104,7 +104,30 @@ function Ingredients() {
     setCurrentPage(1);
   }, [categoryId]);
 
-  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}${
+  /**
+   * [٣١ أغسطس ٢٠٢٦ · فصلُ الأدوار بين كتالوجَي الأطعمة]
+   *
+   * 🔴 **عدسةُ الرؤية — شرطُ اكتمالِ البند لا زيادةٌ عليه.** صار الخادم يخفي
+   * **١٢٬٢٩٤ صفّاً** عن بحث المستخدم، وفيها **٨٬٥٧٩ منتجاً له باركودٌ وصورةٌ
+   * واسمٌ عربيٌّ نظيف وتنقصه القيمُ الغذائية وحدها** — والخطةُ المعلَنة أن
+   * تُملأ تدريجياً.
+   *
+   * ⛔ **وبلا هذه العدسة لا سبيل إليها إطلاقاً**: صفوفُ الكتالوج **كلُّها في
+   * الفئة `1`** (مقيسٌ على الإنتاج: ١٨٬٣٣١ من ١٨٬٣٣١) فلا تصفيةَ فئةٍ توصل
+   * إلى المخفيّ. **وملءُ ما لا يُرى ممتنع.**
+   *
+   * 📌 **وتبقى عبر تبديل الفئة** — لأنها وضعُ عملٍ («أملأ القيم») لا مرشِّحُ
+   * بحثٍ يتبع الفئة؛ والصفحةُ وحدها تُصفَّر.
+   */
+  const [visibility, setVisibility] = useState<"visible" | "hidden" | "all">(
+    "visible"
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [visibility]);
+
+  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}&visibility=${visibility}&include_food_db=1${
     query ? `&search_query=${encodeURIComponent(query)}` : ""
   }`;
 
@@ -125,14 +148,23 @@ function Ingredients() {
         size: item.size,
         measure: item.measure,
         image: item.image,
+        // خادمٌ قديم لا يرسله ⇒ يُقرأ «ظاهراً» فلا تظهر شارةٌ كاذبة
+        is_visible: item.is_visible !== false,
+        // مصدرُ الصفّ: كتالوجُ المدرّب (يُحرَّر) أو قاعدةُ الأطعمة (للعرض)
+        source: item.source ?? "catalog",
+        item_type_label: item.item_type_label ?? null,
+        brand: item.brand ?? null,
       })),
       pagination: data.pagination, // استخراج معلومات التصفح
+      // عدّادٌ يفصل المصدرين — يرسله الخادم كي لا تعدّ اللوحة الصفحة وحدها
+      counts: (data as any).counts ?? null,
     }),
     refetchOnWindowFocus: false,
   });
   
   const ingredientsList = ingredientsData?.items ?? [];
   const pagination = ingredientsData?.pagination ?? {};
+  const counts = ingredientsData?.counts ?? null;
 
   const columns = React.useMemo(
     () => [
@@ -150,6 +182,27 @@ function Ingredients() {
                 </div>
               </div>
               {row.original.name}
+              {/* ⛔ **الشارةُ في «الكل» وحدها** — في عدسةٍ مفردة يكون كلُّ
+                  صفٍّ من نوعها فتصير الشارةُ ضجيجاً يُقرأ من طرف العين.
+                  وغيابُها هناك لا يُلبس: العدسةُ نفسها تقول ما تعرض. */}
+              {row.original.source === "food_db" && (
+                <span
+                  className="text-xs px-2 py-[2px] rounded-full border border-sky-400 text-sky-400 whitespace-nowrap"
+                  title="من قاعدة الأطعمة — للعرض والإضافة إلى الوصفات، ولا يُحرَّر من هنا"
+                >
+                  قاعدة الأطعمة
+                </span>
+              )}
+              {row.original.source !== "food_db" &&
+                visibility === "all" &&
+                !row.original.is_visible && (
+                <span
+                  className="text-xs px-2 py-[2px] rounded-full border border-amber-400 text-amber-400 whitespace-nowrap"
+                  title="مخفيٌّ عن بحث المستخدم — تنقصه القيم الغذائية"
+                >
+                  مخفيّ
+                </span>
+              )}
             </div>
           );
         },
@@ -211,7 +264,9 @@ function Ingredients() {
         ),
       },
     ],
-    []
+    // ⚠️ `visibility` في التبعيات — الشارةُ تقرؤها، وبقاءُ `[]` يجمّد
+    //    الإغلاقةَ على أوّل قيمة فلا تظهر الشارةُ عند التبديل إلى «الكل».
+    [visibility]
   );
 
   const rowOnClick = (item: any) => {
@@ -262,6 +317,47 @@ function Ingredients() {
         </Card>
       </div>
       <div className="!mt-10">
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {(
+            [
+              ["visible", "المعروضة"],
+              ["hidden", "بانتظار القيم"],
+              ["all", "الكل"],
+            ] as const
+          ).map(([key, label]) => (
+            <Button
+              key={key}
+              size="small"
+              primary={visibility === key}
+              secondaryBorder={visibility !== key}
+              onClick={() => setVisibility(key)}
+            >
+              {label}
+            </Button>
+          ))}
+
+          {/* ⚖️ **العددُ مفصولٌ بالمصدر لا مجموعاً** — الشاشةُ صارت تعرض
+              كتالوجين، ورقمٌ واحد يجعل المدرّب يظنّ أن ٨٬١٨٦ منتجاً صفوفٌ
+              يملكها ويحرّرها، وهي للعرض والإضافة وحدهما. */}
+          {!isListLoading && counts && (
+            <Text className="text-sm opacity-70">
+              {Number(counts.catalog ?? 0).toLocaleString("en-US")} من كتالوجك
+              {(counts.food_db ?? 0) > 0 && (
+                <> · {Number(counts.food_db).toLocaleString("en-US")} من قاعدة الأطعمة</>
+              )}
+            </Text>
+          )}
+        </div>
+
+        {/* ⚖️ سطرٌ يشرح العدسةَ بدل أن يخمّن المدرّبُ لماذا نقص الجدول فجأة */}
+        {visibility !== "visible" && (
+          <div className="mb-4 text-sm text-amber-400/90">
+            {visibility === "hidden"
+              ? "هذه مكوّنات ومنتجات مخفيّة عن بحث المستخدم — تنقصها القيم الغذائية. املأ قيمها لتظهر."
+              : "العرضُ يشمل المخفيّ — والصفّ المخفيّ موسومٌ بشارة."}
+          </div>
+        )}
+
         <div className="mb-4">
           <Input
             name=""
@@ -279,6 +375,10 @@ function Ingredients() {
             data={ingredientsList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
+            /* ⛔ صفُّ قاعدة الأطعمة **لا يُحرَّر**: معرّفُه `food:123` لا رقمٌ،
+               و`update-meal-ingredient` يعمل على كتالوج المدرّب وحده ⇒ فتحُ
+               الدرج عليه كان يُنتج حفظاً يردّ 404 أو يكتب على صفٍّ آخر. */
+            rowClickable={(row: any) => row.original.source !== "food_db"}
             opnSideBar="إضافة مكون"
             opnSideBarOpen={() => setIngredientData(null)}
             setPage={setCurrentPage}

@@ -21,6 +21,16 @@ export interface TableProps<ColumnsType> {
   pagination?: PaginationType;
   noPagination?: boolean;
   rowOnClick?: (row: any) => void;
+  /**
+   * صفٌّ غيرُ قابلٍ للنقر — يردّ `false` فلا يُفتح الدرج ولا يُنادى
+   * `rowOnClick`. **إضافةٌ صرفة**: بلا تمريره يبقى كلُّ صفٍّ قابلاً للنقر
+   * كما كان، فلا يُمَسّ مستدعٍ قائم.
+   *
+   * ⚖️ **ولماذا في المكوّن لا في المستدعي:** الدرجُ يُفتح **قبل**
+   * `rowOnClick` (سطرُ `my-drawer` أدناه)، فمستدعٍ يمتنع في دالّته يجد
+   * الدرجَ مفتوحاً سلفاً على بياناتٍ قديمة.
+   */
+  rowClickable?: (row: any) => boolean;
   opnSideBarOpen?: () => void;
   title?: string;
   modalTitle?: string;
@@ -40,6 +50,7 @@ const Table = <ColumnsType,>({
   title,
   modalTitle,
   rowOnClick,
+  rowClickable,
   opnSideBarOpen,
   setPage,
   pagination,
@@ -231,6 +242,9 @@ const Table = <ColumnsType,>({
                 onClick={
                   rowOnClick
                     ? () => {
+                        // صفٌّ مُعلَنٌ غيرَ قابلٍ للنقر ⇒ لا درجَ ولا نداء
+                        if (rowClickable && !rowClickable(row)) return;
+
                         !withoutCloseDrawer &&
                           document.getElementById("my-drawer")?.click();
 
