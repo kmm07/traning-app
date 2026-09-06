@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SidePar from "./components/SIdeBar";
 import Header from "./components/Header";
+import OpsAlertBanner from "components/OpsAlertBanner";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "hooks/useRedux";
 import { selectCurrentToken, setCredentials } from "redux/slices/auth";
@@ -42,6 +43,12 @@ function Layout() {
 
   return (
     <div className="flex flex-col h-full relative">
+      {/*
+        شريطُ «حدث اختناق» — **فوق الرأس لا تحته** كي يدفع الصفحة لأسفل بدل أن
+        يطفو عليها: عائمٌ فوق المحتوى كان يحجب أوّل صفٍّ من كل جدول. ولا يرسم
+        شيئاً إطلاقاً ما لم يوجد تنبيهٌ غير مقروء.
+      */}
+      <OpsAlertBanner />
       <Header />
       <div className="font-roboto h-full grid grid-cols-11 pt-10">
         <div className="col-span-2 bg-gray-900_01">
