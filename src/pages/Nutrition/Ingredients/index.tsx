@@ -16,6 +16,7 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import AddIngredientCategories from "./components/AddIngredientCategories";
 import EditIngredient from "./components/editIngredient";
+import FoodItemSideBar from "./components/FoodItemSideBar";
 import { useConfirm } from "components/ConfirmDialog/context";
 
 function Ingredients() {
@@ -154,6 +155,14 @@ function Ingredients() {
         source: item.source ?? "catalog",
         item_type_label: item.item_type_label ?? null,
         brand: item.brand ?? null,
+        // ⚠️ **حقولُ درج التحرير** — كانت تُسقَط هنا فيفتح الدرجُ على صفٍّ
+        // بلا `food_item_id` ⇒ يقصف `/food-items/undefined`. والتصفيةُ
+        // الصامتة أخطرُ من الحقل الغائب: النموذجُ يبدو صحيحاً ويحفظ في لا شيء.
+        food_item_id: item.food_item_id ?? null,
+        serving_basis: item.serving_basis ?? null,
+        basis_label: item.basis_label ?? null,
+        confidence: item.confidence ?? null,
+        code: item.code ?? null,
       })),
       pagination: data.pagination, // استخراج معلومات التصفح
       // عدّادٌ يفصل المصدرين — يرسله الخادم كي لا تعدّ اللوحة الصفحة وحدها
@@ -188,7 +197,7 @@ function Ingredients() {
               {row.original.source === "food_db" && (
                 <span
                   className="text-xs px-2 py-[2px] rounded-full border border-sky-400 text-sky-400 whitespace-nowrap"
-                  title="من قاعدة الأطعمة — للعرض والإضافة إلى الوصفات، ولا يُحرَّر من هنا"
+                  title="من قاعدة الأطعمة المستوردة — يُحرَّر في مصدره، وتصحيحُه يسري على البحث والباركود والوصفات معاً"
                 >
                   قاعدة الأطعمة
                 </span>
@@ -378,7 +387,6 @@ function Ingredients() {
             /* ⛔ صفُّ قاعدة الأطعمة **لا يُحرَّر**: معرّفُه `food:123` لا رقمٌ،
                و`update-meal-ingredient` يعمل على كتالوج المدرّب وحده ⇒ فتحُ
                الدرج عليه كان يُنتج حفظاً يردّ 404 أو يكتب على صفٍّ آخر. */
-            rowClickable={(row: any) => row.original.source !== "food_db"}
             opnSideBar="إضافة مكون"
             opnSideBarOpen={() => setIngredientData(null)}
             setPage={setCurrentPage}
@@ -410,8 +418,16 @@ function Ingredients() {
         <AddIngredientCategories values={valuesItem} />
       </Modal>
 
+      {/* 🔴 **درجان لا واحد** — الصفّان لا يتقاسمان حقولاً بل جدولين:
+          كتالوجُ المدرّب يحمل سكراً ودهوناً متحوّلة وحصّةً مرجعية وصورةً
+          وفئةً وحذفاً، **ولا شيء منها في المصدر المستورد**. ونموذجٌ واحد
+          نصفُ خاناته معطَّل يُقرأ عطلاً لا خياراً. */}
       <Drawer>
-        <SideBar ingredientData={ingredientData} categoryId={categoryId} />
+        {ingredientData?.source === "food_db" ? (
+          <FoodItemSideBar data={ingredientData} listKey={url} />
+        ) : (
+          <SideBar ingredientData={ingredientData} categoryId={categoryId} />
+        )}
       </Drawer>
     </div>
   );
