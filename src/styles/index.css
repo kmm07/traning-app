@@ -1,74 +1,150 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap");
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  الطبقةُ العامّة — أرضيةُ اللوحة وخطُّها وسلوكُ عناصرها الخام
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * 🔴 **الخطُّ كان `DM Sans` — ولا حرفَ عربياً فيه.** واللوحةُ عربيةٌ كلُّها،
+ *    فكان كلُّ نصٍّ يسقط على خطِّ النظام: يختلف بين ويندوز وماك وأندرويد،
+ *    وتختلف معه أطوالُ الأسطر وارتفاعُ الصفوف — أي أن تصميمَ اللوحة لم يكن
+ *    مضبوطاً على جهازٍ واحد. `IBM Plex Sans Arabic` يحمل العربية واللاتينية
+ *    والأرقام معاً فيكفي استيرادٌ واحد ويصير الشكلُ واحداً عند الجميع.
+ */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap");
+
 * {
   box-sizing: border-box;
 }
+
 html,
 body {
-  @apply h-full scroll-smooth bg-gray-900_01;
+  @apply h-full scroll-smooth bg-surface-base text-content antialiased;
+  font-family: theme("fontFamily.sans");
+  /* تفعيلُ الأرقام العربية-الهندية المتناسقة وتحسينُ تقطيع الكلمات. */
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
 }
+
 #root {
   @apply h-full;
 }
-.dhiwise-navigation {
-  padding: 20px;
-  background-color: #232323;
+
+/* ── الاختيار والتركيز ─────────────────────────────────────────────────── */
+
+::selection {
+  background: theme("colors.brand.400");
+  color: theme("colors.ink.950");
 }
-.dhiwise-navigation h1 {
-  color: white;
+
+/*
+ * ⛔ **وكان `input:focus { outline: none }` بلا بديل** — أي أن من يتنقّل
+ *    بالـTab لا يرى أين هو إطلاقاً. الحلقةُ أدناه تُعيد الإشارة لكلِّ عنصرٍ
+ *    يُبلَغ بلوحة المفاتيح **دون** أن تظهر عند الضغط بالفأرة.
+ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid theme("colors.brand.400");
+  outline-offset: 2px;
+  border-radius: 6px;
 }
-.dhiwise-navigation .headline {
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: white;
+
+/* ── شريطُ التمرير ─────────────────────────────────────────────────────── */
+
+/*
+ * ⚖️ **وشريطُ التمرير جزءٌ من التصميم لا تفصيلٌ فيه** — اللوحةُ داكنةٌ
+ *    وشريطُ النظام الافتراضيّ فاتحٌ عريض، فيقطع حافّةَ كلِّ جدولٍ وقائمة.
+ *    ودقّةُ القياس: **8px** لا 10 — يُمسَك بالفأرة ولا يزاحم المحتوى،
+ *    ويخفت في السكون ويظهر عند المرور على الحاوية.
+ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
 }
-.dhiwise-navigation ul {
-  padding: 0;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
-.dhiwise-navigation ul li {
-  list-style: none;
-  margin-right: 20px;
-  font-size: 16px;
-  font-weight: bold;
+::-webkit-scrollbar-thumb {
+  background: theme("colors.ink.700");
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
 }
-.dhiwise-navigation a {
-  color: #132cdc;
+::-webkit-scrollbar-thumb:hover {
+  background: theme("colors.ink.500");
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.ink.700") transparent;
+}
+
+/* ── الجداول ───────────────────────────────────────────────────────────── */
+
 table {
   border-spacing: 0;
   width: 100%;
 }
-.common-select {
-  z-index: 10000;
-}
-.react-datepicker-popper {
-  z-index: 100000 !important;
-}
-.drawable-icon {
-  position: absolute;
-  margin: auto;
-  z-index: 1000;
-}
-.input-wrap {
-  position: relative;
-}
-option {
-  color: #000;
-}
+
 .table-wrap {
   overflow: auto;
 }
-input:focus {
-  outline: none;
-}
-.ReactModal__Body--open {
-  overflow: hidden;
-}
-.slider-indicator:first-child {
-  margin-left: 0;
+
+/* ── النوافذ والأدراج ──────────────────────────────────────────────────── */
+
+/*
+ * 🔴 **وكان `.modal-box { @apply h-[50vh] }` مفروضاً على كل نافذة** — نصفُ
+ *    الشاشة لأيّ محتوى: حوارُ تأكيدٍ من سطرين يترك فراغاً هائلاً، ونموذجٌ
+ *    طويلٌ يُقصّ. صار الارتفاعُ يتبع المحتوى بسقفٍ يمنع تجاوز الشاشة.
+ */
+.drawer-style,
+.modal-box {
+  border-radius: 20px;
+  border: 1px solid theme("colors.line.DEFAULT") !important;
+  background: theme("colors.surface.DEFAULT") !important;
+  box-shadow: theme("boxShadow.pop") !important;
 }
 
-.slider-indicator:last-child {
-  margin-right: 0;
+.modal-box {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal {
+  backdrop-filter: blur(6px) saturate(120%);
+  background: rgb(0 0 0 / 0.62);
+  transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/*
+ * ➕ **ودخولُ النافذة صار حركةً لا ظهوراً مفاجئاً.** كانت تُقلب الرؤيةُ
+ *    دفعةً واحدة فتظهر النافذةُ **كأنها ومضة** — والعينُ تفقد من أين جاءت
+ *    فتبحث عن موضعها في الشاشة. والتكبيرُ من ٩٦٪ مع ارتفاعٍ خفيف يقول
+ *    «هذه قادمةٌ من فوق ما تنظر إليه» في ٢٢٠ms — وهي مدّةٌ تُحسّ ولا تُنتظر.
+ */
+.modal-toggle:checked ~ .modal .modal-box,
+.modal-open .modal-box {
+  animation: scaleIn 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/** الدرجُ المنزلق (rc-drawer) — نفسُ المنحنى، فلا تختلف حركتان في شاشة. */
+.rc-drawer-content-wrapper {
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.rc-drawer-mask {
+  transition: opacity 320ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  backdrop-filter: blur(2px);
 }
 
 .rc-drawer-content-wrapper {
@@ -85,30 +161,62 @@ input:focus {
 .ReactModal__Overlay {
   z-index: 1051;
 }
+.ReactModal__Body--open {
+  overflow: hidden;
+}
+
+/* ── متفرّقاتٌ يعتمد عليها كودٌ قائم ───────────────────────────────────── */
+
+.common-select {
+  z-index: 10000;
+}
+.react-datepicker-popper {
+  z-index: 100000 !important;
+}
+.drawable-icon {
+  position: absolute;
+  margin: auto;
+  z-index: 1000;
+}
+.input-wrap {
+  position: relative;
+}
+option {
+  color: theme("colors.ink.950");
+  background: theme("colors.ink.100");
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid theme("colors.line.DEFAULT");
+}
 
 ul li a {
   display: block;
 }
 
-.mobile-menu div {
-  height: 1.5px;
-  width: 20px;
-  background-color: #000;
-  margin: 4px 0;
+.common-row-list > ul {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  flex-grow: 1;
 }
-.mobile-menu {
-  display: none;
-  cursor: pointer;
+.common-column-list > ul {
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
 }
+.common-column-list li {
+  width: 100%;
+}
+
 .header-row {
   align-items: center;
   justify-content: space-between;
   display: flex;
 }
+
 @media only screen and (min-width: 200px) and (max-width: 767px) {
-  .mobile-menu {
-    display: block;
-  }
   .header-row {
     width: 100% !important;
   }
@@ -124,72 +232,130 @@ ul li a {
     flex-wrap: wrap;
   }
 }
-.menu-close-icon {
+
+/* ── فئاتٌ تصميميةٌ عامّة تستعملها الطبقةُ الجديدة ─────────────────────── */
+
+/** بطاقةٌ زجاجيةٌ خفيفة — تُستعمل في الرأس والشريط الجانبيّ. */
+.glass {
+  background: rgb(20 20 22 / 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/** خطٌّ فاصلٌ يتلاشى عند طرفيه — أنظفُ من `hr` الممتدّ. */
+.divider-soft {
+  height: 1px;
+  background: linear-gradient(
+    to left,
+    transparent,
+    theme("colors.line.DEFAULT") 15%,
+    theme("colors.line.DEFAULT") 85%,
+    transparent
+  );
+}
+
+/** هيكلُ تحميلٍ — يحلّ محلّ نصّ «loading...» العاري. */
+.skeleton-line {
+  position: relative;
+  overflow: hidden;
+  background: theme("colors.ink.800");
+  border-radius: 8px;
+}
+.skeleton-line::after {
+  content: "";
   position: absolute;
-  right: 16px;
-  top: 16px;
+  inset: 0;
+  transform: translateX(100%);
+  background: linear-gradient(
+    to left,
+    transparent,
+    rgb(255 255 255 / 0.06),
+    transparent
+  );
+  animation: shimmer 1.4s infinite;
 }
-.menu-overlay {
-  width: 100%;
-  height: 100%;
-  background-color: #000;
-  opacity: 0.7;
-  position: fixed;
-  left: 0px;
-  top: 0px;
-}
-.close-line1 {
-  transform: translate(0, 6px) rotate(-45deg) skewX(0) skewY(0) scaleX(1)
-    scaleY(1);
-}
-.close-line2 {
-  transform: translate(0, 0) rotate(45deg) skewX(0) skewY(0) scaleX(1) scaleY(1);
-}
-.common-row-list > ul {
-  display: flex;
-  flex-direction: row;
-  list-style-type: none;
-  flex-grow: 1;
+@keyframes shimmer {
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
-.common-column-list > ul {
-  display: flex;
-  flex-direction: column;
-  list-style-type: none;
+
+/* ── منطقةُ التمرير ───────────────────────────────────────────────────── */
+
+/*
+ * ⛔ **وكان المحتوى يُمرَّر بلا سلاسةٍ ولا حدّ.** ثلاثةُ أشياء تُصلحه:
+ *    `smooth` فينزلق التنقّلُ الداخليّ بدل أن يقفز · و`overscroll-contain`
+ *    فلا يجرّ تمريرُ **الجدول** الصفحةَ كلَّها تحته حين يبلغ طرفه ·
+ *    و`scrollbar-gutter: stable` فلا يقفز عرضُ المحتوى أفقياً لحظةَ ظهور
+ *    الشريط عند تبدّل الصفحة — وهي قفزةٌ تُرى في كل انتقال.
+ */
+.scroll-area {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
-.common-column-list li {
-  width: 100%;
+/* ── الأسطح ───────────────────────────────────────────────────────────── */
+
+/**
+ * حافّةٌ داخليةٌ فاتحةٌ في أعلى السطح.
+ *
+ * ⚖️ **ولماذا تُضاف على أسودَ شبهِ خالص**: الحدُّ وحده يرسم مستطيلاً مسطّحاً،
+ *    والضوءُ في الواقع يسقط من فوق. خطٌّ بشفافية ٥٪ في الحافّة العليا يكفي
+ *    لأن تُقرأ البطاقةُ **جسماً** لا مساحةً محدودة — بلا ظلٍّ ثقيلٍ ولا
+ *    حافّتين نيومورفيّتين (وهو ما نُزع أصلاً).
+ */
+.hairline {
+  box-shadow: theme("boxShadow.hairline");
 }
 
-/* scroll */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+/** رأسُ جدولٍ لاصق داخل حاويةٍ تُمرَّر — يبقى العمودُ معروفاً في صفٍّ ٢٥. */
+.table-head-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: theme("colors.surface.DEFAULT");
+  backdrop-filter: blur(6px);
+}
+
+/* ── التمرير عند الحاوية ──────────────────────────────────────────────── */
+
+/** الشريطُ يخفت ما لم تكن الفأرة على الحاوية — أهدأُ في السكون. */
+.scroll-quiet {
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 200ms ease;
+}
+.scroll-quiet::-webkit-scrollbar-thumb {
   background: transparent;
 }
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
+.scroll-quiet:hover,
+.scroll-quiet:focus-within {
+  scrollbar-color: theme("colors.ink.700") transparent;
+}
+.scroll-quiet:hover::-webkit-scrollbar-thumb,
+.scroll-quiet:focus-within::-webkit-scrollbar-thumb {
+  background: theme("colors.ink.700");
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #6b6b6b;
-  border-radius: 10px;
+
+/* ── صفوفُ الجدول ─────────────────────────────────────────────────────── */
+
+/*
+ * ⚖️ **والصفُّ المُمَرُّ عليه يستدير طرفاه.** الإبرازُ المستطيلُ الممتدُّ من
+ *    حافّةٍ إلى حافّة يُقرأ **شريطاً** لا صفّاً، ويصطدم بحافّة البطاقة
+ *    فيبدو تسرّباً لونياً. والاستدارةُ تجعل الإبرازَ **جسماً مستقلاً** يتبع
+ *    المؤشّر — وبخصائصَ منطقية فيصحّ في RTL بلا مقلوب.
+ */
+.table-rows-soft tbody td {
+  transition: background-color 160ms ease;
 }
-.drawer-style,
-.modal-box {
-  border-radius: 25px;
-  border: 1px solid #26243f !important;
-  background: #151423 !important;
-  box-shadow: 6px 6px 12px 0px #121120, -5px -5px 12px 0px #232239,
-    0px 0px 3px 0px #202124 inset !important;
+.table-rows-soft tbody tr:hover td:first-child {
+  border-start-start-radius: 12px;
+  border-end-start-radius: 12px;
 }
-hr {
-  border: 2px solid #2c2c2e;
-}
-.modal-box {
-  @apply h-[50vh];
+.table-rows-soft tbody tr:hover td:last-child {
+  border-start-end-radius: 12px;
+  border-end-end-radius: 12px;
 }

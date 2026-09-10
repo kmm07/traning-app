@@ -17,3 +17,6 @@ export { SettingCard } from "./SettingCard";
 export { TextArea } from "./TextArea";
 export { TrhButton } from "./TrhButton";
 export { Tabs } from "./Tabs";
+export { Icon, IconTile } from "./Icon";
+export type { IconName, IconTone } from "./Icon";
+export { SectionHeader, Chip, Toolbar } from "./Section";

@@ -25,8 +25,16 @@ export default function OpsAlertBanner() {
     <div
       dir="rtl"
       role="alert"
-      className={`w-full px-4 py-3 text-white shadow-lg ${
-        critical ? "bg-red-700" : "bg-amber-600"
+      /*
+       * ⚖️ **يبقى ملوَّناً بألوان الحالة لا بالهوية** — الشريطُ إنذارٌ،
+       *    ولونُ الهوية لونُ الفعل. لكنّ درجاتِه صارت من سلّم الحالات في
+       *    الإعداد (`danger`/`warning`) لا من لوحة Tailwind الافتراضية،
+       *    فيتّفق مع بقيّة إشارات اللوحة.
+       */
+      className={`w-full px-4 py-3 shadow-raised ${
+        critical
+          ? "bg-danger-600 text-white"
+          : "bg-warning-400 text-ink-950"
       }`}
     >
       <div className="flex items-start gap-3 flex-wrap">
@@ -48,7 +56,7 @@ export default function OpsAlertBanner() {
           {expanded && (
             <ul className="mt-3 space-y-3">
               {alerts.map((a) => (
-                <li key={a.id} className="text-sm leading-6 border-r-2 border-white/40 pr-3">
+                <li key={a.id} className="text-sm leading-6 border-e-2 border-current/40 pe-3">
                   <div className="font-semibold">
                     {a.title}
                     <span className="mx-2 font-normal opacity-80">· {a.occurred_human}</span>
@@ -64,14 +72,22 @@ export default function OpsAlertBanner() {
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="px-3 py-1 rounded bg-white/15 hover:bg-white/25 text-sm"
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              critical
+                ? "bg-white/15 hover:bg-white/25"
+                : "bg-ink-950/10 hover:bg-ink-950/20"
+            }`}
           >
             {expanded ? "إخفاء التفاصيل" : "التفاصيل"}
           </button>
           <button
             type="button"
             onClick={() => void acknowledge()}
-            className="px-3 py-1 rounded bg-white text-gray-900 text-sm font-semibold hover:bg-gray-200"
+            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-colors ${
+              critical
+                ? "bg-white text-ink-950 hover:bg-ink-100"
+                : "bg-ink-950 text-white hover:bg-ink-900"
+            }`}
           >
             فهمت
           </button>

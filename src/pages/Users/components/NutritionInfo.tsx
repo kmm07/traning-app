@@ -16,7 +16,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
       percentage: percentageCalc(values?.protein, activeUser?.protein?.current),
       cardTitle: values?.protein,
       body_number: Number(activeUser?.protein?.current).toFixed(2).toString(),
-      className: "text-[#FFC300]",
+      className: "text-macro-protein",
     },
     {
       name: "fat",
@@ -24,7 +24,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
       percentage: percentageCalc(values?.fat, activeUser?.fat?.current),
       cardTitle: values?.fat,
       body_number: Number(activeUser?.fat?.current).toFixed(2).toString(),
-      className: "text-[#00E8A2]",
+      className: "text-macro-fat",
     },
     {
       name: "calories",
@@ -35,7 +35,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
       ),
       cardTitle: values?.calories,
       body_number: Number(activeUser?.calories?.current).toFixed(2).toString(),
-      className: "text-[#E80054]",
+      className: "text-macro-calories",
     },
     {
       name: "carbohydrates",
@@ -46,7 +46,7 @@ function NutritionInfo({ activeUser }: { activeUser: any }) {
       ),
       cardTitle: values?.carbohydrates,
       body_number: Number(activeUser?.carbs?.current).toFixed(2).toString(),
-      className: "text-[#00D4FF]",
+      className: "text-macro-carbs",
     },
   ];
 

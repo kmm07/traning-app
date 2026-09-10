@@ -2,10 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  تجاوزاتُ المكتبات — daisyUI و react-select و react-datepicker
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
 :root {
-  --primary-color: #373d45bf;
+  --primary-color: theme("colors.brand.400");
+  --ring-color: rgb(209 254 15 / 0.25);
 }
-/* Override default focus colors for tailwindcss-forms https://github.com/tailwindlabs/tailwindcss-forms */
+
+/* ── الحقول ────────────────────────────────────────────────────────────── */
+
 [type="text"]:focus,
 [type="email"]:focus,
 [type="url"]:focus,
@@ -13,13 +22,72 @@
 [type="number"]:focus,
 [type="date"]:focus,
 [type="search"]:focus,
-[type="checkbox"]:focus,
-[type="radio"]:focus,
+[type="tel"]:focus,
 [multiple]:focus,
 textarea:focus,
 select:focus {
-  --tw-ring-color: var(--primary-color);
+  --tw-ring-color: var(--ring-color);
   border-color: var(--primary-color);
+}
+
+[type="checkbox"]:focus,
+[type="radio"]:focus {
+  --tw-ring-color: var(--ring-color);
+}
+
+input,
+textarea,
+select {
+  transition: border-color 160ms ease, box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+/*
+ * ⛔ **كان `input:focus { outline: none !important }` وحده** — بلا أيّ بديلٍ
+ *    بصريّ. تُرك الإلغاء (فحلقةُ المتصفّح تتنازع مع الحدّ الملوَّن) وأُضيف
+ *    بدلُه **توهّجٌ من لون الهوية**، فيبقى موضعُ التركيز مرئياً.
+ */
+input:focus,
+textarea:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 3px var(--ring-color);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: theme("colors.ink.400");
+}
+
+/* الأسهمُ في حقل العدد ضجيجٌ في لوحةِ إدخالٍ عربية. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* أيقونةُ منتقي التاريخ سوداءُ على أرضيةٍ سوداء — تُقلَب. */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.55);
+  cursor: pointer;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) opacity(1);
+}
+
+/* الإكمالُ التلقائيّ في كروم يفرض أرضيةً بيضاء — تُلغى. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: theme("colors.content.DEFAULT");
+  -webkit-box-shadow: 0 0 0 1000px theme("colors.ink.900") inset;
+  caret-color: theme("colors.content.DEFAULT");
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 .react-datepicker-wrapper .react-datepicker__input-container input {
@@ -30,22 +98,19 @@ select:focus {
 }
 .react-datepicker__day.react-datepicker__day--keyboard-selected {
   background: none;
-  color: black;
+  color: theme("colors.ink.950");
 }
-input:focus,
-textarea:focus {
-  outline: none !important;
-  outline-offset: 0 !important;
-  --tw-ring-offset-width: none !important;
-}
+
+/* ── القوائم ───────────────────────────────────────────────────────────── */
 
 li:focus-visible {
   outline: none;
 }
-
 li:hover {
   cursor: pointer;
 }
+
+/* ── الألسنة ───────────────────────────────────────────────────────────── */
 
 .tab-panel--selected {
   animation-name: tabPanel;
@@ -60,22 +125,8 @@ li:hover {
     opacity: 1;
   }
 }
-/* Input style */
-.input-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
 
-.input-container label {
-  position: absolute;
-  transform-origin: top left;
-  transition: 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-}
-
-.input-container input {
-  transition: 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-}
+/* ── الشريطُ الجانبيّ (بقايا react-pro-sidebar) ────────────────────────── */
 
 .ps-menu-icon {
   width: unset !important;
@@ -128,10 +179,156 @@ li:hover {
   justify-content: space-between;
 }
 
+/* ── الأزرار ───────────────────────────────────────────────────────────── */
+
+/*
+ * 🔴 **هنا كان أخطرُ سطرٍ في اللوحة كلِّها:**
+ *
+ *      .btn { @apply border-none bg-transparent hover:bg-transparent
+ *                    p-0 m-0 normal-case; }
+ *
+ *    يجرّد **كلَّ** زرِّ daisyUI من أرضيته وحدوده **وحشوته**. ونتيجتُه أن
+ *    كلَّ زرٍّ في اللوحة صار بلا مساحةِ نقرٍ خاصّةٍ به: مساحتُه مساحةُ نصّه
+ *    حرفياً. ولذلك كُتب `!px-10` و`!px-4` يدوياً في عشرات المواضع — كلٌّ
+ *    يعوّض الحشوةَ المنزوعة برقمٍ يخصّه، فلا يتّفق زرّان على قياس.
+ *
+ * ⚖️ **ولا يُنزع السطر** — أربعةٌ وستّون ملفاً تعتمد على أن `btn` لا يلوّن
+ *    شيئاً، ونزعُه يُعيد أرضيةَ daisyUI تحت كل زرٍّ ملوَّنٍ باليد. فيُبقى
+ *    التجريد **وتُعاد الحشوةُ والقياسُ في مكوّن الزرّ نفسه** حيث يمكن
+ *    ضبطُهما مرّةً واحدة للجميع.
+ */
 .btn {
   @apply border-none bg-transparent hover:bg-transparent p-0 m-0 normal-case;
+  font-weight: 600;
+  letter-spacing: 0;
+  min-height: 0;
+  height: auto;
+  transition: background-color 180ms ease, color 180ms ease,
+    box-shadow 180ms ease, transform 120ms ease, opacity 180ms ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* daisyUI يفرض `text-transform` و`height` على مقاييسه — تُحيَّد. */
+.btn-sm,
+.btn-md,
+.btn-lg {
+  height: auto;
+  min-height: 0;
 }
 
 .navigation {
   @apply !flex;
+}
+
+/* ── حقولُ daisyUI الخام ───────────────────────────────────────────────── */
+
+/*
+ * 🔴 **ثلاثةٌ وعشرون حقلاً في الصفحات مكتوبةٌ `<input>` و`<select>` خاماً**
+ *    بأصناف daisyUI (`input input-bordered bg-transparent`) لا بمكوّن
+ *    `Input`. ونتيجتُه أن **شكل الحقل يتبع أيَّ ملفٍّ كُتب فيه**: بعضُها
+ *    `input-sm` وبعضُها لا، وكلُّها بحدودٍ ونصفِ قطرٍ من السمة الافتراضية
+ *    لا من الإعداد ⇒ في النموذج الواحد حقلان بارتفاعين ونصفَي قطرٍ
+ *    مختلفين. و`bg-transparent` عليها كان **التفافاً** على أرضية daisyUI
+ *    الفاتحة قبل ضبط السمة.
+ *
+ * ⚖️ **والعلاج هنا لا في ثلاثةٍ وعشرين ملفاً** — قاعدةٌ واحدة تُلبس
+ *    أصنافَ daisyUI مظهرَ نظام التصميم، فينتفع القائمُ وكلُّ ما يُكتب
+ *    غداً. وتحويلُ المواضع إلى مكوّن `Input` تغييرٌ سلوكيّ (ربطُ Formik
+ *    ولافتاتٌ وأخطاء) لا يُعاين بصرياً هنا — فيُترك بنداً مستقلاً.
+ */
+.input,
+.select,
+.textarea,
+.file-input {
+  border-radius: 14px !important;
+  background-color: theme("colors.ink.900") !important;
+  border-color: theme("colors.line.DEFAULT") !important;
+  color: theme("colors.content.DEFAULT") !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover,
+.file-input:hover {
+  border-color: theme("colors.line.strong") !important;
+}
+
+.input:focus,
+.input:focus-within,
+.select:focus,
+.textarea:focus,
+.file-input:focus {
+  border-color: theme("colors.brand.400") !important;
+  box-shadow: 0 0 0 3px var(--ring-color) !important;
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ثمّةُ خياراتٍ داخل `select` أصليّ ترسمها المنصّة — تُجبَر على الداكن. */
+.select option {
+  background-color: theme("colors.ink.850");
+  color: theme("colors.content.DEFAULT");
+}
+
+/* ── الجداول والشارات والألسنة ─────────────────────────────────────────── */
+
+.badge {
+  border-width: 1px;
+  font-weight: 600;
+}
+
+/*
+ * الشارةُ التحذيرية هي شارةُ الرسائل غير المقروءة في قوائم المستخدمين
+ * (`badge badge-warning`) — تُحاذى بلون الهوية نفسه الذي يحمله جرسُ الرأس،
+ * فلا يقرأ المدرّب رقمَين لشيءٍ واحد بلونين.
+ */
+.badge-warning {
+  background-color: theme("colors.brand.400") !important;
+  border-color: theme("colors.brand.400") !important;
+  color: theme("colors.ink.950") !important;
+}
+
+/* أرضيةٌ وحدٌّ للصورة الرمزية — الفارغةُ منها كانت تظهر مربّعاً مكسوراً. */
+.avatar > div {
+  background-color: theme("colors.ink.800");
+  border: 1px solid theme("colors.line.DEFAULT");
+}
+
+.tab-active {
+  color: theme("colors.brand.400") !important;
+  border-color: theme("colors.brand.400") !important;
+}
+
+/* ── react-select ──────────────────────────────────────────────────────── */
+
+.select2-selection__control {
+  border-radius: 14px !important;
+}
+
+/* ── الشارات والقوائم المنسدلة ─────────────────────────────────────────── */
+
+.dropdown-content {
+  animation: theme("animation.fade-in");
+}
+
+/* ── تفضيلُ تقليل الحركة ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

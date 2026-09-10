@@ -35,10 +35,10 @@ function Select({
             {Boolean(label) && (
               <label
                 htmlFor={name}
-                className={" text-start block mb-2 text-sm  w-full !text-white"}
+                className="text-start block mb-2 text-sm w-full text-content-muted font-medium"
               >
                 {label}{" "}
-                {required === true && <span className="text-red-500"> *</span>}
+                {required === true && <span className="text-danger-400 ms-1" aria-hidden="true">*</span>}
               </label>
             )}
             <ReactSelect
@@ -59,18 +59,18 @@ function Select({
               }
                ${
                  Boolean(touched[name]) && Boolean(errors[name])
-                   ? "!border-error-100"
+                   ? "!border-danger-500"
                    : ""
                } `}
               {...props}
-              className={`h-10 w-full ${className} !text-white `}
+              className={`w-full ${className}`}
               onChange={(selectedOption: any) => {
                 if (props?.onChange == null) {
                   setFieldValue(name, selectedOption.value);
                 }
               }}
             />
-            <div className="text-red-500 text-sm text-start">
+            <div className="text-danger-400 text-xs text-start mt-1.5">
               <ErrorMessage name={name} />
             </div>
           </div>
@@ -86,9 +86,7 @@ function Select({
       {Boolean(label) && (
         <label
           htmlFor={name}
-          className={
-            " text-start block mb-2 text-sm  w-full !text-white font-normal"
-          }
+          className="text-start block mb-2 text-sm w-full text-content-muted font-medium"
         >
           {label}
         </label>
@@ -103,7 +101,7 @@ function Select({
           props.isDisabled === true ? "!opacity-80 " : ""
         }
          `}
-        className={`h-10 w-full ${className}!text-white `}
+        className={`w-full ${className}`}
       />
     </div>
   );

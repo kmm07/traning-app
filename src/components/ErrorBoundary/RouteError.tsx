@@ -31,31 +31,43 @@ export default function RouteError() {
   console.error("[panel] route error:", error);
 
   return (
-    <div dir="rtl" className="flex flex-col items-center gap-6 p-10 text-white">
-      <h1 className="text-2xl font-bold">{title}</h1>
-      <p className="text-center opacity-80 leading-relaxed max-w-xl">
+    <div
+      dir="rtl"
+      className="min-h-[60vh] flex flex-col items-center justify-center gap-5 p-10 text-content"
+    >
+      <div className="h-14 w-14 grid place-items-center rounded-2xl bg-danger-500/10 border border-danger-500/30 text-danger-400 text-2xl">
+        !
+      </div>
+
+      <h1 className="text-xl font-bold text-center">{title}</h1>
+      <p className="text-center text-sm text-content-muted leading-relaxed max-w-xl">
         وقع خطأٌ أثناء رسم الصفحة. بياناتك على الخادم **لم تُمَسّ** — ما فشل هو
         العرض وحده. أعد المحاولة، وإن تكرّر فأرسل التفصيل أدناه.
       </p>
 
       <div className="flex gap-3">
         <button
-          className="btn !bg-deep_purple-A200 !text-white rounded-[16px] px-6"
+          className="btn rounded-field px-6 py-2.5 text-sm font-semibold !bg-brand-400 !text-ink-950 hover:!bg-brand-300 transition-colors"
           onClick={() => navigate(-1)}
         >
           رجوع
         </button>
         <button
-          className="btn !bg-transparent border !border-deep_purple-A200 !text-deep_purple-A200 rounded-[16px] px-6"
+          className="btn rounded-field px-6 py-2.5 text-sm font-semibold !bg-transparent border !border-line-strong !text-content hover:!border-brand-400 hover:!text-brand-400 transition-colors"
           onClick={() => window.location.reload()}
         >
           إعادة التحميل
         </button>
       </div>
 
-      <details className="w-full max-w-3xl mt-4 opacity-70">
-        <summary className="cursor-pointer select-none">التفصيل التقنيّ</summary>
-        <pre dir="ltr" className="mt-2 overflow-auto text-xs whitespace-pre-wrap">
+      <details className="w-full max-w-3xl mt-4">
+        <summary className="cursor-pointer select-none text-sm text-content-faint hover:text-content-muted transition-colors">
+          التفصيل التقنيّ
+        </summary>
+        <pre
+          dir="ltr"
+          className="mt-3 p-4 rounded-card bg-ink-900 border border-line overflow-auto text-xs whitespace-pre-wrap text-content-faint"
+        >
           {detail}
         </pre>
       </details>

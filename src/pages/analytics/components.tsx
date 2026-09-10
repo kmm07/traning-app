@@ -22,10 +22,15 @@ export function PeriodSelect({
         <button
           key={p.key}
           onClick={() => onChange(p.key)}
-          className={`px-4 py-2 rounded-full text-sm transition-colors ${
+          /*
+           * 🔴 **`bg-primary text-white`** — وقد صار `primary` لونَ الهوية
+           *    الليمونيّ، والأبيضُ فوقه **1.4:1**: نصٌّ لا يُقرأ. النصُّ
+           *    الصحيح على الليمونيّ أسود.
+           */
+          className={`px-4 py-2 rounded-pill text-sm font-semibold transition-colors ${
             period === p.key
-              ? "bg-primary text-white"
-              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              ? "bg-brand-400 text-ink-950"
+              : "bg-ink-800 text-content-muted hover:bg-ink-700 hover:text-content"
           }`}
         >
           {p.label}
@@ -50,17 +55,17 @@ export function KpiCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-blue_gray-900_01 bg-gray-900_01 p-4 space-y-1 ${
+      className={`rounded-card border border-line bg-surface p-4 space-y-1 transition-colors hover:border-line-strong ${
         unavailable ? "opacity-50" : ""
       }`}
     >
-      <div className="text-sm text-gray-400">{title}</div>
-      <div className="text-2xl font-bold">
+      <div className="text-sm text-content-muted">{title}</div>
+      <div className="text-2xl font-bold text-content">
         {unavailable ? "—" : value ?? "—"}
       </div>
-      {sub && <div className="text-xs text-gray-400">{sub}</div>}
+      {sub && <div className="text-xs text-content-faint">{sub}</div>}
       {note && (
-        <div className="text-xs text-amber-400 bg-amber-500/10 rounded-full px-2 py-0.5 inline-block">
+        <div className="text-xs text-warning-400 bg-warning-400/10 border border-warning-400/25 rounded-pill px-2 py-0.5 inline-block">
           {note}
         </div>
       )}
@@ -154,13 +159,32 @@ export function Section({
   );
 }
 
+/*
+ * ألوانُ الرسوم البيانية.
+ *
+ * ⛔ **كانت من عائلةٍ رماديةٍ زرقاء** (`#334155` شبكةً و`#94a3b8` نصّاً
+ *    و`#0f172a` أرضيةَ التلميح) لا صلةَ لها بحياديّ اللوحة ⇒ الرسمُ يبدو
+ *    مقتطعاً من لوحةٍ أخرى ملصوقاً في هذه.
+ *
+ * 🔑 **والسلسلتان مقيستان لا مختارتان بالذوق:** مُرّرتا على مدقّق التباين
+ *    ومحاكاة عمى الألوان على أرضية البطاقة (`#141416`) فأعطتا:
+ *    نطاقُ الإضاءة ✅ · أرضيةُ التشبّع ✅ · فصلُ CVD **ΔE 26.2** (والحدُّ
+ *    ٨) · وفصلُ الرؤية العادية **28.2** · والتباينُ على الأرضية ≥3:1
+ *    (**5.82:1** و**3.10:1**). ⛔ **ولذلك ليستا لونَ الهوية نفسَه**:
+ *    `#D1FE0F` إضاءتُه **0.93** — خارج نطاق الرسم على أرضيةٍ داكنة
+ *    (يبهر ويطمس شكلَ الخطّ)، فأُخذت درجتُه الأغمق من السلّم نفسه.
+ *
+ * ⚖️ **والحالاتُ محجوزة**: `warn` و`danger` لا تُستعملان سلسلةً ثالثة —
+ *    وإلا قُرئ ارتفاعُ رقمٍ عادّيٍّ إنذاراً.
+ */
 export const CHART_COLORS = {
-  primary: "#22c55e",
-  secondary: "#38bdf8",
-  warn: "#f59e0b",
-  danger: "#ef4444",
-  grid: "#334155",
-  text: "#94a3b8",
+  primary: "#7E9C00",
+  secondary: "#0369A1",
+  warn: "#FFB020",
+  danger: "#F04438",
+  grid: "#232326",
+  text: "#A1A1AA",
+  surface: "#141416",
 };
 
 export function fmtSeconds(s?: number | null) {

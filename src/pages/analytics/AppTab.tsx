@@ -143,7 +143,13 @@ function AppTab({ period }: { period: string }) {
           <XAxis dataKey="date" stroke={CHART_COLORS.text} fontSize={12} />
           <YAxis stroke={CHART_COLORS.text} fontSize={12} allowDecimals={false} />
           <Tooltip
-            contentStyle={{ background: "#0f172a", border: "1px solid #334155" }}
+            contentStyle={{
+              background: CHART_COLORS.surface,
+              border: `1px solid ${CHART_COLORS.grid}`,
+              borderRadius: 12,
+              color: "#F6F6F7",
+            }}
+            labelStyle={{ color: CHART_COLORS.text }}
           />
           <Bar
             dataKey="installs"

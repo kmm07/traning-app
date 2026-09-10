@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 import NotFound from "pages/NotFound";
 import SignInPage from "pages/SignIn";
+import ForgotPasswordPage from "pages/ForgotPassword";
 import Messages from "pages/Messages";
 import Layout from "layout";
 import Users from "pages/Users";
@@ -41,6 +42,13 @@ const router = createBrowserRouter(
     */
     <Route path="/" errorElement={<RouteError />}>
       <Route path="/" element={<SignInPage />} />
+
+      {/*
+        كان <Link to="/forgot-password"> قائماً في صفحة الدخول **بلا مسارٍ
+        هنا وبلا مسارٍ في الخادم** ⇒ يهبط الضاغطُ على شاشة الخطأ. المسار
+        عامٌّ بحكم تعريفه: من نسي كلمته لا توكن له.
+      */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       <Route path="/" element={<Layout />} errorElement={<RouteError />}>
         <Route path="/dashboard" element={<Messages />} />

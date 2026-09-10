@@ -20,10 +20,20 @@ function SettingCard({
   onDelete,
 }: Props) {
   return (
+    /*
+     * 🔴 **الحالةُ النشطة كانت `!bg-[#00A4FA]`** — أزرقُ فاتحٌ من القالب
+     *    القديم، ونصُّها يبقى أبيضَ فوقه فيضعف التباين. صارت بلون الهوية
+     *    ونصُّها أسود، وبحدٍّ يميّزها ولو عُرضت بالأبيض والأسود.
+     * ⛔ **وعرضُها كان مكوَّداً `w-[180px]`** ⇒ اسمُ فئةٍ طويل يلتفّ على
+     *    ثلاثة أسطر ويكسر ارتفاعَ الصفّ. صار حدّاً أدنى يتمدّد.
+     */
     <Card
-      className={`p-4 w-[180px] cursor-pointer ${
-        active && "!bg-[#00A4FA]"
-      } ${className}`}
+      hover
+      className={`p-4 min-w-[160px] cursor-pointer transition-colors ${
+        active
+          ? "!bg-brand-400 !border-brand-400"
+          : ""
+      } ${className ?? ""}`}
     >
       <div
         onClick={onClick}
@@ -49,7 +59,13 @@ function SettingCard({
           </div>
         )}
 
-        <Text size="3xl" className="mt-4 text-center !whitespace-normal">
+        <Text
+          size="base"
+          bold
+          className={`mt-3 text-center !whitespace-normal !w-full leading-relaxed ${
+            active ? "!text-ink-950" : ""
+          }`}
+        >
           {label}
         </Text>
       </div>

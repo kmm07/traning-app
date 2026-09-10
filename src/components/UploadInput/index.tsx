@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useFormikContext } from "formik";
 import { useDispatch } from "react-redux";
 import { setImageDelete } from "redux/slices/imageDelete";
-import { Img, Text } from "components";
+import { Img } from "components";
 
 interface Props {
   className?: string;
@@ -42,23 +42,50 @@ function UploadInput({ className = "", name, video, label }: Props) {
     }
   }, [values[name]]);
 
+  /*
+   * 🔴 **لافتةُ الرفع كانت `size="3xl"`** — أي بحجم عنوانِ صفحةٍ بجانب مربّعِ
+   *    رفعٍ صغير، فتقرأ العينُ اللافتةَ قبل أيّ شيءٍ في النموذج. صارت لافتةَ
+   *    حقلٍ كبقيّة الحقول.
+   *
+   * 🔴 **ونصُّ الزرّ كان `text-dark-100`** — من عائلة الأصناف الصامتة التي
+   *    صارت أسودَ على أسودَ لمّا عُرِّفت. ومعه كلمةُ «ارفع» وحدها بلا بيانٍ
+   *    لما يُرفع.
+   */
   return (
-    <div className={`relative   flex flex-col items-center  ${className}`}>
-      <div className="gap-4 w-full max-w-full flex items-center">
-        <Text size="3xl">{label}</Text>
+    <div className={`relative flex flex-col gap-2 ${className}`}>
+      <div className="gap-4 w-full max-w-full flex items-center flex-wrap">
+        {Boolean(label) && (
+          <span className="text-sm font-medium text-content-muted">
+            {label}
+          </span>
+        )}
         {values[name] === "" && (
           <div className="flex  flex-col gap-4 w-full h-full">
             <button
-              className="border rounded-lg border-dashed px-10 overflow-hidden border-deep_purple-A200 flex justify-center items-center w-full flex-1"
+              className="group border rounded-field border-dashed border-line-strong hover:border-brand-400 hover:bg-brand-400/[0.04] px-6 py-5 overflow-hidden flex justify-center items-center w-full flex-1 transition-colors"
               onClick={uploadFun}
               type="button"
             >
-              <div className="flex justify-center flex-col items-center gap-3">
-                <div className="dark:text-white text-dark-100">
-                  <p>
-                    <span className="text-deep_purple-A200">ارفع</span>
-                  </p>
-                </div>
+              <div className="flex justify-center flex-col items-center gap-2">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-content-faint group-hover:text-brand-400 transition-colors"
+                  aria-hidden="true"
+                >
+                  <path d="M12 16V4" />
+                  <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                  <path d="M4.5 15v3a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" />
+                </svg>
+                <span className="text-sm font-semibold text-content group-hover:text-brand-400 transition-colors">
+                  {video === true ? "ارفع مقطعاً" : "ارفع صورة"}
+                </span>
               </div>
               <input
                 type="file"
@@ -83,7 +110,7 @@ function UploadInput({ className = "", name, video, label }: Props) {
               <a href={image} target="_blank">
                 <Img
                   src={image}
-                  className={`w-[150px] h-[130px] ${
+                  className={`w-[150px] h-[130px] object-cover rounded-field border border-line ${
                     values[name] === "" ? "hidden" : "block"
                   }`}
                 />
@@ -91,17 +118,21 @@ function UploadInput({ className = "", name, video, label }: Props) {
             ))}
           <button
             type="button"
+            aria-label="حذف الملف"
+            title="حذف الملف"
             className={
-              values[name] === "" ? "hidden" : "block absolute bottom-0 left-0"
+              values[name] === ""
+                ? "hidden"
+                : "grid place-items-center absolute bottom-2 left-2 h-8 w-8 rounded-lg bg-ink-950/80 border border-line hover:bg-danger-500 hover:border-danger-500 transition-colors"
             }
             onClick={deleteImg}
           >
-            <Img src="/images/trash.svg" className="w-4" alt="delete" />
+            <Img src="/images/trash.svg" className="w-4" alt="" />
           </button>
         </div>
       </div>
       {Boolean(touched[name]) && Boolean(errors[name]) && (
-        <div className="text-red-500 text-sm text-start">
+        <div className="text-danger-400 text-xs text-start">
           <>{errors[name]}</>
         </div>
       )}

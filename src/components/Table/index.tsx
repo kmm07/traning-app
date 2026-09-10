@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTable, useFilters, useGlobalFilter, Column } from "react-table";
 import NoDataFounded from "../NoData";
 import PaginationType from "./paginationType";
-import { Button, Input, Modal, Text } from "components";
+import { Button, IconTile, Input, Modal, Text } from "components";
+import type { IconName } from "components";
+import { useLocation } from "react-router-dom";
+import { iconForPath } from "layout/nav";
 import ReactPaginate from "react-paginate";
 
 declare global {
@@ -32,6 +35,10 @@ export interface TableProps<ColumnsType> {
   opnSideBar?: string;
   withoutCloseDrawer?: boolean;
   headerActions?: React.ReactNode;
+  /** أيقونةُ الرأس — تُشتقّ من المسار حين لا تُمرَّر. */
+  icon?: IconName;
+  /** سطرُ شرحٍ تحت العنوان — «١٧٬٩٢٣ مكوّناً» مثلاً. */
+  hint?: string;
 }
 
 const Table = <ColumnsType,>({
@@ -51,7 +58,17 @@ const Table = <ColumnsType,>({
   id,
   withoutCloseDrawer = false,
   headerActions,
+  icon,
+  hint,
 }: TableProps<ColumnsType>) => {
+  /*
+   * ➕ **ورأسُ الجدول صار رأسَ قسمٍ لا نصّاً غليظاً** [١٠ سبتمبر].
+   *    البلاطةُ الملوّنة تُلتقط بطرف العين فتعرف أين أنت قبل قراءة الكلمة،
+   *    **وهي أيقونةُ الشريط الجانبيّ نفسُها** مشتقّةً من المسار — فلا
+   *    يُتعلَّم رمزان لقسمٍ واحد ولا تُعدَّل عشرون صفحة.
+   */
+  const { pathname } = useLocation();
+  const headIcon = icon ?? iconForPath(pathname);
   const itemsPerPage = 25;
   const [itemOffset, setItemOffset] = useState(0);
 
@@ -134,11 +151,34 @@ const Table = <ColumnsType,>({
       useGlobalFilter
     );
 
-  return data.length !== 0 ? (
-    <div className="flex flex-col p-5 items-end gap-4 bg-[#151423] overflow-hidden shadow-bs border-[#26243F] border rounded-[25px]">
-      <div className=" flex gap-7 w-full justify-between items-center">
-        <div className="flex-1 flex items-center gap-7">
-          <Text size="2xl">{title}</Text>
+  /*
+   * 🔴 **وكان الجدولُ كلُّه يختفي حين تكون الحمولة فارغة** — الغلافُ ورأسُه
+   *    وزرُّ الإضافة وحقلُ البحث معه. ونتيجتاه عمليّتان:
+   *    ١) **بحثٌ لا نتيجةَ له يُخفي حقلَ البحث نفسه** ⇒ المدرّب لا يستطيع
+   *       مسحَ ما كتب، فيبدو أن الصفحة عُطبت.
+   *    ٢) **قائمةٌ فارغة تُخفي زرَّ «إضافة»** ⇒ لا سبيل إلى إضافة أوّل صفٍّ
+   *       في جدولٍ جديد إطلاقاً.
+   *    الرأسُ يبقى الآن دائماً، ورسالةُ «لا بيانات» تحلّ محلَّ الصفوف وحدها.
+   */
+  const isEmpty = data.length === 0;
+
+  return (
+    <div className="flex flex-col p-5 items-end gap-4 bg-surface shadow-card border-line border rounded-card">
+      <div className="flex gap-5 w-full justify-between items-center flex-wrap">
+        <div className="flex-1 min-w-[220px] flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            {headIcon && <IconTile name={headIcon} tone="brand" />}
+            <div className="min-w-0">
+              <Text size="2xl" bold className="!whitespace-normal !leading-tight">
+                {title}
+              </Text>
+              {hint && (
+                <p className="text-[13px] text-content-muted leading-snug">
+                  {hint}
+                </p>
+              )}
+            </div>
+          </div>
           {/*
             ⛔ **ولا يُعرض بحثٌ محلّيٌّ فوق ترقيمٍ خادميّ.** `data` هناك
             **صفحةٌ واحدة (٢٥ صفّاً)**، والحقل يرشّحها وحدها بينما يقرؤه
@@ -151,13 +191,15 @@ const Table = <ColumnsType,>({
             لا يستطيع مسحه.
           */}
           {search && pagination == null && (
-            <div className="w-1/2">
+            <div className="w-full max-w-sm min-w-[180px]">
               <Input
                 name=""
                 isForm={false}
-                inputSize="large"
+                inputSize="medium"
+                isSearch
+                placeholder="ابحث…"
                 value={searchInput}
-                className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl  border-slate-800"
+                rounded="full"
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </div>
@@ -193,20 +235,28 @@ const Table = <ColumnsType,>({
         )}
       </div>
 
+      {/*
+        ⛔ **وكان الغلافُ `overflow-hidden`** بينما نصوصُ الخلايا
+           `whitespace-nowrap` ⇒ العمودُ الطويل **يُقصّ بلا أثر**: لا نقاطَ
+           ولا شريطَ تمرير، فيقرأ المدرّب نصفَ اسمٍ ويظنّه كاملاً. صار
+           تمريراً أفقياً، وهو العلاجُ الذي يُبقي المحتوى مقروءاً بلا قلبِ
+           سلوكِ الالتفاف في ٢٤١ موضعَ نصّ.
+      */}
+      <div className="w-full overflow-x-auto scroll-quiet -mx-1 px-1">
       <table
-        className="z-0 table w-full relative text-right"
+        className="table-rows-soft z-0 table w-full relative text-right border-separate border-spacing-0"
         {...getTableProps()}
       >
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr
-              className="w-full border-0 border-y-2 border-y-[#26243F]"
+              className="w-full"
               {...headerGroup.getHeaderGroupProps()}
               key={headerGroup.getHeaderGroupProps().key}
             >
               {headerGroup.headers.map((column) => (
                 <th
-                  className={`text-[#A3AED0] rounded-none ${
+                  className={`bg-transparent text-content-faint text-[11px] font-semibold tracking-wide rounded-none border-b border-line py-3 first:ps-3 last:pe-3 ${
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     //@ts-ignore
                     (column?.className as string) ?? ""
@@ -225,7 +275,7 @@ const Table = <ColumnsType,>({
             prepareRow(row);
             return (
               <tr
-                className="border-y-2 border-b-[#26243F] duration-200  hover:bg-[#26243FA6]"
+                className="transition-colors duration-200 hover:bg-surface-raised group"
                 {...row.getRowProps()}
                 key={row.id}
                 onClick={
@@ -242,7 +292,7 @@ const Table = <ColumnsType,>({
                 {row.cells.map((cell) => {
                   return (
                     <td
-                      className="py-5 text-white font-bold cursor-pointer "
+                      className="py-3.5 text-content text-sm font-medium border-b border-line/70 first:ps-3 last:pe-3 cursor-pointer"
                       {...cell.getCellProps()}
                       /*
                         ⛔ كان `key={Math.random().toString()}` — **بلا سقوطٍ
@@ -265,11 +315,36 @@ const Table = <ColumnsType,>({
           })}
         </tbody>
       </table>
+      </div>
 
-      <div className="p-2 flex justify-between w-full">
+      {/* رسالةُ الفراغ تحلّ محلَّ الصفوف — والرأسُ فوقها باقٍ بأدواته. */}
+      {isEmpty && (
+        <div className="w-full py-16">
+          <NoDataFounded />
+        </div>
+      )}
+
+      {!isEmpty && rows.length === 0 && (
+        <div className="w-full py-12 text-center">
+          <p className="text-content-muted text-sm">
+            لا نتيجة تطابق «{searchValue}»
+          </p>
+        </div>
+      )}
+
+      {/*
+        ⛔ **وكان شريطُ الترقيم يُرسَم دائماً** — حتى على ثلاثة صفوفٍ في صفحةٍ
+           واحدة. `renderOnZeroPageCount={null}` يمنع الأصفار وحدها، فيبقى
+           شريطٌ فارغٌ بحشوته تحت كل جدولٍ صغير. ولا يُرسَم الآن إلا حين
+           يكون ثمّة **ما يُتنقّل إليه**.
+      */}
+      <div className={`p-2 flex justify-between w-full ${pageCount > 1 ? "" : "hidden"}`}>
         <ReactPaginate
-          className="flex justify-center items-center gap-3"
-          activeClassName="bg-[#00A4FA] text-white rounded-full w-8 h-8 flex justify-center items-center"
+          className="flex justify-center items-center gap-2 text-sm text-content-muted"
+          pageLinkClassName="px-3 py-1.5 rounded-lg hover:bg-ink-800 hover:text-content transition-colors inline-block"
+          previousLinkClassName="px-3 py-1.5 rounded-lg hover:bg-ink-800 hover:text-content transition-colors inline-block"
+          nextLinkClassName="px-3 py-1.5 rounded-lg hover:bg-ink-800 hover:text-content transition-colors inline-block"
+          activeLinkClassName="!bg-brand-400 !text-ink-950 font-bold hover:!bg-brand-300"
           disabledClassName="hidden"
           breakLabel="..."
           nextLabel="التالي >"
@@ -292,10 +367,6 @@ const Table = <ColumnsType,>({
           }
         />
       </div>
-    </div>
-  ) : (
-    <div className="mt-20 flex flex-col items-center gap-4">
-      <NoDataFounded />
     </div>
   );
 };

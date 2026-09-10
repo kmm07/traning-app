@@ -1,4 +1,6 @@
 import { Button, Input } from "components";
+import { Field } from "formik";
+import usePermissions from "hooks/usePermissions";
 import { Form, Formik, FormikHelpers } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
 import { useQueryClient } from "react-query";
@@ -14,10 +16,17 @@ const initialValues = {
   name: "",
   email: "",
   password: "",
+  permissions: [] as string[],
+  is_super: false,
 };
 
 const AddAdmin = ({ adminsData = null, setAdminsData }: Props) => {
   const isEditing = adminsData !== null;
+
+  // خريطةُ الأقسام تأتي من الخادم (سجلّ `AdminSections`) — فلا تُكتب
+  // التسميات العربية مرّتين ولا يتباعد الطرفان (نمط BUG-15/61). ومنحُ
+  // الصلاحيات للمدير الأعلى وحده، فيُخفى المحرّر عن غيره.
+  const { sections, isSuper } = usePermissions();
 
   const url = isEditing ? `/admins/${adminsData?.id}` : "/admins";
 
@@ -58,7 +67,13 @@ const AddAdmin = ({ adminsData = null, setAdminsData }: Props) => {
 
   return (
     <Formik
-      initialValues={{ ...initialValues, ...adminsData }}
+      initialValues={{
+        ...initialValues,
+        ...adminsData,
+        // الخادم يردّ `null` لمن لا أقسام له، و`Field` المصفوفيّ يسقط عليها.
+        permissions: adminsData?.permissions ?? [],
+        is_super: Boolean(adminsData?.is_super),
+      }}
       onSubmit={onSubmit}
       enableReinitialize
     >
@@ -73,6 +88,38 @@ const AddAdmin = ({ adminsData = null, setAdminsData }: Props) => {
             name="password"
             label="كلمّة المرور"
           />
+
+          {isSuper && (
+            <div className="flex flex-col gap-3 border-t border-blue_gray-900_01 pt-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Field type="checkbox" name="is_super" className="w-4 h-4" />
+                <span className="text-white text-sm font-bold">
+                  مدير أعلى — كل الصلاحيات، ويمنحها لغيره
+                </span>
+              </label>
+
+              <p className="text-xs text-gray-400">
+                الأقسام المسموحة (تُتجاهَل للمدير الأعلى — يملكها كلها):
+              </p>
+
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(sections).map(([key, label]) => (
+                  <label
+                    key={key}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <Field
+                      type="checkbox"
+                      name="permissions"
+                      value={key}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-white text-sm">{label as string}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-4 ">
             <Button

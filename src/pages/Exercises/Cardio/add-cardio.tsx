@@ -117,7 +117,7 @@ export default function CardioForm({ cardioData, setCardioData }: Props) {
               />
               <Input
                 name="met"
-                label="met"
+                label="معامل MET"
                 isForm={false}
                 value={singleCardio.met}
                 onChange={(e) =>

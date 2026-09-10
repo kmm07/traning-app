@@ -42,12 +42,12 @@ const DateInput: FC<
             {label !== undefined && (
               <label
                 htmlFor={name}
-                className={
-                  "text-start block mb-2 text-sm  w-full !text-dark-200 dark:!text-white font-normal"
-                }
+                className="text-start block mb-2 text-sm w-full text-content-muted font-medium"
               >
                 {label}{" "}
-                {required === true && <span className="text-red-500"> *</span>}
+                {required === true && (
+                <span className="text-danger-400 ms-1" aria-hidden="true">*</span>
+              )}
               </label>
             )}
             <DatePicker
@@ -66,15 +66,15 @@ const DateInput: FC<
               }
               containerClassName={`h-10 w-full ${
                 props.disabled === true ? "opacity-50 cursor-not-allowed" : ""
-              } rounded-md border-dark-300  ${className}`}
+              } rounded-field ${className}`}
               inputClass={`${
                 Boolean(touched[name]) && Boolean(errors[name])
-                  ? "border-error-100"
+                  ? "border-danger-500"
                   : ""
-              } bg-transparent h-10 w-full px-2`}
+              } bg-transparent h-11 w-full px-4 text-sm`}
               className={`${
                 Boolean(touched[name]) && Boolean(errors[name])
-                  ? "border-error-100"
+                  ? "border-danger-500"
                   : ""
               } w-full `}
               {...props}
@@ -89,7 +89,7 @@ const DateInput: FC<
               }}
             />
             {Boolean(touched[name]) && Boolean(errors[name]) && (
-              <div className="text-error-100 text-sm text-start">
+              <div className="text-danger-400 text-xs text-start mt-1.5">
                 <>{errors[name]}</>
               </div>
             )}
@@ -102,12 +102,12 @@ const DateInput: FC<
       {label !== undefined && (
         <label
           htmlFor={name}
-          className={
-            "text-start block mb-2 text-sm  w-full !text-dark-200 dark:!text-white font-normal"
-          }
+          className="text-start block mb-2 text-sm w-full text-content-muted font-medium"
         >
           {label}{" "}
-          {required === true && <span className="text-red-500"> *</span>}
+          {required === true && (
+                <span className="text-danger-400 ms-1" aria-hidden="true">*</span>
+              )}
         </label>
       )}
       <DatePicker
@@ -168,13 +168,19 @@ function CustomCalendarButton({
 
   return (
     <div
-      className={`border border-primary h-10 w-full  rounded-md flex items-center ${className}`}
+      /*
+       * ⛔ **`border-primary` هنا صنفُ daisyUI لا صنفَ الإعداد** ⇒ كان يأخذ
+       *    بنفسجيَّ السمة الافتراضية. ومع ضبط السمة صار لونَ الهوية — وهو
+       *    **حدٌّ مميَّزٌ دائم** حول حقلٍ ساكن، فيُقرأ الحقلُ نشطاً أبداً.
+       *    صار حدَّ الحقول العاديّ.
+       */
+      className={`border border-line hover:border-line-strong bg-surface-sunken h-11 w-full rounded-field flex items-center cursor-pointer transition-colors ${className}`}
       onClick={onClick}
     >
       {/* <Calendar className="stroke-dark-300 mx-2" /> */}
       {!ssr && (
-        <span className="flex items-center h-full text-dark-100 dark:text-white !w-full justify-center">
-          {showDate(0) ?? <span className="text-dark-300">{placeholder}</span>}
+        <span className="flex items-center h-full text-content !w-full justify-center">
+          {showDate(0) ?? <span className="text-content-faint">{placeholder}</span>}
           {splitDate(1) !== undefined && showDate(1) !== "Invalid date"
             ? ` -  ${showDate(1)}`
             : null}

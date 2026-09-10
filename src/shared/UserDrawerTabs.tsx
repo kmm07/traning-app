@@ -89,7 +89,7 @@ function UserDrawerTabs({
       {tab === "chat" ? (
         <div
           className={`flex flex-col gap-2 w-full ${
-            activeUser?.chat?.length === 0 ? "h-[100%]" : "h-[140%]"
+            (activeUser?.chat?.count ?? activeUser?.chat?.length ?? 0) === 0 ? "h-[100%]" : "h-[140%]"
           }`}
         >
           <UsersInfo

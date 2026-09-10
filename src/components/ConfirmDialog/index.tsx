@@ -58,20 +58,27 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
             aria-hidden="true"
           />
 
-          <div className="modal-box relative z-10 bg-gray-900_01 border border-blue_gray-900_01 max-w-md">
-            <h3 className="text-lg font-bold">{options.title}</h3>
+          <div className="modal-box relative z-10 !max-w-md animate-fade-in">
+            <h3 className="text-lg font-bold text-content">{options.title}</h3>
 
             {options.message && (
-              <p className="py-4 whitespace-pre-line opacity-80">
+              <p className="pt-3 pb-1 text-sm leading-relaxed whitespace-pre-line text-content-muted">
                 {options.message}
               </p>
             )}
 
             <div className="modal-action flex gap-4 justify-start">
+              {/*
+                🔴 **كان زرُّ الحذف تدرّجاً برتقالياً-أحمر والإلغاء أزرق** —
+                   تدرّجان زخرفيّان يجعلان الفعلَ المدمّر يبدو زرَّ عرضٍ لا
+                   تحذيراً. والإلغاءُ **أبرزُ** من الحذف بلونٍ مشبَع، وهو
+                   عكسُ ما يُقرأ. صارا مسطَّحين: المحايدُ سطحٌ رماديّ،
+                   والمدمّرُ أحمرُ صريحٌ واحد.
+              */}
               <button
                 type="button"
                 autoFocus
-                className="btn !px-10 rounded-xl"
+                className="btn rounded-field px-8 py-2.5 min-h-[42px] text-sm font-semibold !bg-ink-800 !border !border-line !text-content hover:!bg-ink-700 transition-colors"
                 onClick={() => settle(false)}
               >
                 {options.cancelLabel ?? "إلغاء"}
@@ -79,10 +86,10 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
 
               <button
                 type="button"
-                className={`btn !px-10 rounded-xl text-white ${
+                className={`btn rounded-field px-8 py-2.5 min-h-[42px] text-sm font-semibold transition-colors ${
                   options.tone === "neutral"
-                    ? "bg-gradient-to-tr from-sky-500 to-blue-600"
-                    : "bg-gradient-to-tr from-orange-500 to-red-600"
+                    ? "!bg-brand-400 !text-ink-950 hover:!bg-brand-300"
+                    : "!bg-danger-500 !text-white hover:!bg-danger-600"
                 }`}
                 onClick={() => settle(true)}
               >

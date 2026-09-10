@@ -1,8 +1,34 @@
 import React from "react";
-
-import { Img, Text } from "components";
+import { Icon, Text } from "components";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { UseQueryResult } from "react-query";
+import usePermissions from "hooks/usePermissions";
+import { useAppSelector } from "hooks/useRedux";
+import { selectAuthData } from "redux/slices/auth";
+import { Link } from "react-router-dom";
+
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  عنقودُ الرأس — الجرسُ وبطاقةُ الحساب
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * 🔴 **واسمُ المدير كان مكتوباً نصّاً في الشيفرة: «خالد المالكي».**
+ *    وهو خطأٌ صار **حيّاً** منذ نشر صلاحيات الأقسام (٧ سبتمبر ٢٠٢٦): اللوحةُ
+ *    صارت متعدّدةَ المديرين، فكلُّ مسؤولٍ يدخل بحسابه يرى **اسمَ صاحب
+ *    اللوحة في رأس شاشته**. وحمولةُ الدخول تحمل `user.name` سلفاً
+ *    (`redux/slices/auth`) فلم يكن ينقص إلا قراءتُها.
+ *
+ * 🔴 **وصورةُ الحساب كانت ملفّاً ثابتاً** (`img_image.png`) لا صلةَ له
+ *    بالداخل — تُعرض لكل مسؤول. صارت الحرفَ الأول من اسمه على أرضية
+ *    الهوية: تصحّ لكلِّ اسمٍ ولا تحتاج ملفاً.
+ *
+ * ⛔ **وقائمةُ الإشعارات كانت `w-52` ثابتة** ونصوصُها بلا حدٍّ للأسطر
+ *    ⇒ رسالةٌ طويلةٌ تمدّها خارج الشاشة. وصارت مقيَّدةَ العرض بسطرين لكلٍّ.
+ *
+ * ⚖️ **ومنطقُ الشارة لم يُمَسّ بحرف** — `total` من الخادم مع سقوطٍ على طول
+ *    القائمة، وحسابُ المخفيّ، وشرطُ `enabled` على صلاحية «الرسائل».
+ *    وحجّتُها كلُّها محفوظةٌ أدناه كما كُتبت.
+ */
 
 type HeaderProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
@@ -11,6 +37,9 @@ type HeaderProps = React.DetailedHTMLProps<
   Partial<any>;
 
 const Header: React.FC<HeaderProps> = (props) => {
+  const { can } = usePermissions();
+  const auth = useAppSelector(selectAuthData);
+
   // get chat notifications ================>
 
   const url = "/chat-notification";
@@ -22,18 +51,15 @@ const Header: React.FC<HeaderProps> = (props) => {
    * المُرسَلة** لا عددَ غير المقروء. وهو صادقٌ ما دام الخادم يرسل **كلَّ**
    * رسالةٍ غير مقروءة بلا حدّ، **ويكذب لحظة يُقصّ**.
    *
-   * والخادم يُقصّ فعلاً في البند نفسه (كان يجلبها كلَّها ثم يقرأ المرسِل
-   * لكلِّ صفٍّ ⇒ N+1 يُعاد عند كل تنقّلٍ بين الصفحات) ⇒ **بلا هذا الشطر
-   * تهبط الشارة من ٨٠ إلى ٣٠** على الإنتاج (مقيسٌ: ٨٠ غير مقروءة الآن)
-   * — نقصٌ ٦٢٪ في عدّادٍ يقرؤه المدرّب ليقرّر أيَّ محادثةٍ يفتح، **وبلا
-   * رمز خطإٍ ولا سطرِ سجلّ**.
-   *
    * ⚖️ **والسقوطُ على الطول متعمَّد لا احتياط** — يجعل هذا الشطر صالحاً
    * **قبل** نشر الخادم وبعده: إن غاب `total` (خادمٌ قديم) فالسلوك هو
-   * السابق حرفياً. وهي قاعدةُ ترتيب النشر في هذا المستودع مقلوبةً على
-   * سطحٍ نملك طرفيه: الأمانُ في الاتجاهين لا في اتجاهٍ واحد.
+   * السابق حرفياً.
    */
   const { data: chatNotice }: UseQueryResult<any> = useGetQuery(url, url, {
+    // [٧ سبتمبر ٢٠٢٦] `chat-notification` صار محروساً بقسم «الرسائل». ومن
+    // لا يملكه يستقبل **403 على كل تنقّل** لأن الترويسة في التخطيط. فيُعطَّل
+    // النداء ولا تُخفى الترويسة.
+    enabled: can("messages"),
     select: ({ data }: { data: { data: any[]; total?: number } }) => ({
       items: data.data ?? [],
       total: data.total ?? (data.data ?? []).length,
@@ -41,68 +67,94 @@ const Header: React.FC<HeaderProps> = (props) => {
   });
 
   const notifications: any[] = chatNotice?.items ?? [];
-
   const unreadTotal: number = chatNotice?.total ?? 0;
 
   /** كم بقي خارج القائمة المقصوصة — يُقال صراحةً ولا يُترك للتخمين. */
   const hiddenCount = Math.max(0, unreadTotal - notifications.length);
 
-  return (
-    <header className={props.className}>
-      <div className="flex flex-col items-center justify-start w-[62%] md:w-full"></div>
+  const name = auth?.user?.name?.trim() ?? "";
+  const initial = name ? name.charAt(0) : "؟";
 
-      <div className="flex flex-row items-center mx-10 gap-10">
-        <div className="dropdown">
-          <label tabIndex={0} className="btn m-1 relative ">
-            <Img
-              className="h-10 object-cover "
-              src="/images/img_group.png"
-              alt="group"
-            />
-            <span className="absolute -top-2 -right-2 indicator-item badge-sm h-6 rounded-full badge badge-warning">
-              {unreadTotal}
-            </span>
+  return (
+    <div className={`flex items-center gap-2 ${props.className ?? ""}`}>
+      {/* ── الجرس ───────────────────────────────────────────────────── */}
+      {can("messages") && (
+        <div className="dropdown dropdown-end">
+          <label
+            tabIndex={0}
+            aria-label={`الرسائل غير المقروءة: ${unreadTotal}`}
+            className="btn relative h-10 w-10 grid place-items-center rounded-field text-content-muted hover:bg-ink-800 hover:text-content cursor-pointer transition-colors"
+          >
+            <Icon name="bell" />
+            {unreadTotal > 0 && (
+              <span className="absolute -top-1 -end-1 min-w-[18px] h-[18px] px-1 grid place-items-center rounded-full bg-brand-400 text-ink-950 text-[10px] font-bold">
+                {unreadTotal > 99 ? "99+" : unreadTotal}
+              </span>
+            )}
           </label>
+
           <ul
             tabIndex={0}
-            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            className="dropdown-content z-[60] mt-2 w-80 max-w-[calc(100vw-2rem)] p-2 rounded-card bg-surface border border-line shadow-pop"
           >
+            <li className="px-3 py-2 text-xs font-semibold text-content-faint pointer-events-none">
+              الرسائل غير المقروءة
+            </li>
+
             {notifications?.length > 0 ? (
-              notifications?.map((item: any, index: any) => (
+              notifications.slice(0, 6).map((item: any, index: any) => (
                 <li key={index}>
-                  <a className="line-clamp-1">{item?.message}</a>
-                  <span>{item?.created_at}</span>
+                  <Link
+                    to="/dashboard"
+                    className="block rounded-lg px-3 py-2 hover:bg-ink-800 transition-colors"
+                  >
+                    <span className="block text-[13px] text-content line-clamp-2 leading-relaxed">
+                      {item?.message}
+                    </span>
+                    <span className="block text-[11px] text-content-faint mt-0.5">
+                      {item?.created_at}
+                    </span>
+                  </Link>
                 </li>
               ))
             ) : (
-              <Text
-                as="h5"
-                className="font-bold !text-center w-full !text-[12px]"
-              >
-                {"لا يوجد رسائل فائتة"}
-              </Text>
+              <li className="pointer-events-none">
+                <Text
+                  as="p"
+                  className="!w-full !whitespace-normal text-center py-4 !text-content-muted !text-[13px]"
+                >
+                  لا رسائل غير مقروءة
+                </Text>
+              </li>
             )}
 
-            {/* القائمة مقصوصة والعدّاد كامل ⇒ يُقال الفرق بدل أن يبدو الباقي
-                غيرَ موجود. */}
+            {/* القائمة مقصوصة والعدّاد كامل ⇒ يُقال الفرق. */}
             {hiddenCount > 0 && (
-              <li className="pointer-events-none">
-                <span className="!text-[11px] opacity-70">
+              <li className="pointer-events-none border-t border-line mt-1 pt-1">
+                <span className="block px-3 py-2 text-[11px] text-content-faint">
                   {`و${hiddenCount} رسالة أخرى — افتح المحادثات`}
                 </span>
               </li>
             )}
           </ul>
         </div>
-        {/* <Img className="h-[71px]" src="/images/img_folder.svg" alt="folder" /> */}
-        <Img
-          className="h-[30px] md:h-auto mb-1 ml-1.5 object-cover "
-          src="/images/img_image.png"
-          alt="image_One"
-        />
-        خالد المالكي
+      )}
+
+      {/* ── الحساب ──────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2.5 ps-2 sm:ps-0 border-s sm:border-s-0 border-line">
+        <span className="h-9 w-9 shrink-0 grid place-items-center rounded-field bg-brand-400 text-ink-950 text-sm font-bold">
+          {initial}
+        </span>
+        <div className="min-w-0 sm:hidden">
+          <p className="text-[13px] font-semibold text-content leading-tight truncate max-w-[140px]">
+            {name || "—"}
+          </p>
+          <p className="text-[11px] text-content-faint leading-tight">
+            {auth?.user?.is_super ? "مدير أعلى" : "مسؤول"}
+          </p>
+        </div>
       </div>
-    </header>
+    </div>
   );
 };
 

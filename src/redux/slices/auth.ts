@@ -10,7 +10,13 @@ interface Data {
     expires_in: number;
     created_at: string;
     updated_at: string;
+    /** دلالتُها منذ ٧ سبتمبر ٢٠٢٦: **مديرٌ أعلى**. الاسم منشورٌ فبقي. */
     is_admin: boolean;
+    is_super: boolean;
+    /** مفاتيحُ الأقسام المسموحة — يرسم بها الشريطُ الجانبيّ نفسه. */
+    permissions: string[];
+    /** مفتاحُ القسم => تسميتُه العربية، من سجلّ الخادم لا مكتوبةً هنا. */
+    sections: Record<string, string>;
   };
 }
 

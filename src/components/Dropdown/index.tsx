@@ -15,7 +15,10 @@ type Props = {
 function Dropdown({ children, ntNumber, list = [], showArrow = true }: Props) {
   return (
     <div className="relative dropdown dropdown-right">
-      <label tabIndex={0} className="btn  p-1 bg-transparent border-none">
+      <label
+        tabIndex={0}
+        className="btn cursor-pointer p-1.5 rounded-lg bg-transparent border-none text-content-muted hover:bg-ink-800 hover:text-content transition-colors"
+      >
         <div className=" whitespace-nowrap flex items-center gap-2 w-fit">
           {children}
 
@@ -28,7 +31,7 @@ function Dropdown({ children, ntNumber, list = [], showArrow = true }: Props) {
           )}
 
           {ntNumber && (
-            <span className=" bg-primary h-5 w-5 border-0 text-white  indicator-item">
+            <span className="grid place-items-center min-w-[20px] h-5 px-1 rounded-full bg-brand-400 text-ink-950 text-[10px] font-bold">
               {ntNumber}
             </span>
           )}
@@ -37,11 +40,13 @@ function Dropdown({ children, ntNumber, list = [], showArrow = true }: Props) {
 
       <ul
         tabIndex={0}
-        className="menu  menu-sm dropdown-content mt-3 z-[1] shadow bg-blue_gray-900 rounded-box w-52"
+        className="menu menu-sm dropdown-content mt-2 z-[60] p-1.5 shadow-pop bg-surface border border-line rounded-card w-48"
       >
         {list.map((item, index) => (
           <li onClick={item.onClick} key={index}>
-            <span className="justify-between p-2 ">{item.label}</span>
+            <span className="justify-between rounded-lg px-3 py-2 text-sm text-content-muted hover:bg-ink-800 hover:text-content transition-colors">
+              {item.label}
+            </span>
           </li>
         ))}
       </ul>

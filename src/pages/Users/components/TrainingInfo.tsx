@@ -302,7 +302,7 @@ function TrainingInfo() {
           <Text as="h5">تقدم برنامج التدريب</Text>
 
           <div
-            className={"radial-progress text-[#E80054]"}
+            className={"radial-progress text-brand-400"}
             style={
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore

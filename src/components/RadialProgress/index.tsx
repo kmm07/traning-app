@@ -22,10 +22,11 @@ const RadialProgress = ({ percentage, className, body, name }: Props) => {
         }}
         value={values[name ?? ("blank" as any)] ?? (percentage as any)}
         name={name ?? ("blank" as any)}
-        className="text-center font-bold !text-[20px] w-[98px]"
+        className="!text-center !font-bold !text-lg !w-[110px]"
       />
+      {/* لونُ الحلقة يتبع الهوية — كان يأخذ لونَ السمة الافتراضية. */}
       <div
-        className={`radial-progress  ${className}`}
+        className={`radial-progress text-brand-400 ${className}`}
         style={
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
