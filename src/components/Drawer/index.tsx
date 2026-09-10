@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 /*
  * الدرجُ الجانبيّ — يحمل نماذجَ التحرير الطويلة (١٠ ملفات).
@@ -21,7 +22,28 @@ type Props = {
 };
 
 function Drawer({ label, children, id = "my-drawer", title }: Props) {
-  return (
+  /*
+   * 🔴 **والدرجُ يُركَّب في `document.body` لا في مكانه من الشجرة.**
+   *
+   * `.drawer-side` قاعدتُها `position: fixed; top: 0` — أي **بالنسبة إلى
+   * الشاشة**. لكن أيَّ سلفٍ عليه `transform` أو `filter` أو حركةٌ مالئةٌ
+   * على أحدهما **يصير هو الكتلةَ الحاوية**، فيهبط الدرجُ عند رأس الصفحة
+   * بدل رأس الشاشة: من ضغط صفّاً في أسفل جدولٍ طويل لا يراه حتى يمرّر
+   * لأعلى — ويعلوه الرأسُ اللاصق لأن سياقَ التكديس يحبس `z-50`.
+   *
+   * ⚖️ **والبوّابةُ تُغلق العائلة لا الحالة**: لا يبقى للدرج سلفٌ في
+   * الصفحة إطلاقاً، فأيُّ تحويلٍ يُضاف غداً في أيّ تخطيطٍ أو بطاقةٍ لا
+   * يبلغه. وهي أضمنُ من ملاحقة كل سلفٍ على حدة.
+   *
+   * ⛔ **وأثرُها على التخطيط صفر — مقيسٌ من CSS المخدوم**: `.drawer-toggle`
+   * عليها `display: none`، و`.drawer-content` **لا تُركَّب أصلاً** (صفرُ
+   * مستدعٍ يمرّر `label` في المستودع كلِّه) ⇒ الكتلةُ المُضافة إلى الجسم
+   * بلا ابنٍ في التدفّق، وارتفاعُها صفر.
+   *
+   * 📌 وسياقاتُ React تعبر البوّابة (Formik · react-query · التوجيه)،
+   * و`getElementById("my-drawer")` يفتحه من أيّ موضعٍ في المستند.
+   */
+  return createPortal(
     <div className="drawer drawer-end z-50">
       <input id={id} type="checkbox" className="drawer-toggle" />
 
@@ -56,7 +78,8 @@ function Drawer({ label, children, id = "my-drawer", title }: Props) {
           <div className="p-5">{children}</div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -106,6 +106,38 @@ function Layout() {
     scrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
   }, [pathname]);
 
+  /*
+   * 🔴 **وحركةُ دخول الصفحة كانت تكسر كلَّ درجٍ ونافذةٍ في اللوحة.**
+   *
+   * `animate-page-in` تُشغَّل بـ`fill-mode: both` ⇒ تبقى **مطبَّقةً** على
+   * `<main>` بعد انتهائها لا تزول. والمتصفّحُ يعامل عنصراً عليه حركةٌ
+   * جاريةٌ أو مالئةٌ على `transform` معاملةَ من عليه تحويلٌ فعليّ ⇒ يصير:
+   *   ١. **الكتلةَ الحاويةَ لكل `position: fixed` بداخله** — ودرجُ daisyUI
+   *      `position: fixed; top: 0` ⇒ يُوضَع عند **رأس الصفحة** لا رأس
+   *      الشاشة، فمن ضغط صفّاً في أسفل جدولٍ طويل لا يراه حتى يمرّر لأعلى.
+   *   ٢. **وسياقَ تكديسٍ** يحبس `z-index` أبنائه ⇒ يعلوهما الرأسُ اللاصق.
+   *
+   * ⛔ **وردُّ آخرِ إطارٍ إلى `transform: none` لا يكفي — مُجرَّبٌ ومقيس:**
+   * الحزمةُ حُمّلت والعطلُ باق. لأن العبرة بأن الحركة **ما زالت تُطبَّق**
+   * لا بقيمتها الأخيرة.
+   *
+   * ⚖️ **فالعلاجُ نزعُ الصنف بعد انتهائها** — فلا يبقى على `<main>` حركةٌ
+   * ولا تحويلٌ ولا مرشِّح، وهو علاجٌ لا يتوقّف على أيِّ قراءةٍ للمواصفة:
+   * العنصرُ بعد الاستقرار **عارٍ**. والحركةُ تُعاد في كل انتقالٍ لأن
+   * `settledPath` يفارق المسار الجديد لحظةَ رسمه.
+   *
+   * 📌 ومهلةٌ احتياطية لأن `animationend` **قد لا يقع أصلاً**: تبويبٌ مخفيّ
+   * وقتَ الانتقال، أو `prefers-reduced-motion` يُلغي الحركة. وبلاها يبقى
+   * الصنفُ إلى الأبد في الحالتين — وهو عينُ العطل.
+   */
+  const [settledPath, setSettledPath] = useState<string | null>(null);
+  const entering = settledPath !== pathname;
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setSettledPath(pathname), 600);
+    return () => window.clearTimeout(t);
+  }, [pathname]);
+
   /** Esc يُغلق الدرج — فعلُ خروجٍ متوقَّع لا يحتاج تعلّماً. */
   useEffect(() => {
     if (!menuOpen) return;
@@ -192,7 +224,15 @@ function Layout() {
                جديد). ⇒ حركةٌ مكتوبةٌ في الكود ولا تُرى إلا مرّة.
                و`key={pathname}` يُعيد تركيب المحتوى في كل انتقال فتُرى فعلاً.
           */}
-          <main key={pathname} className="flex-1 p-6 sm:p-4 animate-page-in">
+          <main
+            key={pathname}
+            className={`flex-1 p-6 sm:p-4 ${entering ? "animate-page-in" : ""}`}
+            /* ⛔ والشرطُ على المصدر لا مطلقاً — الحدثُ يتصاعد من حركةِ أيِّ
+               عنصرٍ داخل الصفحة، فبلاه يُنزع الصنفُ قبل أن تبدأ حركةُ الصفحة. */
+            onAnimationEnd={(e) => {
+              if (e.target === e.currentTarget) setSettledPath(pathname);
+            }}
+          >
             <Outlet />
           </main>
         </div>
