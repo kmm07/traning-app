@@ -307,24 +307,43 @@ export default {
       },
       transitionDuration: { 120: "120ms", 320: "320ms" },
 
+      /*
+       * 🔴 **وكلُّ حركةِ دخولٍ تنتهي إلى `transform: none` لا إلى المطابقة
+       *    الصفرية — والفرقُ هو الفرقُ بين لوحةٍ تعمل ولوحةٍ لا تعمل.**
+       *
+       * الأربعُ تُشغَّل بـ`fill-mode: both` فتُبقي **آخرَ إطارٍ** مسنَداً
+       * إلى الأبد. و`translateY(0)` تحويلٌ قائمٌ لا غيابُ تحويل ⇒ العنصرُ
+       * يصير (١) **الكتلةَ الحاوية لكلّ `position: fixed` بداخله** و(٢)
+       * **سياقَ تكديسٍ** يحبس `z-index` أبنائه.
+       *
+       * وأثرُه مقيسٌ على `<main>` التي تحمل `animate-page-in`: درجُ daisyUI
+       * `position: fixed; top: 0` وكذلك النافذة `z-index: 999` ⇒
+       *   · الدرجُ يُوضَع عند **رأس الصفحة** لا رأس الشاشة، فمن ضغط صفّاً
+       *     في أسفل جدولٍ طويل يجد الدرجَ فوقه ويلزمه أن يمرّر ليراه؛
+       *   · و`z-50`/`z-999` محبوسان داخل `main` فيعلوهما **الرأسُ اللاصق**
+       *     (`z-40`) وهو أخوها لا ابنُها ⇒ يغطّي أعلى الدرج.
+       *
+       * ⚖️ و`none` تنتهي إليها الحركةُ نفسُها بلا فارقٍ بصريّ (المطابقةُ
+       * الصفرية والغيابُ يرسمان الشيء عينه)، فالعلاجُ كلمةٌ لا إعادةُ بناء.
+       */
       keyframes: {
         "fade-in": {
           from: { opacity: "0", transform: "translateY(4px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          to: { opacity: "1", transform: "none" },
         },
         "slide-in": {
           from: { opacity: "0", transform: "translateX(8px)" },
-          to: { opacity: "1", transform: "translateX(0)" },
+          to: { opacity: "1", transform: "none" },
         },
         /** دخولُ الصفحة — ارتفاعٌ خفيفٌ مع تلاشٍ، لا انزلاقٌ يُشتّت. */
         "page-in": {
           from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          to: { opacity: "1", transform: "none" },
         },
         /** دخولُ النوافذ — تكبيرٌ خفيفٌ من ٩٦٪ فتبدو قادمةً من العمق. */
         "scale-in": {
           from: { opacity: "0", transform: "scale(0.96) translateY(8px)" },
-          to: { opacity: "1", transform: "scale(1) translateY(0)" },
+          to: { opacity: "1", transform: "none" },
         },
         shimmer: {
           "100%": { transform: "translateX(-100%)" },
