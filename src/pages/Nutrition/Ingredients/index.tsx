@@ -23,6 +23,20 @@ function Ingredients() {
   const confirm = useConfirm();
   const [categoryId, setCategoryId] = useState(1);
 
+  /**
+   * 🔴 **عدسةُ المصدر — وبلاها لا سبيل إلى صفٍّ واحد من قاعدة الأطعمة.**
+   * القائمةُ تُذيَّل بالمستورد **بعد** كتالوج المدرّب كلِّه، وفئةُ «جميع
+   * المكوّنات» وحدها ١٨٬٣٣١ صفّاً ⇒ أوّلُ صفٍّ مستورد يقع في الصفحة ٧٣٤.
+   * ومقيسٌ على سجلّ الخادم أن **كلَّ** زيارةٍ حقيقية كانت `page=1` ⇒ صفوفُ
+   * قاعدة الأطعمة **غيرُ قابلةٍ للبلوغ عملياً** إلا بمصادفةِ بحثٍ يقلّ فيه
+   * الكتالوج عن خمسةٍ وعشرين. وتحريرُها منشورٌ منذ ١ سبتمبر ولا يُبلغ.
+   *
+   * ⚖️ **وصفر تعديلٍ في الخادم**: `meal_ingredient_category_id=0` يعني عنده
+   * «المستوردَ وحده» سلفاً (٨٬١٨٦ صنفاً · ٣٢٨ صفحة) — العدسةُ تستعمل ما هو
+   * مبنيٌّ ولا تفتح باباً جديداً.
+   */
+  const [source, setSource] = useState<"catalog" | "food_db">("catalog");
+
   const [ingredientData, setIngredientData] = useState<any>(null);
 
   const [valuesItem, setValuesItem] = useState(null);
@@ -128,7 +142,19 @@ function Ingredients() {
     setCurrentPage(1);
   }, [visibility]);
 
-  const url = `/meal-ingredients?meal_ingredient_category_id=${categoryId}&per_page=25&page=${currentPage}&visibility=${visibility}&include_food_db=1${
+  // ⛔ وتبديلُ المصدر يُصفّر البحثَ والصفحة — بحثٌ من كتالوجٍ آخر مطبَّقاً
+  //    على مصدرٍ آخر يُقرأ «فارغاً» لا «لا نتيجة لهذا البحث».
+  useEffect(() => {
+    setSearch("");
+    setQuery("");
+    setCurrentPage(1);
+  }, [source]);
+
+  // `0` = «المستوردَ وحده» بحكم الخادم؛ وفئاتُ اللوحة تصنيفُ كتالوجها هي
+  //  ولا عضوية للمستورد فيها.
+  const listCategoryId = source === "food_db" ? 0 : categoryId;
+
+  const url = `/meal-ingredients?meal_ingredient_category_id=${listCategoryId}&per_page=25&page=${currentPage}&visibility=${visibility}&include_food_db=1${
     query ? `&search_query=${encodeURIComponent(query)}` : ""
   }`;
 
@@ -194,7 +220,7 @@ function Ingredients() {
               {/* ⛔ **الشارةُ في «الكل» وحدها** — في عدسةٍ مفردة يكون كلُّ
                   صفٍّ من نوعها فتصير الشارةُ ضجيجاً يُقرأ من طرف العين.
                   وغيابُها هناك لا يُلبس: العدسةُ نفسها تقول ما تعرض. */}
-              {row.original.source === "food_db" && (
+              {row.original.source === "food_db" && source !== "food_db" && (
                 <span
                   className="text-xs px-2 py-[2px] rounded-full border border-sky-400 text-sky-400 whitespace-nowrap"
                   title="من قاعدة الأطعمة المستوردة — يُحرَّر في مصدره، وتصحيحُه يسري على البحث والباركود والوصفات معاً"
@@ -275,7 +301,7 @@ function Ingredients() {
     ],
     // ⚠️ `visibility` في التبعيات — الشارةُ تقرؤها، وبقاءُ `[]` يجمّد
     //    الإغلاقةَ على أوّل قيمة فلا تظهر الشارةُ عند التبديل إلى «الكل».
-    [visibility]
+    [visibility, source]
   );
 
   const rowOnClick = (item: any) => {
@@ -299,7 +325,11 @@ function Ingredients() {
                 key={item.id}
                 label={item.name}
                 active={categoryId === item.id}
-                onClick={() => setCategoryId(item.id)}
+                onClick={() => {
+                  // ⛔ وإلا بدت البطاقةُ معطّلة: العدسةُ المستوردة تتجاهل الفئة
+                  setSource("catalog");
+                  setCategoryId(item.id);
+                }}
                 className={`h-[120px] ${
                   item.private === 1 ? "!border-[#CFFF0F]" : "!border-[#fff]"
                 }`}
@@ -329,37 +359,72 @@ function Ingredients() {
         <div className="mb-4 flex flex-wrap items-center gap-3">
           {(
             [
-              ["visible", "المعروضة"],
-              ["hidden", "بانتظار القيم"],
-              ["all", "الكل"],
+              ["catalog", "كتالوجك"],
+              ["food_db", "قاعدة الأطعمة"],
             ] as const
           ).map(([key, label]) => (
             <Button
               key={key}
               size="small"
-              primary={visibility === key}
-              secondaryBorder={visibility !== key}
-              onClick={() => setVisibility(key)}
+              primary={source === key}
+              secondaryBorder={source !== key}
+              onClick={() => setSource(key)}
             >
               {label}
             </Button>
           ))}
+
+          {source === "catalog" && <span className="w-px h-6 bg-line" />}
+
+          {/* ⛔ عدسةُ الرؤية لكتالوج المدرّب وحده — المستوردُ مقصورٌ على
+              `is_visible = 1` في الخادم، فخياراتُها فيه أزرارٌ بلا أثر. */}
+          {source === "catalog" &&
+            (
+              [
+                ["visible", "المعروضة"],
+                ["hidden", "بانتظار القيم"],
+                ["all", "الكل"],
+              ] as const
+            ).map(([key, label]) => (
+              <Button
+                key={key}
+                size="small"
+                primary={visibility === key}
+                secondaryBorder={visibility !== key}
+                onClick={() => setVisibility(key)}
+              >
+                {label}
+              </Button>
+            ))}
 
           {/* ⚖️ **العددُ مفصولٌ بالمصدر لا مجموعاً** — الشاشةُ صارت تعرض
               كتالوجين، ورقمٌ واحد يجعل المدرّب يظنّ أن ٨٬١٨٦ منتجاً صفوفٌ
               يملكها ويحرّرها، وهي للعرض والإضافة وحدهما. */}
           {!isListLoading && counts && (
             <Text className="text-sm opacity-70">
-              {Number(counts.catalog ?? 0).toLocaleString("en-US")} من كتالوجك
-              {(counts.food_db ?? 0) > 0 && (
-                <> · {Number(counts.food_db).toLocaleString("en-US")} من قاعدة الأطعمة</>
+              {source === "food_db" ? (
+                <>{Number(counts.food_db ?? 0).toLocaleString("en-US")} صنفاً في قاعدة الأطعمة</>
+              ) : (
+                <>
+                  {Number(counts.catalog ?? 0).toLocaleString("en-US")} من كتالوجك
+                  {(counts.food_db ?? 0) > 0 && (
+                    <> · {Number(counts.food_db).toLocaleString("en-US")} من قاعدة الأطعمة</>
+                  )}
+                </>
               )}
             </Text>
           )}
         </div>
 
         {/* ⚖️ سطرٌ يشرح العدسةَ بدل أن يخمّن المدرّبُ لماذا نقص الجدول فجأة */}
-        {visibility !== "visible" && (
+        {source === "food_db" && (
+          <div className="mb-4 text-sm text-sky-400/90">
+            قاعدةُ الأطعمة المستوردة — اضغط أيَّ صنفٍ لتصحيح اسمه وقيمه
+            الغذائية. والتصحيحُ يسري على البحث والباركود والوصفات معاً.
+          </div>
+        )}
+
+        {source === "catalog" && visibility !== "visible" && (
           <div className="mb-4 text-sm text-amber-400/90">
             {visibility === "hidden"
               ? "هذه مكوّنات ومنتجات مخفيّة عن بحث المستخدم — تنقصها القيم الغذائية. املأ قيمها لتظهر."
@@ -372,7 +437,11 @@ function Ingredients() {
             name=""
             isForm={false}
             inputSize="large"
-            placeholder="ابحث في مكوّنات هذه الفئة..."
+            placeholder={
+              source === "food_db"
+                ? "ابحث في قاعدة الأطعمة (اسم أو علامة تجارية)..."
+                : "ابحث في مكوّنات هذه الفئة..."
+            }
             value={search}
             className="Rectangle h-9 bg-gray-900 shadow-bs rounded-3xl border-slate-800"
             onChange={(e) => setSearch(e.target.value)}
@@ -384,10 +453,13 @@ function Ingredients() {
             data={ingredientsList ?? []}
             columns={columns}
             rowOnClick={rowOnClick}
-            /* ⛔ صفُّ قاعدة الأطعمة **لا يُحرَّر**: معرّفُه `food:123` لا رقمٌ،
-               و`update-meal-ingredient` يعمل على كتالوج المدرّب وحده ⇒ فتحُ
-               الدرج عليه كان يُنتج حفظاً يردّ 404 أو يكتب على صفٍّ آخر. */
-            opnSideBar="إضافة مكون"
+            /* ⛔ التعليقُ القديم هنا كان يقول إن صفَّ قاعدة الأطعمة «لا
+               يُحرَّر» — **وقد نُقض في ١ سبتمبر**: صار له درجُه ومسارُه
+               (`PUT admin/food-items/{id}`)، والصفُّ يحمل `food_item_id`
+               الرقميّ فلا يقصف معرّفُه النصّيّ شيئاً.
+               ⛔ **والإضافةُ لكتالوج المدرّب وحدها** — لا يُضاف صنفٌ إلى
+               مصدرٍ مستورَد. */
+            opnSideBar={source === "catalog" ? "إضافة مكون" : undefined}
             opnSideBarOpen={() => setIngredientData(null)}
             setPage={setCurrentPage}
             pagination={pagination}
