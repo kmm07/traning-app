@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import formData from "util/formData";
 import { apiErrorMessage } from "util/apiError";
 import { useConfirm } from "components/ConfirmDialog/context";
+import ExerciseThumb from "./ExerciseThumb";
 
 const initialValues = {
   name: "",
@@ -211,7 +212,40 @@ function SideBar({ exerciseData, categoryData }: any) {
           <Card className="flex  gap-5 p-4">
             <Text size="3xl">صورة العضلة </Text>
             <hr />
-            <UploadInput name="muscle_image" />
+            <div className="flex items-start gap-6">
+              <UploadInput name="muscle_image" />
+
+              {/*
+                مصغّرةُ الفيديو **بجانب** مخطّط العضلة لا بدلاً منه — قرار
+                خالد: المخطّط هنا ليس للتمييز فحسب بل يُرسَل مع التمرين إلى
+                تطبيق فلاتر، فاستبدالُه في هذه الشاشة كان ينزع أداةَ تحريره.
+                واللقطةُ للقراءة فقط: يكتبها الخادم من رابط الفيديو ولا
+                تُرفع بيد، ولذلك بلا `UploadInput`.
+              */}
+              {values.video_thumb && (
+                <div className="flex flex-col gap-2">
+                  <Text className="!text-sm opacity-70">لقطة من الفيديو</Text>
+                  {/* وتتكبّر عند المرور كما في القائمة — نفسُ المكوّن فلا
+                      يفترق سلوكُ الشاشتين. */}
+                  <ExerciseThumb
+                    thumb={values.video_thumb}
+                    // ⛔ **و`internal_video` يصير كائنَ `File` لحظة اختيار
+                    //    ملفٍّ جديد** (`setFieldValue(..., files[0])`) —
+                    //    فتمريرُه خاماً يضع كائناً في `src`. النصُّ وحده يمرّ،
+                    //    والملفُّ غيرُ المحفوظ لا فيديو له على الخادم بعد.
+                    video={
+                      typeof values.external_video === "string" &&
+                      values.external_video
+                        ? values.external_video
+                        : typeof values.internal_video === "string"
+                        ? values.internal_video
+                        : undefined
+                    }
+                    alt={values.name}
+                  />
+                </div>
+              )}
+            </div>
           </Card>
           <Card className="flex flex-col gap-5 p-4">
             <Text size="3xl">الملاحظة</Text>

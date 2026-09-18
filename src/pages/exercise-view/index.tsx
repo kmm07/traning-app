@@ -7,6 +7,7 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import ExerciseCategoryForm from "./components/exerciseCategoryForm";
 import AddExercise from "./components/AddExercise";
+import ExerciseThumb from "./components/ExerciseThumb";
 import { useConfirm } from "components/ConfirmDialog/context";
 
 interface Props {
@@ -76,15 +77,27 @@ function ExercisesView({ home }: Props) {
       {
         Header: "التمرين",
         Cell: ({ row }: { row: Row<any> }) => {
+          // مصغّرةُ الفيديو تحلّ محلّ مخطّط العضلة **في القائمة وحدها**:
+          // المخطّط واحدٌ لعشرات التمارين فلا يميّز بينها، واللقطةُ تقول أيُّ
+          // تمرينٍ هو بلا فتح الفيديو. ومَن لا مصغّرة له (فيديو محلّيّ أو
+          // رابطٌ ليس من Vimeo) يسقط على المخطّط كما كان.
+          // ⛔ والمخطّطُ يبقى في شاشة التفاصيل — يُرسَل مع التمرين إلى تطبيق
+          //    فلاتر، فليس للتمييز في اللوحة فحسب.
+          // وتتكبّر عند المرور — والمعاينةُ `fixed` لأن غلافَ الجدول
+          // `overflow-x-auto` يقصّ أيَّ تكبيرٍ في مجرى التخطيط.
           return (
             <div className="flex items-center gap-4">
-              <div className="avatar indicator">
-                <div className="w-12 h-12 rounded-full">
-                  <img
-                    src={row.original.image || "/images/img_rectangle347.png"}
-                  />
-                </div>
-              </div>
+              <ExerciseThumb
+                thumb={row.original.video_thumb}
+                fallback={row.original.image}
+                // ⚖️ المفتاحُ يتبدّل بنوع الفيديو: `ExerciseResource` يرسل
+                // `external_video` للرابط و`internal_video` للملفّ عندنا،
+                // ولا يرسل الاثنين معاً — فقراءةُ أحدهما وحده تُخفي نصفهما.
+                video={
+                  row.original.external_video || row.original.internal_video
+                }
+                alt={row.original.name}
+              />
               {row.original.name}
             </div>
           );
