@@ -54,6 +54,21 @@ export const NAV_ITEMS: NavItem[] = [
     group: "work",
   },
   {
+    name: "المدربون",
+    section: "coaches",
+    link: "/coaches",
+    icon: "star",
+    group: "work",
+  },
+  {
+    // [اشتراكات المدرّبين] تحت قسم «المستخدمين» على الخادم — النقلُ يقع من خطّة المستخدم
+    name: "مراجعة التجديدات",
+    section: "users",
+    link: "/renewal-reviews",
+    icon: "refresh",
+    group: "work",
+  },
+  {
     name: "توصيات المدرب",
     section: "insights",
     link: "/insight-recommendations",
@@ -152,6 +167,7 @@ const EXTRA_TITLES: Array<{ match: RegExp; title: string }> = [
   { match: /^\/users\/\d+\/plan/, title: "خطّة المستخدم" },
   { match: /^\/users\/\d+\/subscriptions/, title: "اشتراكات المستخدم" },
   { match: /^\/exercises\/week-days\/\d+/, title: "أيام الأسبوع" },
+  { match: /^\/coaches\/\d+/, title: "كشف المدرب" },
 ];
 
 export function titleForPath(pathname: string): string {

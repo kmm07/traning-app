@@ -6,6 +6,7 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { Row } from "react-table";
 import AddNewSubscription from "./components/addSubscription";
 import { useConfirm } from "components/ConfirmDialog/context";
+import usePermissions from "hooks/usePermissions";
 
 export default function Subscriptions() {
   const confirm = useConfirm();
@@ -18,6 +19,15 @@ export default function Subscriptions() {
     useGetQuery(url, url, {
       select: ({ data }: { data: { data: [] } }) => data.data,
     });
+  // [اشتراكات المدرّبين] أسماءُ المدرّبين لعمود «المدرب» — لمن يملك القسم وحده
+  const { can } = usePermissions();
+  const { data: coachNames = {} }: UseQueryResult<any> =
+    useGetQuery("/coaches", "/coaches", {
+      select: ({ data }: any) =>
+        Object.fromEntries((data.data ?? []).map((c: any) => [c.id, c.name])),
+      enabled: can("coaches"),
+    });
+
   // subscriptions actions ======================>
   const { mutateAsync } = useDeleteQuery();
 
@@ -89,6 +99,15 @@ export default function Subscriptions() {
         },
       },
       {
+        Header: "المدرب",
+        Cell: ({ row }: { row: Row<any> }) => {
+          // `NULL` = باقةُ المنصّة (خالد)
+          const id = row.original.coach_id;
+          if (!id) return <span className="text-content-muted">المنصة</span>;
+          return <span>{coachNames[id] ?? `#${id}`}</span>;
+        },
+      },
+      {
         Header: "سعر الإشتراك",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
@@ -120,7 +139,7 @@ export default function Subscriptions() {
         },
       },
     ],
-    []
+    [coachNames]
   );
 
   return (

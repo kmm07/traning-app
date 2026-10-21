@@ -31,6 +31,9 @@ import SystemNotices from "pages/system-notices";
 import InsightRecommendations from "pages/insight-recommendations";
 import Analytics from "pages/analytics";
 import RouteError from "components/ErrorBoundary/RouteError";
+import Coaches from "pages/coaches";
+import CoachView from "pages/coaches/view";
+import RenewalReviews from "pages/renewal-reviews";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -61,6 +64,9 @@ const router = createBrowserRouter(
         />
         <Route path="/users/:id/plan" element={<UserPlan />} />
         <Route path="subscriptions" index element={<Subscriptions />} />
+        <Route path="/coaches" element={<Coaches />} />
+        <Route path="/coaches/:id" element={<CoachView />} />
+        <Route path="/renewal-reviews" element={<RenewalReviews />} />
         <Route path="/nutrition">
           <Route path="descriptions" element={<Descriptions />} />
           <Route path="ingredients" element={<Ingredients />} />
