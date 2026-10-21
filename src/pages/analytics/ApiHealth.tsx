@@ -24,14 +24,25 @@ function ApiHealth({ period }: { period: string }) {
           title="إجمالي النداءات"
           value={s.total_calls?.toLocaleString?.()}
         />
+        {/*
+         * 🔴 «نداءات فاشلة» وحدها كانت تخلط بوّاباتِ اشتراكٍ ومصادقةٍ (403/401)
+         * وتحقّقَ مدخل (422) — سلوكٌ مقصود — مع انقطاع الشبكة و5xx، فتُقرأ
+         * بوّابةٌ تعمل كما صُمِّمت عطلاً حيّاً. البطاقتان أدناه تفصلان ما
+         * يستحقّ الانتباه (`real_failed`) عمّا لا يستحقّه.
+         */}
         <KpiCard
-          title="نداءات فاشلة"
-          value={s.failed?.toLocaleString?.()}
-          sub={s.fail_pct != null ? `النسبة: ${s.fail_pct}%` : undefined}
+          title="عطلٌ حقيقي"
+          value={s.real_failed?.toLocaleString?.()}
+          sub={
+            s.real_fail_pct != null
+              ? `النسبة: ${s.real_fail_pct}% — بلا ردٍّ أو 5xx`
+              : undefined
+          }
         />
         <KpiCard
-          title="بلا رد (انقطاع/مهلة)"
-          value={s.no_response?.toLocaleString?.()}
+          title="رفضٌ متوقّع"
+          value={s.expected_failed?.toLocaleString?.()}
+          sub="بوّاباتُ اشتراكٍ/مصادقة أو تحقّقُ مدخل (4xx) — سلوكٌ مقصود"
         />
         <KpiCard
           title="متوسط زمن الرد"
@@ -39,14 +50,15 @@ function ApiHealth({ period }: { period: string }) {
         />
       </div>
 
-      <Section title="حسب المسار (الأكثر فشلاً أولاً)">
+      <Section title="حسب المسار (العطل الحقيقيّ أولاً)">
         <div className="rounded-2xl border border-blue_gray-900_01 bg-gray-900_01 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-right opacity-70 border-b border-blue_gray-900_01">
                 <th className="px-4 py-3">المسار</th>
                 <th className="px-4 py-3">نداءات</th>
-                <th className="px-4 py-3">فشل</th>
+                <th className="px-4 py-3">عطلٌ حقيقي</th>
+                <th className="px-4 py-3">رفضٌ متوقّع</th>
                 <th className="px-4 py-3">نسبة الفشل</th>
                 <th className="px-4 py-3">متوسط (ms)</th>
                 <th className="px-4 py-3">أقصى (ms)</th>
@@ -61,10 +73,17 @@ function ApiHealth({ period }: { period: string }) {
                   <td className="px-4 py-2">{r.calls}</td>
                   <td
                     className={`px-4 py-2 ${
-                      r.failed > 0 ? "text-red-400 font-bold" : ""
+                      r.real_failed > 0 ? "text-red-400 font-bold" : "opacity-50"
                     }`}
                   >
-                    {r.failed}
+                    {r.real_failed}
+                  </td>
+                  <td
+                    className={`px-4 py-2 ${
+                      r.expected_failed > 0 ? "text-amber-400" : "opacity-50"
+                    }`}
+                  >
+                    {r.expected_failed}
                   </td>
                   <td className="px-4 py-2">{r.fail_pct}%</td>
                   <td className="px-4 py-2">{r.avg_ms ?? "—"}</td>
@@ -73,7 +92,7 @@ function ApiHealth({ period }: { period: string }) {
               ))}
               {!data?.by_path?.length && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center opacity-60">
+                  <td colSpan={7} className="px-4 py-8 text-center opacity-60">
                     لا نداءات مسجلة بعد — تظهر مع وصول تحديث التطبيق للمستخدمين
                   </td>
                 </tr>

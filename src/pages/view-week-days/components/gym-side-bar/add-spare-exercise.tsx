@@ -1,4 +1,5 @@
 import { Button, CheckBox,  Input, Select, Text } from "components";
+import { exerciseOptionLabel, toExerciseOption } from "pages/exercise-view/components/ExerciseOptionLabel";
 import { useFormikContext } from "formik";
 import { useGetQuery } from "hooks/useQueryHooks";
 import { useState } from "react";
@@ -45,7 +46,7 @@ export default function AddWeekSpareDayExercise({ parent }: Props) {
     exercisesURL,
     {
       select: ({ data }: { data: { data: [] } }) =>
-        data.data.map((item: any) => ({ label: item?.name, value: item?.id })),
+        data.data.map(toExerciseOption),
       enabled: ![undefined, null, ""].includes(
         extraData?.exercise_category_id?.value
       ),
@@ -88,6 +89,7 @@ export default function AddWeekSpareDayExercise({ parent }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <Select
             name="exercise_id"
+            formatOptionLabel={exerciseOptionLabel}
             options={exercises}
             label="التمرين"
             isForm={false}

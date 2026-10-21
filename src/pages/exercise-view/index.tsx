@@ -77,27 +77,40 @@ function ExercisesView({ home }: Props) {
       {
         Header: "التمرين",
         Cell: ({ row }: { row: Row<any> }) => {
-          // مصغّرةُ الفيديو تحلّ محلّ مخطّط العضلة **في القائمة وحدها**:
-          // المخطّط واحدٌ لعشرات التمارين فلا يميّز بينها، واللقطةُ تقول أيُّ
-          // تمرينٍ هو بلا فتح الفيديو. ومَن لا مصغّرة له (فيديو محلّيّ أو
-          // رابطٌ ليس من Vimeo) يسقط على المخطّط كما كان.
-          // ⛔ والمخطّطُ يبقى في شاشة التفاصيل — يُرسَل مع التمرين إلى تطبيق
-          //    فلاتر، فليس للتمييز في اللوحة فحسب.
-          // وتتكبّر عند المرور — والمعاينةُ `fixed` لأن غلافَ الجدول
-          // `overflow-x-auto` يقصّ أيَّ تكبيرٍ في مجرى التخطيط.
+          // صورةُ العضلة **ولقطةُ الفيديو معاً** (قرار خالد): الأولى تعرّف
+          // المجموعة العضلية والثانية التمرينَ نفسه. ومن لا لقطة له (فيديو
+          // محلّيّ أو رابطٌ ليس من Vimeo) تبقى صورةُ العضلة وحدها — وعليها
+          // معاينةُ الفيديو عند المرور كما كانت.
+          // المعاينةُ `fixed` لأن غلافَ الجدول `overflow-x-auto` يقصّ أيَّ
+          // تكبيرٍ في مجرى التخطيط.
+          // ⚖️ المفتاحُ يتبدّل بنوع الفيديو: `ExerciseResource` يرسل
+          // `external_video` للرابط و`internal_video` للملفّ، ولا يرسل الاثنين.
+          const muscle = row.original.muscle_image || row.original.image;
+          const video =
+            row.original.external_video || row.original.internal_video;
           return (
             <div className="flex items-center gap-4">
-              <ExerciseThumb
-                thumb={row.original.video_thumb}
-                fallback={row.original.image}
-                // ⚖️ المفتاحُ يتبدّل بنوع الفيديو: `ExerciseResource` يرسل
-                // `external_video` للرابط و`internal_video` للملفّ عندنا،
-                // ولا يرسل الاثنين معاً — فقراءةُ أحدهما وحده تُخفي نصفهما.
-                video={
-                  row.original.external_video || row.original.internal_video
-                }
-                alt={row.original.name}
-              />
+              {row.original.video_thumb ? (
+                <>
+                  <img
+                    src={muscle || "/images/img_rectangle347.png"}
+                    alt=""
+                    loading="lazy"
+                    className="w-16 h-16 rounded-xl object-cover shrink-0"
+                  />
+                  <ExerciseThumb
+                    thumb={row.original.video_thumb}
+                    video={video}
+                    alt={row.original.name}
+                  />
+                </>
+              ) : (
+                <ExerciseThumb
+                  thumb={muscle}
+                  video={video}
+                  alt={row.original.name}
+                />
+              )}
               {row.original.name}
             </div>
           );

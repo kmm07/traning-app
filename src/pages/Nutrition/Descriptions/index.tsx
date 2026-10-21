@@ -21,6 +21,7 @@ interface DescriptionType {
   ingredients: { name: string };
   prepare: any;
   diet_mea_categories: any;
+  needs_review_note: string | null;
 }
 
 function Descriptions() {
@@ -62,6 +63,7 @@ function Descriptions() {
         prepare: item.prepare,
         image: item.image,
         diet_mea_categories: item.diet_mea_categories,
+        needs_review_note: item.needs_review_note,
       })),
     refetchOnWindowFocus: false,
     enabled: categoryId !== undefined,
@@ -122,6 +124,14 @@ function Descriptions() {
                   className="px-2 py-[2px] rounded-full bg-red-500/20 border border-red-500 text-red-400 text-xs whitespace-nowrap"
                 >
                   ناقصة ({row.original.missing_ingredients_count})
+                </span>
+              )}
+              {row.original.needs_review_note && (
+                <span
+                  title={row.original.needs_review_note}
+                  className="px-2 py-[2px] rounded-full bg-amber-500/20 border border-amber-500 text-amber-400 text-xs whitespace-nowrap"
+                >
+                  ⚠️ للمراجعة
                 </span>
               )}
             </div>

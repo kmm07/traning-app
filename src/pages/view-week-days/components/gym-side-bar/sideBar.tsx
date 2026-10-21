@@ -68,6 +68,13 @@ const SingleExercise = ({
             alt="image"
             className="!w-[150px]"
           />
+          {exercise?.exercise_video_thumb && (
+            <Img
+              src={exercise.exercise_video_thumb}
+              alt="video"
+              className="!w-[150px]"
+            />
+          )}
           <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
 

@@ -111,12 +111,15 @@ function AddExerciseModal({
   userId,
   stepId,
   onAdded,
+  substituteFor,
 }: {
   open: boolean;
   onClose: () => void;
   userId: string;
   stepId: number;
   onAdded: () => void;
+  /** إن وُجد: التمرين يُضاف بديلاً لهذا التمرين الرئيسي (الصفّ المعروض) */
+  substituteFor?: { id: number; name: string };
 }) {
   const axios = useAxios({});
 
@@ -127,6 +130,8 @@ function AddExerciseModal({
   const [exercises, setExercises] = useState<any[]>([]);
 
   const [exerciseId, setExerciseId] = useState<string>("");
+
+  const [search, setSearch] = useState<string>("");
 
   const [restSec, setRestSec] = useState<string>("60");
 
@@ -175,6 +180,7 @@ function AddExerciseModal({
     try {
       await axios.post(`/users/${userId}/training-steps/${stepId}/exercises`, {
         exercise_id: Number(exerciseId),
+        ...(substituteFor ? { substitute_for: substituteFor.id } : {}),
         rest_sec: Number(restSec || 60),
         sessions: sessions.map((s) => ({
           counter: Number(s.counter || 0),
@@ -183,7 +189,7 @@ function AddExerciseModal({
           notes: s.notes ?? "",
         })),
       });
-      toast.success("تم إضافة التمرين");
+      toast.success(substituteFor ? "تم إضافة البديل" : "تم إضافة التمرين");
       onAdded();
       onClose();
     } catch (error: any) {
@@ -196,7 +202,9 @@ function AddExerciseModal({
   return (
     <PlanModal open={open} onClose={onClose} wide>
       <Text size="xl" className="font-bold">
-        إضافة تمرين لهذا اليوم (لهذا المستخدم فقط)
+        {substituteFor
+          ? `إضافة بديل لتمرين «${substituteFor.name}» (لهذا المستخدم فقط)`
+          : "إضافة تمرين لهذا اليوم (لهذا المستخدم فقط)"}
       </Text>
 
       <div className="grid grid-cols-2 gap-3">
@@ -208,6 +216,7 @@ function AddExerciseModal({
             onChange={(e) => {
               setCategoryId(e.target.value);
               setExerciseId("");
+              setSearch("");
             }}
           >
             <option value="" className="bg-gray-900">
@@ -223,20 +232,55 @@ function AddExerciseModal({
 
         <div className="space-y-1">
           <Text size="xs">التمرين:</Text>
-          <select
-            className="select select-bordered w-full bg-transparent"
-            value={exerciseId}
-            onChange={(e) => setExerciseId(e.target.value)}
-          >
-            <option value="" className="bg-gray-900">
-              اختر تمريناً
-            </option>
-            {exercises.map((ex) => (
-              <option key={ex.id} value={ex.id} className="bg-gray-900">
-                {ex.name}
-              </option>
-            ))}
-          </select>
+          <input
+            type="text"
+            className="input input-bordered input-sm w-full bg-transparent"
+            placeholder="ابحث باسم التمرين"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {/* قائمةٌ بصور التمارين بدل select نصّيّ: يُعرف التمرين بصورته */}
+          <div className="max-h-64 overflow-y-auto space-y-1 rounded-xl border border-blue_gray-900_01 p-1">
+            {!categoryId && (
+              <Text size="xs" className="text-gray-400 p-2">
+                اختر فئة أولاً
+              </Text>
+            )}
+            {exercises
+              .filter((ex) =>
+                String(ex.name ?? "")
+                  .toLowerCase()
+                  .includes(search.trim().toLowerCase())
+              )
+              .map((ex) => (
+                <button
+                  key={ex.id}
+                  type="button"
+                  className={`w-full flex items-center gap-3 rounded-lg p-1 text-start border-2 ${
+                    String(ex.id) === exerciseId
+                      ? "!border-deep_purple-A200"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => setExerciseId(String(ex.id))}
+                >
+                  <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
+                    <Img
+                      src={ex.muscle_image || ex.image}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {ex.video_thumb && (
+                    <div className="h-10 aspect-video rounded-lg overflow-hidden shrink-0">
+                      <Img
+                        src={ex.video_thumb}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Text size="xs">{ex.name}</Text>
+                </button>
+              ))}
+          </div>
         </div>
       </div>
 
@@ -253,7 +297,7 @@ function AddExerciseModal({
       <SessionsEditor sessions={sessions} setSessions={setSessions} />
 
       <Button primary size="small" isLoading={saving} onClick={onSave}>
-        إضافة التمرين
+        {substituteFor ? "إضافة البديل" : "إضافة التمرين"}
       </Button>
     </PlanModal>
   );
@@ -265,11 +309,19 @@ function ExerciseRow({
   userId,
   onChanged,
   isSubstitute = false,
+  onMove,
+  canMoveUp = false,
+  canMoveDown = false,
+  onAddSubstitute,
 }: {
   exercise: any;
   userId: string;
   onChanged: () => void;
   isSubstitute?: boolean;
+  onMove?: (exerciseId: number, direction: -1 | 1) => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  onAddSubstitute?: (exercise: any) => void;
 }) {
   const axios = useAxios({});
 
@@ -348,6 +400,14 @@ function ExerciseRow({
             className="w-full h-full object-cover"
           />
         </div>
+        {exercise.video_thumb && (
+          <div className="h-10 aspect-video rounded-lg overflow-hidden">
+            <Img
+              src={exercise.video_thumb}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         <div>
           <div className="flex items-center gap-2">
             <Text size="xs" className="font-bold">
@@ -372,6 +432,37 @@ function ExerciseRow({
         ) : (
           <span className="badge badge-ghost badge-sm">غير منجز</span>
         )}
+        {onMove && (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              className="btn btn-xs btn-outline"
+              title="تقديم التمرين"
+              disabled={!canMoveUp}
+              onClick={() => onMove(exercise.id, -1)}
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              className="btn btn-xs btn-outline"
+              title="تأخير التمرين"
+              disabled={!canMoveDown}
+              onClick={() => onMove(exercise.id, 1)}
+            >
+              ↓
+            </button>
+          </div>
+        )}
+        {onAddSubstitute && (
+          <Button
+            size="xSmall"
+            secondaryBorder
+            onClick={() => onAddSubstitute(exercise)}
+          >
+            + بديل
+          </Button>
+        )}
         <Button size="xSmall" secondaryBorder onClick={onOpenEdit}>
           تعديل
         </Button>
@@ -393,6 +484,136 @@ function ExerciseRow({
   );
 }
 
+/** نافذة تخصيص اسم اليوم وصورته لهذا المستخدم وحده (لا تمسّ قالب الفئة) */
+function EditDayModal({
+  open,
+  onClose,
+  userId,
+  step,
+  imageChoices,
+  onSaved,
+}: {
+  open: boolean;
+  onClose: () => void;
+  userId: string;
+  step: any;
+  imageChoices: any[];
+  onSaved: () => void;
+}) {
+  const axios = useAxios({});
+  const [name, setName] = useState<string>(step.custom_name ?? "");
+  const [image, setImage] = useState<string>(step.custom_image ?? "");
+  const [saving, setSaving] = useState(false);
+
+  // تُعاد تعبئة الحقول كلما فُتحت النافذة (قد تتبدّل الخطوة بعد إعادة الجلب)
+  useEffect(() => {
+    if (open) {
+      setName(step.custom_name ?? "");
+      setImage(step.custom_image ?? "");
+    }
+  }, [open, step.custom_name, step.custom_image]);
+
+  const save = async (nextName: string, nextImage: string) => {
+    setSaving(true);
+    try {
+      await axios.put(`/users/${userId}/training-steps/${step.id}`, {
+        custom_name: nextName.trim() === "" ? null : nextName.trim(),
+        custom_image: nextImage === "" ? null : nextImage,
+      });
+      toast.success("تم تحديث اليوم");
+      onSaved();
+      onClose();
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ??
+          err?.response?.data?.errors?.[0] ??
+          "حدث خطأ ما"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <PlanModal open={open} onClose={onClose}>
+      <Text className="font-bold">
+        تعديل اسم اليوم وصورته — الاسم الأصلي: {step.template_name || "—"}
+      </Text>
+      <Text size="xs" className="text-gray-400">
+        التعديل يخصّ هذا المستخدم فقط ولا يغيّر قالب الفئة.
+      </Text>
+
+      <div className="space-y-1">
+        <Text size="xs">اسم اليوم</Text>
+        <input
+          type="text"
+          maxLength={60}
+          className="input input-bordered input-sm w-full bg-transparent"
+          placeholder={step.template_name || "اسم اليوم"}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <div className="flex flex-wrap gap-1 pt-1">
+          {imageChoices.map((c: any) => (
+            <button
+              key={c.key}
+              type="button"
+              className="btn btn-xs btn-outline"
+              onClick={() => setName(c.label)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <Text size="xs">الصورة</Text>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className={`btn btn-sm ${
+              image === "" ? "btn-primary" : "btn-outline"
+            }`}
+            onClick={() => setImage("")}
+          >
+            تلقائي (حسب الاسم)
+          </button>
+          {imageChoices.map((c: any) => (
+            <button
+              key={c.key}
+              type="button"
+              title={c.label}
+              className={`w-16 h-16 rounded-xl overflow-hidden border-2 ${
+                image === c.key
+                  ? "!border-deep_purple-A200"
+                  : "border-transparent"
+              }`}
+              onClick={() => setImage(c.key)}
+            >
+              <Img src={c.image} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button size="small" disabled={saving} onClick={() => save(name, image)}>
+          حفظ
+        </Button>
+        <Button
+          size="small"
+          secondaryBorder
+          disabled={saving || (!step.custom_name && !step.custom_image)}
+          onClick={() => save("", "")}
+        >
+          إعادة اليوم الأصلي
+        </Button>
+      </div>
+    </PlanModal>
+  );
+}
+
 /** بطاقة خطوة (يوم تدريب أو راحة) مع تمارينها وحالة إنجازها */
 function StepCard({
   step,
@@ -401,17 +622,52 @@ function StepCard({
   onMove,
   canMoveUp,
   canMoveDown,
+  imageChoices,
 }: {
   step: any;
   userId: string;
+  imageChoices: any[];
   onChanged: () => void;
   onMove: (stepId: number, direction: -1 | 1) => void;
   canMoveUp: boolean;
   canMoveDown: boolean;
 }) {
+  const axios = useAxios({});
+
   const [expanded, setExpanded] = useState(step.is_current);
 
   const [addOpen, setAddOpen] = useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [substituteFor, setSubstituteFor] = useState<any>(null);
+
+  const [moving, setMoving] = useState(false);
+
+  const mainIds: number[] = (step.exercises ?? []).map((e: any) => e.id);
+
+  // ترتيب التمارين الرئيسية؛ البدائل تتبع أصلها في الخادم
+  const moveExercise = async (exerciseId: number, direction: -1 | 1) => {
+    const index = mainIds.indexOf(exerciseId);
+    const target = index + direction;
+    if (index === -1 || target < 0 || target >= mainIds.length || moving)
+      return;
+    const ids = [...mainIds];
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    setMoving(true);
+    try {
+      await axios.post(
+        `/users/${userId}/training-steps/${step.id}/reorder-exercises`,
+        { exercise_ids: ids }
+      );
+      toast.success("تم تحديث ترتيب التمارين");
+      onChanged();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "حدث خطأ ما");
+    } finally {
+      setMoving(false);
+    }
+  };
 
   const isRest = step.type === "rest";
 
@@ -492,6 +748,18 @@ function StepCard({
               secondaryBorder
               onClick={(e?: any) => {
                 e?.stopPropagation?.();
+                setEditOpen(true);
+              }}
+            >
+              اسم وصورة
+            </Button>
+          )}
+          {!isRest && (
+            <Button
+              size="xSmall"
+              secondaryBorder
+              onClick={(e?: any) => {
+                e?.stopPropagation?.();
                 setExpanded(!expanded);
               }}
             >
@@ -519,12 +787,16 @@ function StepCard({
 
       {!isRest && expanded && (
         <div className="space-y-2 border-t border-blue_gray-900_01 pt-3">
-          {step.exercises?.map((exercise: any) => (
+          {step.exercises?.map((exercise: any, index: number) => (
             <div key={exercise.id} className="space-y-2">
               <ExerciseRow
                 exercise={exercise}
                 userId={userId}
                 onChanged={onChanged}
+                onMove={moveExercise}
+                canMoveUp={!moving && index > 0}
+                canMoveDown={!moving && index < mainIds.length - 1}
+                onAddSubstitute={setSubstituteFor}
               />
               {exercise.substitutes?.map((sub: any) => (
                 <ExerciseRow
@@ -544,12 +816,34 @@ function StepCard({
         </div>
       )}
 
+      {!isRest && (
+        <EditDayModal
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          userId={userId}
+          step={step}
+          imageChoices={imageChoices}
+          onSaved={onChanged}
+        />
+      )}
       <AddExerciseModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
         userId={userId}
         stepId={step.id}
         onAdded={onChanged}
+      />
+      <AddExerciseModal
+        open={!!substituteFor}
+        onClose={() => setSubstituteFor(null)}
+        userId={userId}
+        stepId={step.id}
+        onAdded={onChanged}
+        substituteFor={
+          substituteFor
+            ? { id: substituteFor.id, name: substituteFor.name }
+            : undefined
+        }
       />
     </Card>
   );
@@ -665,6 +959,7 @@ function TrainingTab({ userId }: { userId: string }) {
             step={step}
             userId={userId}
             onChanged={load}
+            imageChoices={week?.image_choices ?? []}
             onMove={moveStep}
             canMoveUp={!reordering && pendingIds.indexOf(step.id) > 0}
             canMoveDown={
