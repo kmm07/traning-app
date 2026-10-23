@@ -17,6 +17,8 @@ import type { IconName } from "components/Icon";
 export interface NavChild {
   name: string;
   link: string;
+  /** صفحةُ مكتبةٍ مشتركة (تمارين · مكوّنات · كارديو): لا يديرها المدرّب — تُخفى في وضعه. */
+  libraryOnly?: boolean;
 }
 
 export interface NavItem {
@@ -26,12 +28,29 @@ export interface NavItem {
   link: string;
   icon: IconName;
   subMenu?: NavChild[];
+  /** [المرحلة ٤] «ملخّصي» لا قسمَ له: تظهر في وضع المدرّب وحده. */
+  coachOnly?: boolean;
   /** مجموعةٌ في الشريط — لتقسيم إحدى عشرة بنداً إلى كتلٍ تُقرأ. */
   group: "work" | "catalog" | "system";
 }
 
+/**
+ * أقسامُ الخادم التي يبلغها وضعُ المدرّب (حسابُ مدرّب أو المدير الأعلى داخل تبويبه).
+ * ما سواها يردّ 403 `scope_forbidden` — فلا يُعرض في الشريط أصلاً.
+ */
+export const COACH_MODE_SECTIONS = ["messages", "users", "nutrition", "training"];
+
 export const NAV_ITEMS: NavItem[] = [
   /* ── المتابعةُ اليومية ─────────────────────────────────────────────── */
+  {
+    // [المرحلة ٤] ملخّصُ المدرّب: مشتركوه وأرباحه ومنتجاته وإشعاراته
+    name: "ملخّصي",
+    section: "__coach",
+    link: "/coach-home",
+    icon: "analytics",
+    group: "work",
+    coachOnly: true,
+  },
   {
     name: "الرسائل",
     section: "messages",
@@ -85,7 +104,7 @@ export const NAV_ITEMS: NavItem[] = [
     group: "catalog",
     subMenu: [
       { name: "الوصفات", link: "/nutrition/descriptions" },
-      { name: "المكوّنات", link: "/nutrition/ingredients" },
+      { name: "المكوّنات", link: "/nutrition/ingredients", libraryOnly: true },
     ],
   },
   {
@@ -99,9 +118,9 @@ export const NAV_ITEMS: NavItem[] = [
       { name: "جدول جيم النساء", link: "/exercises/table-women" },
       { name: "جدول المنزل رجال", link: "/exercises/table-home-men" },
       { name: "جدول المنزل نساء", link: "/exercises/table-home-women" },
-      { name: "الكارديو", link: "/exercises/cardio" },
-      { name: "تمارين الجيم", link: "/exercises/exercises-gym" },
-      { name: "تمارين المنزل", link: "/exercises/exercises-home" },
+      { name: "الكارديو", link: "/exercises/cardio", libraryOnly: true },
+      { name: "تمارين الجيم", link: "/exercises/exercises-gym", libraryOnly: true },
+      { name: "تمارين المنزل", link: "/exercises/exercises-home", libraryOnly: true },
     ],
   },
 
@@ -142,6 +161,14 @@ export const NAV_ITEMS: NavItem[] = [
     group: "system",
   },
   {
+    // [المرحلة ٤] من عدّل ماذا ومتى — للمدير الأعلى، وبتبويبٍ لكل مدرّب
+    name: "سجل التدقيق",
+    section: "coaches",
+    link: "/audit-log",
+    icon: "shield",
+    group: "system",
+  },
+  {
     name: "المسؤولون",
     section: "admins",
     link: "/admins",
@@ -168,6 +195,7 @@ const EXTRA_TITLES: Array<{ match: RegExp; title: string }> = [
   { match: /^\/users\/\d+\/subscriptions/, title: "اشتراكات المستخدم" },
   { match: /^\/exercises\/week-days\/\d+/, title: "أيام الأسبوع" },
   { match: /^\/coaches\/\d+/, title: "كشف المدرب" },
+  { match: /^\/coach-home/, title: "ملخّص المدرب" },
 ];
 
 export function titleForPath(pathname: string): string {

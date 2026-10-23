@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "hooks/useRedux";
 import { logOut, selectAuthData } from "redux/slices/auth";
 import usePermissions from "hooks/usePermissions";
 import { useConfirm } from "components/ConfirmDialog/context";
-import { GROUP_LABELS, NAV_ITEMS, NavItem } from "layout/nav";
+import { COACH_MODE_SECTIONS, GROUP_LABELS, NAV_ITEMS, NavItem } from "layout/nav";
 
 /*
  * ═══════════════════════════════════════════════════════════════════════════
@@ -46,17 +46,29 @@ interface Props {
 }
 
 function SidePar({ onNavigate, collapsed = false, onToggleCollapse }: Props) {
-  const { can } = usePermissions();
+  const { can, coachMode, activeCoach } = usePermissions();
   const dispatch = useAppDispatch();
   const push = useNavigate();
   const { pathname } = useLocation();
   const auth = useAppSelector(selectAuthData);
 
-  const visibleItems = useMemo(
-    () => NAV_ITEMS.filter((item) => can(item.section)),
+  /*
+   * [المرحلة ٤] **وضعُ المدرّب** (حسابُ مدرّب · المدير الأعلى داخل تبويبه): الشريطُ يعرض ما يبلغه
+   * الخادمُ وحده — أقسامُ العمل الأربعة و«ملخّصي» — ويخفي صفحاتِ المكتبة المشتركة (قراءةٌ فقط له).
+   * ⚖️ والقاعدةُ المكتوبة: **اللوحة لا تطلب ما يرفضه الخادم**.
+   */
+  const visibleItems = useMemo(() => {
+    if (!coachMode) {
+      return NAV_ITEMS.filter((item) => !item.coachOnly && can(item.section));
+    }
+
+    return NAV_ITEMS.filter(
+      (item) => item.coachOnly || (COACH_MODE_SECTIONS.includes(item.section) && can(item.section))
+    ).map((item) =>
+      item.subMenu ? { ...item, subMenu: item.subMenu.filter((c) => !c.libraryOnly) } : item
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [auth?.user?.permissions, auth?.user?.is_super]
-  );
+  }, [auth?.user?.permissions, auth?.user?.is_super, auth?.user?.type, coachMode, activeCoach]);
 
   const isItemActive = (item: NavItem) =>
     pathname === item.link || pathname.startsWith(item.link + "/");
@@ -159,7 +171,7 @@ function SidePar({ onNavigate, collapsed = false, onToggleCollapse }: Props) {
 
                   if (!item.subMenu) {
                     return (
-                      <li key={item.section}>
+                      <li key={item.link}>
                         <NavLink
                           to={item.link}
                           onClick={onNavigate}
@@ -190,7 +202,7 @@ function SidePar({ onNavigate, collapsed = false, onToggleCollapse }: Props) {
                   const open = openKey === item.section && !collapsed;
 
                   return (
-                    <li key={item.section}>
+                    <li key={item.link}>
                       <button
                         type="button"
                         aria-expanded={open}

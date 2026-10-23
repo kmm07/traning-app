@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAppSelector } from "./useRedux";
 import { selectCurrentToken } from "redux/slices/auth";
+import { selectActiveCoach } from "redux/slices/coachContext";
 import { ADMIN_BASE_URL } from "./useAxios";
 
 /** دورية النبضة — يجب أن تبقى **أضيق** من نافذة الخادم (٩٠ ث افتراضاً). */
@@ -38,6 +39,10 @@ export default function useTrainerPresence(
   const token = useAppSelector(selectCurrentToken);
   const tokenRef = useRef(token);
   tokenRef.current = token;
+  // تبويبُ المدرّب المفتوح: الحضورُ يُختم على مفتاحه (مشتركوه يرون «متصل» لا غيرُهم)
+  const coach = useAppSelector(selectActiveCoach);
+  const coachRef = useRef(coach);
+  coachRef.current = coach;
 
   useEffect(() => {
     if (!enabled) return;
@@ -54,6 +59,7 @@ export default function useTrainerPresence(
           "Content-Type": "application/json",
           accept: "application/json",
           authorization: auth,
+          ...(coachRef.current ? { "X-Coach-Context": String(coachRef.current) } : {}),
         },
         body: JSON.stringify({ state }),
       }).catch(() => undefined);

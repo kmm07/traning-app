@@ -5,7 +5,7 @@ import { logOut } from "redux/slices/auth";
 import { setImageDelete } from "redux/slices/imageDelete";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { apiErrorMessage } from "util/apiError";
+import { apiErrorMessage, isForcedLogout } from "util/apiError";
 
 interface UrlContentType {
   url: string;
@@ -31,7 +31,7 @@ export function useGetQuery(name: string | any, url: string, options: any) {
       if (error?.response?.status === 412) {
         void push("/unauthenticated");
       }
-      if (error?.response?.status === 401) {
+      if (isForcedLogout(error)) {
         dispatch(logOut());
         void push("/login");
       }
@@ -67,7 +67,7 @@ export function usePostQuery({
       }
     },
     onError: (error: any) => {
-      if (error?.response?.status === 401) {
+      if (isForcedLogout(error)) {
         dispatch(logOut());
         void push("/login");
         toast.error("تم تسجيل الخروج بنجاح");
@@ -122,7 +122,7 @@ export function usePutQuery({ url, contentType }: UrlContentType) {
       toast.success("تم الحفظ بنجاح");
     },
     onError: (error: any) => {
-      if (error?.response?.status === 401) {
+      if (isForcedLogout(error)) {
         dispatch(logOut());
         return;
       }
@@ -199,7 +199,7 @@ export function useDeleteQuery(options?: { suppressErrorToast?: boolean }) {
        * والكتلة `catch` تبقى: وظيفتُها منعُ `onClose()` بعد فشل، لا العرض.
        */
       onError: (error: any) => {
-        if (error?.response?.status === 401) {
+        if (isForcedLogout(error)) {
           dispatch(logOut());
           return;
         }

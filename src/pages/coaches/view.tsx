@@ -7,6 +7,9 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import CoachForm, { COACH_MODAL_ID } from "./components/CoachForm";
 import { Coach, Money, STATUS_LABEL, STATUS_TONE, sar, usd } from "./shared";
+import { AccountsCard, AiUsageCard, CoverageCard, OfferingCard, PayoutRequestCard } from "./components/CoachOps";
+import { useAppDispatch } from "hooks/useRedux";
+import { openTab } from "redux/slices/coachContext";
 
 /*
  * [اشتراكات المدرّبين · المرحلة ١ — اللوحة] صفحةُ المدرّب: ملخّصٌ · باقاتٌ ·
@@ -49,6 +52,7 @@ export default function CoachView() {
   const confirm = useConfirm();
   const queryClient = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
+  const dispatch = useAppDispatch();
 
   const { data: coachData, isLoading }: UseQueryResult<any> = useGetQuery(
     `/coaches/${id}`,
@@ -150,6 +154,20 @@ export default function CoachView() {
           </p>
         </div>
         <div className="flex gap-2">
+          {!coach.is_house && (
+            <Button
+              primary
+              size="small"
+              onClick={() => {
+                // [المرحلة ٤] تبويبٌ لهذا المدرب: اللوحةُ كلُّها كما يراها هو
+                dispatch(openTab({ id: coach.id, name: coach.name }));
+                queryClient.invalidateQueries();
+                navigate("/coach-home");
+              }}
+            >
+              فتح تبويب المدرب
+            </Button>
+          )}
           <Button
             secondaryBorder
             size="small"
@@ -183,6 +201,13 @@ export default function CoachView() {
         <Tile label="المحوَّل" value={usd(coach.paid_out)} sub={sar(coach.paid_out)} />
         <Tile label="المتبقي" value={usd(coach.balance)} sub={sar(coach.balance)} highlight />
       </div>
+
+      {/* ── [المرحلة ٤] طلب الصرف · التغطية والإظهار · الذكاء · الحسابات ── */}
+      <PayoutRequestCard coach={coach as any} onDone={refresh} />
+      <OfferingCard coach={coach} />
+      <CoverageCard coach={coach} />
+      <AiUsageCard coach={coach} />
+      <AccountsCard coach={coach as any} />
 
       {missing > 0 && (
         <Card padded="sm" className="!border-warning-500/40">

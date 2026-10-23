@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Pusher from "pusher-js";
 import useAxios, { ADMIN_BASE_URL } from "hooks/useAxios";
 import { useAppSelector } from "hooks/useRedux";
-import { selectCurrentToken } from "redux/slices/auth";
+import { selectCurrentToken, selectAuthData } from "redux/slices/auth";
 import useTrainerPresence from "hooks/useTrainerPresence";
 import { apiErrorMessage } from "util/apiError";
 
@@ -23,7 +23,7 @@ import { apiErrorMessage } from "util/apiError";
  */
 const PUSHER_KEY = "b48f98218c05a058e5a5";
 const PUSHER_CLUSTER = "eu";
-const CHANNEL = "private-trainer";
+const DEFAULT_CHANNELS = ["private-trainer"];
 const EVENT = "chat";
 
 type ChatMessage = MsgProps["messages"][0] & { user_id?: number; chat_id?: number };
@@ -37,6 +37,8 @@ function Chat({ userData }: { userData: any }) {
 
   const [messages, seMessages] = useState<ChatMessage[]>([]);
   const token = useAppSelector(selectCurrentToken);
+  const pusher_channels: string[] =
+    useAppSelector(selectAuthData)?.user?.realtime_channels ?? [];
 
   const { mutateAsync, isLoading } = usePostQuery({
     url,
@@ -99,16 +101,25 @@ function Chat({ userData }: { userData: any }) {
       },
     });
 
-    const channel = pusher.subscribe(CHANNEL);
-    channel.bind(EVENT, (data: ChatMessage) => {
-      if (Number(data?.user_id) !== Number(userData.id)) return;
-      appendUnique(data);
-      scrollToBottom();
+    // [المرحلة ٤] قنواتُ هذا الحساب كما سمّاها الخادم عند الدخول: مدرّبٌ ⇒ قناةُ مدرّبه وحدها (العامّةُ
+    // تحمل رسائل الجميع ولا تُوقَّع له)، وغيرُ المقيَّد ⇒ العامّة كما كانت.
+    const channels = pusher_channels.length ? pusher_channels : DEFAULT_CHANNELS;
+    const subs = channels.map((name) => {
+      const ch = pusher.subscribe(name);
+      ch.bind(EVENT, (data: ChatMessage) => {
+        if (Number(data?.user_id) !== Number(userData.id)) return;
+        appendUnique(data);
+        scrollToBottom();
+      });
+
+      return { name, ch };
     });
 
     return () => {
-      channel.unbind(EVENT);
-      pusher.unsubscribe(CHANNEL);
+      subs.forEach(({ name, ch }) => {
+        ch.unbind(EVENT);
+        pusher.unsubscribe(name);
+      });
       pusher.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

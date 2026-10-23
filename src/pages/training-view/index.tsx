@@ -217,8 +217,14 @@ function TrainingView({ home, gender }: Props) {
 
     setLevel(storageLevel?.level ?? "junior");
 
+    // الفئةُ المحفوظة تُستعمل **إن كانت في القائمة المعروضة فعلاً** — وإلا (تبويبُ مدرّبٍ بلا فئات)
+    // كانت تُجلَب أسابيعُ فئةٍ ليست له وتُعرض تحت اسمه.
+    const stored = storageLevel?.exerciesCategory;
+    const ids = (trainingCategories ?? []).map((c: any) => c.id);
     setExerciseCategory(
-      storageLevel?.exerciesCategory ?? trainingCategories?.[0]?.id
+      stored !== undefined && stored !== null && ids.includes(stored)
+        ? stored
+        : ids[0] ?? null
     );
   }, [trainingCategories]);
 

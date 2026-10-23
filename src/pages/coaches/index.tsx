@@ -71,6 +71,7 @@ export default function Coaches() {
                       : `نسبة ${c.revenue_share_pct}٪ من الصافي`}
                   </p>
                 </div>
+                {(c as any).pending_request && <Chip tone="warning" size="sm">طلب صرف</Chip>}
                 {c.is_house ? (
                   <Chip tone="brand" size="sm">المنصة</Chip>
                 ) : (

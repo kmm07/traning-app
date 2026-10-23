@@ -6,6 +6,10 @@ import { UseQueryResult, useQueryClient } from "react-query";
 import { Row } from "react-table";
 import AddAdmin from "./components/addAdmin";
 import { useConfirm } from "components/ConfirmDialog/context";
+import { toast } from "react-toastify";
+import { useAppSelector } from "hooks/useRedux";
+import { selectAuthData } from "redux/slices/auth";
+import { Chip } from "components";
 
 export default function Admin() {
   const confirm = useConfirm();
@@ -26,6 +30,36 @@ export default function Admin() {
   const { mutateAsync } = useDeleteQuery();
 
   const queryClient = useQueryClient();
+  const me = useAppSelector(selectAuthData)?.user;
+
+  // تعطيلٌ/تفعيلٌ بلا حذف: يمنع الدخول فوراً (اللوحة والتطبيق) ويُعيده التفعيل
+  const onToggle = async (a: any) => {
+    const disabling = !a.disabled;
+    if (
+      !(await confirm({
+        title: disabling ? "تعطيل الحساب؟" : "تفعيل الحساب؟",
+        message: disabling
+          ? "يُمنع من الدخول فوراً — حتى لو كان داخل اللوحة الآن — وتبقى بياناته كما هي."
+          : "يستطيع الدخول مجدداً بكلمة مروره.",
+        confirmLabel: disabling ? "تعطيل" : "تفعيل",
+        tone: "neutral",
+      }))
+    ) {
+      return;
+    }
+    try {
+      const token = (JSON.parse(localStorage.getItem("userLogin") ?? "{}") || {}).token;
+      await fetch(`https://personaltrainerkmm.com/api/admin/admins/${a.id}/${disabling ? "disable" : "enable"}`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, accept: "application/json" },
+      }).then(async (r) => {
+        if (!r.ok) throw new Error((await r.json().catch(() => ({})))?.message ?? "تعذّر التنفيذ");
+      });
+      await queryClient.invalidateQueries("/admins");
+    } catch (e: any) {
+      toast.error(e?.message ?? "تعذّر التنفيذ");
+    }
+  };
 
   const onDelete = async (id: number) => {
     if (
@@ -77,9 +111,50 @@ export default function Admin() {
       },
 
       {
+        // [المرحلة ٤] نوعُ الحساب ونطاقُه
+        Header: "النوع",
+        Cell: ({ row }: { row: Row<any> }) => {
+          const a = row.original;
+          if (a.type === "coach") {
+            return (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Chip tone="brand" size="sm">مدرّب</Chip>
+                <span>{a.coach_name}</span>
+                {a.access_level === "read" && <Chip tone="warning" size="sm">قراءة فقط</Chip>}
+              </div>
+            );
+          }
+          return (
+            <div className="flex items-center gap-2 flex-wrap">
+              <Chip tone={a.is_super ? "success" : "neutral"} size="sm">{a.is_super ? "مدير أعلى" : "مسؤول"}</Chip>
+              {a.scope_mode === "selected" && (
+                <Chip tone="neutral" size="sm">يشرف على {a.scope_coach_ids?.length ?? 0} مدرّب</Chip>
+              )}
+            </div>
+          );
+        },
+      },
+
+      {
+        Header: "الحالة",
+        Cell: ({ row }: { row: Row<any> }) =>
+          row.original.disabled ? (
+            <Chip tone="danger" size="sm">معطَّل</Chip>
+          ) : (
+            <Chip tone="success" size="sm">فعّال</Chip>
+          ),
+      },
+
+      {
         Header: " ",
         Cell: ({ row }: { row: Row<any> }) => {
           return (
+            <div className="flex items-center gap-2">
+              {row.original.id !== me?.id && (
+                <Button soft size="small" onClick={() => onToggle(row.original)}>
+                  {row.original.disabled ? "تفعيل" : "تعطيل"}
+                </Button>
+              )}
             <TableActions
               onDelete={
                 row.original.id === 1
@@ -88,11 +163,12 @@ export default function Admin() {
               }
               onEdit={() => onEdit(row.original)}
             />
+            </div>
           );
         },
       },
     ],
-    []
+    [me?.id]
   );
 
   return (

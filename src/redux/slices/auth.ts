@@ -17,6 +17,13 @@ interface Data {
     permissions: string[];
     /** مفتاحُ القسم => تسميتُه العربية، من سجلّ الخادم لا مكتوبةً هنا. */
     sections: Record<string, string>;
+    /** [المرحلة ٤] نوعُ الحساب ونطاقُه — منها ترسم اللوحةُ واجهتَها. */
+    type?: "admin" | "coach";
+    coach?: { id: number; name: string } | null;
+    access_level?: "full" | "read";
+    scoped?: boolean;
+    scope_coaches?: Array<{ id: number; name: string; is_house: boolean }>;
+    realtime_channels?: string[];
   };
 }
 

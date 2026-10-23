@@ -7,9 +7,8 @@ import { Coach, STATUS_LABEL } from "../shared";
 /*
  * إضافةُ مدرّبٍ وتحريرُه — `POST admin/coaches` و`POST admin/coaches/{id}`.
  *
- * ⛔ **الحالةُ `visible` ليست بين الخيارات** — الخادم يردّها بـ422 حتى يُبنى
- *    تقرير التغطية (المرحلة ٣)، بقرار خالد: «لا يظهر المدرّب إلا بعد تغطية
- *    كل الجداول». فلا يُعرض خيارٌ يرفضه الخادم.
+ * ⚖️ **«ظاهر» خيارٌ عند التحرير وحده** [المرحلة ٣]: الخادم يقبله بتغطيةٍ كاملة وإلا يردّ 422 بالناقص
+ *    (قرار خالد: «لا يظهر المدرّب إلا بعد تغطية كل الجداول»). ولا يُنشأ مدرّبٌ جديد ظاهراً.
  *
  * ⛔ **ومدرّبُ المنصّة (خالد)** تُحرَّر منه الأسماءُ والنبذةُ والصورة وحدها —
  *    نسبتُه صفرٌ وحالتُه ثابتة، والخادم يُسقط غيرها على أيّ حال.
@@ -26,13 +25,17 @@ interface Props {
   onDone: () => void;
 }
 
-const statusOptions = [
+const baseStatusOptions = [
   { label: STATUS_LABEL.draft, value: "draft" },
   { label: STATUS_LABEL.hidden, value: "hidden" },
 ];
 
 export default function CoachForm({ coach, onDone }: Props) {
   const isEditing = coach !== null;
+  // [المرحلة ٣] «ظاهر» خيارٌ لمدرّب قائم فقط: يُنشأ مخفياً ثم يُفتح بعد اكتمال تغطيته (الخادم يردّ 422 بالناقص)
+  const statusOptions = isEditing
+    ? [...baseStatusOptions, { label: STATUS_LABEL.visible, value: "visible" }]
+    : baseStatusOptions;
   const isHouse = Boolean(coach?.is_house);
   const url = isEditing ? `/coaches/${coach!.id}` : "/coaches";
 
@@ -78,7 +81,7 @@ export default function CoachForm({ coach, onDone }: Props) {
         bio: coach?.bio ?? "",
         offering_id: coach?.offering_id ?? "",
         revenue_share_pct: coach?.revenue_share_pct ?? 50,
-        status: coach?.status === "hidden" ? "hidden" : "draft",
+        status: coach?.status ?? "draft",
         image: coach?.image ?? "",
       }}
       onSubmit={onSubmit}
@@ -113,7 +116,7 @@ export default function CoachForm({ coach, onDone }: Props) {
           {!isHouse && (
             <p className="text-xs text-content-muted leading-relaxed">
               الحالة «ظاهر» تُفتح بعد اكتمال تغطية المدرب: ٦٠ خانة تمرين و١٢
-              خانة تغذية. حتى ذلك لا يراه أي مستخدم.
+              خانة تغذية ومعرّف Offering. حتى ذلك لا يراه أي مستخدم — وتفاصيل الناقص في صفحة المدرب.
             </p>
           )}
 

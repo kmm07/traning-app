@@ -34,6 +34,8 @@ import RouteError from "components/ErrorBoundary/RouteError";
 import Coaches from "pages/coaches";
 import CoachView from "pages/coaches/view";
 import RenewalReviews from "pages/renewal-reviews";
+import CoachHome from "pages/coach-home";
+import AuditLog from "pages/audit-log";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -67,6 +69,8 @@ const router = createBrowserRouter(
         <Route path="/coaches" element={<Coaches />} />
         <Route path="/coaches/:id" element={<CoachView />} />
         <Route path="/renewal-reviews" element={<RenewalReviews />} />
+        <Route path="/coach-home" element={<CoachHome />} />
+        <Route path="/audit-log" element={<AuditLog />} />
         <Route path="/nutrition">
           <Route path="descriptions" element={<Descriptions />} />
           <Route path="ingredients" element={<Ingredients />} />

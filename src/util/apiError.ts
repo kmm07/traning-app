@@ -49,3 +49,18 @@ export function apiErrorMessage(
 
   return fallback;
 }
+
+/**
+ * هل يُخرِج هذا الخطأُ المستخدمَ من اللوحة؟
+ *
+ * 401 (رمزٌ منتهٍ) **و403 `account_disabled`** (حسابٌ عطّله المدير الأعلى — يردّه الخادم فوراً
+ * على أيّ طلب حتى بجلسةٍ قائمة). بلا الثاني يبقى المدرّبُ المعطَّل أمام لوحةٍ تردّ 403 على كل
+ * شيء بلا أن يعرف أنه معطَّل.
+ */
+export function isForcedLogout(error: any): boolean {
+  const status = error?.response?.status;
+  return (
+    status === 401 ||
+    (status === 403 && error?.response?.data?.error_code === "account_disabled")
+  );
+}

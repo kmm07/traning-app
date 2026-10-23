@@ -1,8 +1,11 @@
+import React from "react";
 import { useEffect, useRef, useState } from "react";
+import { selectActiveCoach } from "redux/slices/coachContext";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SidePar from "./components/SIdeBar";
 import Header from "./components/Header";
 import OpsAlertBanner from "components/OpsAlertBanner";
+import CoachTabs from "./components/CoachTabs";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "hooks/useRedux";
 import { selectCurrentToken, setCredentials } from "redux/slices/auth";
@@ -39,6 +42,7 @@ function Layout() {
   const push = useNavigate();
   const { pathname } = useLocation();
   const token: string | any = useAppSelector(selectCurrentToken);
+  const activeCoach = useAppSelector(selectActiveCoach);
 
   /** الدرجُ في الشاشات الضيّقة. */
   const [menuOpen, setMenuOpen] = useState(false);
@@ -170,6 +174,9 @@ function Layout() {
       */}
       {can("analytics") && <OpsAlertBanner />}
 
+      {/* [المرحلة ٤] تبويباتُ المدرّبين — للمدير الأعلى وحده (ترجع null لغيره) */}
+      <CoachTabs />
+
       {/*
         ⛔ **والشريطُ لا يُثبَّت بـ`fixed`.** أوّلُ صياغةٍ ثبّتته
            (`fixed inset-y-0`) فكان يُوضَع بالنسبة إلى **النافذة** لا إلى
@@ -233,7 +240,10 @@ function Layout() {
               if (e.target === e.currentTarget) setSettledPath(pathname);
             }}
           >
-            <Outlet />
+            {/* تبديلُ تبويب المدرّب يُعيد تركيب الصفحة: حالتُها المحلّية (فئةٌ محدَّدة…) لا تعبر بين مدرّبين */}
+            <React.Fragment key={String(activeCoach ?? "platform")}>
+              <Outlet />
+            </React.Fragment>
           </main>
         </div>
       </div>

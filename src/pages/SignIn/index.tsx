@@ -44,7 +44,8 @@ const SignInPage: React.FC = () => {
 
       setIsLoading(true);
 
-      push("/dashboard");
+      // [المرحلة ٤] حسابُ المدرّب يبدأ من ملخّصه لا من صندوق الرسائل
+      push(data.data?.user?.type === "coach" ? "/coach-home" : "/dashboard");
     } catch (error: any) {
       if (error.response.status === 400) {
         console.error(apiErrorMessage(error));
