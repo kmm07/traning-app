@@ -23,15 +23,50 @@ function Messages() {
    */
   const [opened, setOpened] = useState<Set<number>>(new Set());
 
-  const url = "/users?chat=1";
+  /**
+   * فلتر حالة الاشتراك — **على الخادم** (`state=`) لا على الصفّ المعروض.
+   *
+   * `paying` مشترك (ساريٌ أو ملغيٌّ لم تنتهِ فترتُه) · `non_paying` غير مشترك
+   * (مجانيّ ومن لا اشتراك له) · `expired` منتهي الاشتراك. والأعدادُ من
+   * `cards` — يحسبها الخادم على المجموع لا على ما يُعرض، فتبقى ثابتةً
+   * حين يُبدَّل الفلتر.
+   */
+  const [state, setState] = useState<string>("all");
+
+  const url = `/users?chat=1${state !== "all" ? `&state=${state}` : ""}`;
 
   const { data: users = [], isLoading }: UseQueryResult<any> = useGetQuery(
     url,
     url,
     {
       select: ({ data }: { data: { data: [] } }) => data.data,
+      // وإلا اختفت الصفحةُ كلُّها («loading…») عند كل تبديل فلتر.
+      keepPreviousData: true,
     }
   );
+
+  const cards = (users as any)?.cards ?? {};
+
+  const filters: { key: string; label: string; count: number | undefined }[] = [
+    { key: "all", label: "الكل", count: cards.all },
+    {
+      key: "paying",
+      label: "مشترك",
+      count:
+        cards.subscriped != null
+          ? Number(cards.subscriped) + Number(cards.canceled ?? 0)
+          : undefined,
+    },
+    {
+      key: "non_paying",
+      label: "غير مشترك",
+      count:
+        cards.free != null
+          ? Number(cards.free) + Number(cards.not_subscriped ?? 0)
+          : undefined,
+    },
+    { key: "expired", label: "منتهي الاشتراك", count: cards.expired },
+  ];
 
   const columns = React.useMemo(
     () => [
@@ -64,6 +99,16 @@ function Messages() {
         },
       },
       {
+        // اسمُ مدرّب المستخدم من الخادم؛ «خالد» لمن لا مدرّبَ مسنَداً له.
+        Header: "المدرّب",
+        accessor: "coach_name",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span className="whitespace-nowrap">
+            {row.original.coach_name ?? "—"}
+          </span>
+        ),
+      },
+      {
         Header: "بريد إلكتروني",
         accessor: "email",
       },
@@ -80,7 +125,10 @@ function Messages() {
       {
         Header: "نوع الإشتراك",
         Cell: ({ row }: { row: Row<any> }) => {
-          return <SubState state={row.original.subscription_status as any} />;
+          return <SubState
+              state={row.original.subscription_status as any}
+              source={row.original.subscription_source}
+            />;
         },
       },
       {
@@ -159,6 +207,29 @@ function Messages() {
 
   return (
     <div className="w-full">
+      <div className="flex items-center gap-2 flex-wrap mb-4" role="tablist">
+        {filters.map((f) => (
+          <button
+            key={f.key}
+            type="button"
+            role="tab"
+            aria-selected={state === f.key}
+            onClick={() => setState(f.key)}
+            className={[
+              "inline-flex items-center gap-2 rounded-pill border px-4 py-1.5 text-sm font-semibold whitespace-nowrap transition-colors",
+              state === f.key
+                ? "bg-brand-400/[0.12] text-brand-400 border-brand-400/40"
+                : "bg-ink-800 text-content-muted border-line hover:text-white",
+            ].join(" ")}
+          >
+            {f.label}
+            {f.count != null && (
+              <span className="text-xs opacity-80">{f.count}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
       <Table
         data={users?.users ?? []}
         columns={columns}

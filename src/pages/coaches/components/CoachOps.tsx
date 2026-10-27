@@ -205,6 +205,11 @@ export function CoverageCard({ coach }: { coach: Coach }) {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
+            {cov.in_app ? <Chip tone="success" size="sm">✓ ظاهر الآن في تطبيق المستخدم</Chip> : <Chip tone="warning" size="sm">✗ غير ظاهر في التطبيق</Chip>}
+            {!cov.in_app && (cov.in_app_blockers ?? []).map((b: string) => <span key={b} className="text-xs text-content-muted">{b}</span>)}
+          </div>
+
+          <div className="flex flex-wrap gap-2 items-center">
             {cov.complete ? <Chip tone="success" size="sm">التغطية كاملة</Chip> : <Chip tone="warning" size="sm">التغطية ناقصة</Chip>}
             {!cov.offering_ready && <Chip tone="warning" size="sm">أدخل معرّف الـOffering</Chip>}
             <div className="ms-auto flex gap-2">

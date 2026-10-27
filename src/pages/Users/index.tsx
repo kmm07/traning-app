@@ -22,12 +22,19 @@ interface UserType {
   provider: string;
   subscription: string;
   subscription_status: string;
+  subscription_source?: string | null;
+  coach_name?: string | null;
+  subscription_tier?: "none" | "basic" | "premium";
+  subscription_expire_date?: string | null;
+  subscription_renews?: boolean;
 }
 
 function Users() {
   const [activeUser, setActiveUser] = useState<any>(null);
 
   const [activeState, setActiveState] = useState<string>("all");
+  // [٢٧ أكتوبر] مرشِّحُ الباقة — الخادم يفرضه على البطاقات والقائمة معاً (`tier=`)
+  const [tier, setTier] = useState<"" | "basic" | "premium">("");
 
   // ═══════════════════════════════════════════════════════════════════
   // [٢٥ أغسطس ٢٠٢٦ · خطة ٤-٣] الترقيمُ والبحثُ والترشيحُ صارت **خادمية**.
@@ -60,11 +67,11 @@ function Users() {
 
   // تبديلُ الشريحة يعيد إلى الصفحة الأولى — وإلا بقي المدرّب على صفحةٍ
   // رقمُها أكبر من صفحات الشريحة الجديدة فرأى جدولاً فارغاً.
-  useEffect(() => setCurrentPage(1), [activeState]);
+  useEffect(() => setCurrentPage(1), [activeState, tier]);
 
   const url = `/users?per_page=25&page=${currentPage}${
     activeState !== "all" ? `&state=${activeState}` : ""
-  }${query ? `&search_query=${encodeURIComponent(query)}` : ""}`;
+  }${tier ? `&tier=${tier}` : ""}${query ? `&search_query=${encodeURIComponent(query)}` : ""}`;
 
   const { data: users }: UseQueryResult<any> = useGetQuery(url, url, {
     select: ({ data }: { data: { data: any } }) => data.data,
@@ -92,6 +99,40 @@ function Users() {
         },
       },
       {
+        // [٢٧ أكتوبر] مستوى الباقة من الخادم (`subscription_tier`) ومعه الانتهاء والتجديد
+        Header: "الباقة",
+        accessor: "subscription_tier",
+        Cell: ({ row }: { row: Row<any> }) => {
+          const t = row.original.subscription_tier;
+          if (!t || t === "none") return <span className="text-gray-500">—</span>;
+          return (
+            <div className="flex flex-col whitespace-nowrap">
+              <span
+                className={`badge ${t === "premium" ? "badge-warning" : "badge-ghost"}`}
+              >
+                {t === "premium" ? "مميزة (مع مدرّب)" : "أساسية"}
+              </span>
+              {row.original.subscription_expire_date && (
+                <span className="text-xs opacity-70">
+                  {row.original.subscription_renews ? "يتجدّد" : "ينتهي"}{" "}
+                  {row.original.subscription_expire_date}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        // [٢٥ أكتوبر] اسمُ مدرّب المستخدم — من الخادم (`coach_name`)، و«خالد» لمن لا مدرّبَ مسنَداً له.
+        Header: "المدرّب",
+        accessor: "coach_name",
+        Cell: ({ row }: { row: Row<any> }) => (
+          <span className="whitespace-nowrap">
+            {row.original.coach_name ?? "—"}
+          </span>
+        ),
+      },
+      {
         Header: "بريد إلكتروني",
         accessor: "email",
       },
@@ -108,7 +149,10 @@ function Users() {
       {
         Header: "نوع الإشتراك",
         Cell: ({ row }: { row: Row<UserType> }) => {
-          return <SubState state={row.original.subscription_status as any} />;
+          return <SubState
+              state={row.original.subscription_status as any}
+              source={row.original.subscription_source}
+            />;
         },
       },
       {
@@ -219,6 +263,22 @@ function Users() {
 
   return (
     <div className="w-full space-y-4">
+      <div className="flex gap-2">
+        {([
+          ["", "كل الباقات"],
+          ["basic", "الأساسية (بدون متابعة)"],
+          ["premium", "المميزة (مع مدرّب)"],
+        ] as const).map(([value, label]) => (
+          <button
+            key={value || "all"}
+            type="button"
+            className={`btn btn-sm ${tier === value ? "btn-primary" : "btn-ghost"}`}
+            onClick={() => setTier(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-3 h-24 ">
         {Object.entries(users?.cards ?? {})?.map((item: any, index: number) => {
           return (

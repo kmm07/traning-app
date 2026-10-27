@@ -12,9 +12,14 @@
  *    مستدعين يعملون بلا تعديل.
  */
 type Props = {
-  state: "subscriped" | "not_subscriped" | "issue" | "cancelled";
+  state: "subscriped" | "not_subscriped" | "issue" | "cancelled" | "canceled" | "expired";
   className?: string;
   textClassName?: string;
+  /**
+   * مصدرُ الاشتراك الساري (`subscription_source` من الخادم). `manual` = مضافٌ من الأدمن **غير مدفوع**:
+   * حالتُه `RENEWAL` كالمدفوع تماماً، فلا يُفرَّق بينهما إلا بالمصدر. يُطبَّق على المشترك والملغيّ وحدهما.
+   */
+  source?: string | null;
 };
 
 const MAP: Record<
@@ -32,9 +37,23 @@ const MAP: Record<
     dot: "bg-content-faint",
   },
   cancelled: {
-    name: "ملغي",
+    name: "مشترك · ألغى التجديد",
     tone: "bg-warning-400/10 text-warning-400 border-warning-400/25",
     dot: "bg-warning-400",
+  },
+  // [٢٥ أكتوبر] الخادم يرسل `canceled` (حرف l واحد) من `UserSubscription::bucketOf` وكان المفتاحُ هنا
+  // `cancelled` وحده، فيسقط الملغيُّ الساري إلى «غير مشترك» — وهو في الواقع صاحبُ وصولٍ حتى نهاية فترته.
+  // اسمٌ مرادف لا تغييرٌ للمفتاح القائم، فمستدعو `cancelled` لا يتأثّرون.
+  canceled: {
+    name: "مشترك · ألغى التجديد",
+    tone: "bg-warning-400/10 text-warning-400 border-warning-400/25",
+    dot: "bg-warning-400",
+  },
+  // [٢٥ أكتوبر] اشتراكٌ مدفوعٌ سابق انتهى — يصل من تبويب الرسائل وحده.
+  expired: {
+    name: "منتهي",
+    tone: "bg-danger-500/10 text-danger-400 border-danger-500/25",
+    dot: "bg-danger-400",
   },
   issue: {
     name: "خطأ",
@@ -43,8 +62,17 @@ const MAP: Record<
   },
 };
 
-function SubState({ state, className = "", textClassName = "" }: Props) {
-  const item = MAP[state] ?? MAP.not_subscriped;
+const MANUAL = {
+  name: "مضاف من الأدمن · غير مدفوع",
+  tone: "bg-info-500/10 text-info-400 border-info-500/25",
+  dot: "bg-info-400",
+};
+
+function SubState({ state, className = "", textClassName = "", source }: Props) {
+  const granted =
+    source === "manual" && (state === "subscriped" || state === "canceled" || state === "cancelled");
+
+  const item = granted ? MANUAL : MAP[state] ?? MAP.not_subscriped;
 
   return (
     <span
