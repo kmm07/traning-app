@@ -1,4 +1,4 @@
-import { Button, Card, Img, Input, Modal, Text, UploadInput } from "components";
+import { Button, Card, Chip, Img, Input, Modal, Text, UploadInput } from "components";
 import { Form, Formik, useFormikContext } from "formik";
 import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import { UseQueryResult, useQueryClient } from "react-query";
@@ -74,6 +74,12 @@ const SingleExercise = ({
           />
         )}
         <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
+        {/* [إحماء WARM-UP] الحكم من الخادم (تصنيف التمرين) — والجديد غير المحفوظ يظهر بعد الحفظ */}
+        {exercise?.is_warmup && (
+          <Chip tone="warning" size="sm">
+            إحماء
+          </Chip>
+        )}
       </div>
       <div className="flex items-center gap-4 mb-4">
         <Input
