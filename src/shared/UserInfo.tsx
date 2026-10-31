@@ -20,15 +20,16 @@ import { apiErrorMessage } from "util/apiError";
 
 function Info({ activeUser }: { activeUser: any }) {
   return (
-    <div className="flex h-full gap-[13px] w-full">
+    <div className="flex h-full gap-[13px] w-full min-w-0">
       <Img
-        className="h-[107px] md:h-auto mt-[7px] object-cover rounded-[12px]"
+        className="h-[107px] md:h-auto mt-[7px] object-cover rounded-[12px] w-[80px] shrink-0"
         src="/images/img_rectangle347.png"
         alt="rectangle347"
       />
-      <div className="flex flex-col gap-[5px] items-start justify-start">
-        <Text className="text-sm tracking-[-0.28px]">{activeUser?.name}</Text>
-        <Text className="text-xs tracking-[-0.24px]">{activeUser?.email}</Text>
+      {/* `min-w-0` + التفاف: البريدُ الطويل كان يفيض من عموده (نصُّ `Text` لا يلتفّ افتراضياً) فيُقصّ تحت البطاقة المجاورة. */}
+      <div className="flex flex-col gap-[5px] items-start justify-start min-w-0">
+        <Text className="text-sm tracking-[-0.28px] !whitespace-normal break-words max-w-full">{activeUser?.name}</Text>
+        <Text className="text-xs tracking-[-0.24px] !whitespace-normal break-all max-w-full" title={activeUser?.email}>{activeUser?.email}</Text>
         <Text className="text-sm tracking-[-0.28px]">{activeUser?.phone}</Text>
         <Text className="text-xl tracking-[-0.40px]">{activeUser?.gender}</Text>
       </div>

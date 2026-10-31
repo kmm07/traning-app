@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Button, Input } from "components";
 import { Form, Formik } from "formik";
 import { usePostQuery } from "hooks/useQueryHooks";
@@ -59,10 +60,29 @@ function Chat({ userData }: { userData: any }) {
   };
 
   // إلحاقٌ بلا تكرار: الرسالة المرسَلة تعود من ردّ الإرسال **ومن Pusher** معاً.
+  // ⚠️ **والواصلُ لاحقاً يحلّ محلّ السابق لا يُرمى** — ردُّ `send-message` صفُّ
+  // النموذج الخام (`file: null` · بلا `to` · `created_at` بصيغة ISO)، ونسخةُ
+  // Pusher هي المورد المنسَّق. ورميُها كان يُبقي الخامَ فقاعةً فارغة.
   const appendUnique = (incoming: ChatMessage) =>
     seMessages((prev) =>
-      prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]
+      prev.some((m) => m.id === incoming.id)
+        ? prev.map((m) => (m.id === incoming.id ? incoming : m))
+        : [...prev, incoming]
     );
+
+  /**
+   * 🔴 **ردُّ الإرسال صفٌّ خامّ لا المورد** — `file` فيه **علاقةٌ** (`null`) لا
+   * نصّ، و`to` غائب. فكان `file !== ""` صادقاً ⇒ رابطٌ بلا نصّ ⇒ **فقاعةٌ
+   * فارغة على جهة المستخدم**. يُطبَّع هنا إلى شكل المورد إلى أن تصل نسخة Pusher.
+   */
+  const normalizeSent = (raw: any): ChatMessage => ({
+    ...raw,
+    file: typeof raw?.file_path === "string" ? raw.file_path : "",
+    to: "admin",
+    created_at: raw?.created_at
+      ? moment(raw.created_at).format("YYYY-MM-DD HH:mm:ss")
+      : "",
+  });
 
   const axios = useAxios({});
 
@@ -132,7 +152,7 @@ function Chat({ userData }: { userData: any }) {
       // الردّ يحمل الرسالة المحفوظة — تُلحَق فوراً ولا يُعاد جلبُ المستخدم
       const sent: ChatMessage | undefined = res?.data?.data ?? res?.data;
       if (sent?.id) {
-        appendUnique(sent);
+        appendUnique(normalizeSent(sent));
         scrollToBottom();
       }
 
@@ -173,7 +193,7 @@ function Chat({ userData }: { userData: any }) {
              الافتراضية لا من حياديّ اللوحة ⇒ رماديٌّ دافئٌ ناشزٌ بين
              أسطحٍ محايدة.
           */}
-          <div className="pt-2 px-2 relative overflow-y-auto h-[min(60vh,585px)]">
+          <div className="pt-2 px-2 relative overflow-y-auto h-[clamp(220px,calc(100vh-560px),585px)]">
             <Msg messages={messages} messagesEndRef={messagesEndRef} />
           </div>
 
@@ -336,7 +356,7 @@ function Msg({ messages, messagesEndRef }: MsgProps) {
                       : "bg-ink-800 text-content border border-line rounded-2xl rounded-be-md",
                   ].join(" ")}
                 >
-                  {message.file !== "" ? (
+                  {typeof message.file === "string" && message.file !== "" ? (
                     <a
                       href={message.file}
                       target="_blank"
