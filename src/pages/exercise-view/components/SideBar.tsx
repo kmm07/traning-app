@@ -7,6 +7,7 @@ import formData from "util/formData";
 import { apiErrorMessage } from "util/apiError";
 import { useConfirm } from "components/ConfirmDialog/context";
 import ExerciseThumb from "./ExerciseThumb";
+import AlternativesEditor from "./AlternativesEditor";
 
 const initialValues = {
   name: "",
@@ -69,6 +70,9 @@ function SideBar({ exerciseData, categoryData }: any) {
 
       typeof values.image !== "object" && delete values.image;
 
+      // البدائلُ تُحفظ من بطاقتها بمسارها الخاصّ — لا تُرسَل مع نموذج التمرين.
+      delete values.alternatives;
+
       if (isEditing) {
         await mutatExercise(
           formData({
@@ -126,6 +130,9 @@ function SideBar({ exerciseData, categoryData }: any) {
         ...exerciseData,
         video_type:
           exerciseData?.internal_video !== undefined ? "internal" : "external",
+        // الخادم يردّ قائمتين، والحقل نصٌّ مفصولٌ بفاصلة يُعاد تقطيعه هناك.
+        target_muscles: (exerciseData?.target_muscles ?? []).join("، "),
+        secondary_muscles: (exerciseData?.secondary_muscles ?? []).join("، "),
       }}
       enableReinitialize
     >
@@ -247,6 +254,25 @@ function SideBar({ exerciseData, categoryData }: any) {
               )}
             </div>
           </Card>
+          <Card className="flex flex-col gap-5 p-4">
+            <Text size="3xl">العضلات</Text>
+            <hr />
+            <Input
+              name="target_muscles"
+              label="العضلة المستهدفة (افصل بفاصلة)"
+            />
+            <Input
+              name="secondary_muscles"
+              label="العضلة المساعدة (افصل بفاصلة)"
+            />
+          </Card>
+          {/* بدائلُ التمرين — تُحرَّر هنا وكلُّ فعلٍ يُحفظ فوراً (مستقلٌّ عن زرّ «تعديل»). */}
+          {isEditing && exerciseData?.id && (
+            <AlternativesEditor
+              exercise={exerciseData}
+              categoryData={categoryData}
+            />
+          )}
           <Card className="flex flex-col gap-5 p-4">
             <Text size="3xl">الملاحظة</Text>
             <hr />

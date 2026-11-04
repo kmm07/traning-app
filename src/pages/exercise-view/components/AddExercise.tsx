@@ -13,6 +13,8 @@ const initialValues = {
   internal_video: "",
   external_video: "",
   video_type: "",
+  target_muscles: "",
+  secondary_muscles: "",
 };
 
 interface Props {
@@ -132,6 +134,16 @@ function AddExercise({ exercise_category_id, exerciseData = null }: Props) {
               />
             )}
           </div>
+
+          <Input
+            name="target_muscles"
+            label="العضلة المستهدفة (افصل بفاصلة)"
+          />
+
+          <Input
+            name="secondary_muscles"
+            label="العضلة المساعدة (افصل بفاصلة)"
+          />
 
           <TextArea name="notes" label="ملاحظات" />
 

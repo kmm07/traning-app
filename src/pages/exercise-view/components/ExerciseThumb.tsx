@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Props {
   /** لقطةُ الفيديو — تُفضَّل، وغيابُها حالةٌ مشروعة. */
@@ -143,7 +144,14 @@ function ExerciseThumb({ thumb, fallback, video, alt = "" }: Props) {
         </span>
       )}
 
-      {preview && (
+      {/*
+        🔴 **والمعاينةُ تُركَّب في `document.body`** — داخل الدرج الجانبيّ
+        كانت لا تُرى: لوحةُ الدرج عليها `transform` فتصير هي الكتلةَ الحاوية
+        لـ`fixed`، فتنزاح المعاينةُ وتُقصّ بحافّته. البوّابةُ تُخرجها من أيّ
+        سلفٍ في الصفحة (نفسُ علّة الدرج نفسه — انظر `components/Drawer`).
+      */}
+      {preview &&
+        createPortal(
         <div
           style={{
             top: preview.top,
@@ -173,8 +181,9 @@ function ExerciseThumb({ thumb, fallback, video, alt = "" }: Props) {
               className="absolute inset-0 w-full h-full object-contain"
             />
           )}
-        </div>
-      )}
+        </div>,
+          document.body
+        )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { useDeleteQuery, useGetQuery } from "hooks/useQueryHooks";
 import ExerciseCategoryForm from "./components/exerciseCategoryForm";
 import AddExercise from "./components/AddExercise";
 import ExerciseThumb from "./components/ExerciseThumb";
+import ExerciseMedia from "./components/ExerciseMedia";
 import { useConfirm } from "components/ConfirmDialog/context";
 
 interface Props {
@@ -85,32 +86,11 @@ function ExercisesView({ home }: Props) {
           // تكبيرٍ في مجرى التخطيط.
           // ⚖️ المفتاحُ يتبدّل بنوع الفيديو: `ExerciseResource` يرسل
           // `external_video` للرابط و`internal_video` للملفّ، ولا يرسل الاثنين.
-          const muscle = row.original.muscle_image || row.original.image;
           const video =
             row.original.external_video || row.original.internal_video;
           return (
             <div className="flex items-center gap-4">
-              {row.original.video_thumb ? (
-                <>
-                  <img
-                    src={muscle || "/images/img_rectangle347.png"}
-                    alt=""
-                    loading="lazy"
-                    className="w-16 h-16 rounded-xl object-cover shrink-0"
-                  />
-                  <ExerciseThumb
-                    thumb={row.original.video_thumb}
-                    video={video}
-                    alt={row.original.name}
-                  />
-                </>
-              ) : (
-                <ExerciseThumb
-                  thumb={muscle}
-                  video={video}
-                  alt={row.original.name}
-                />
-              )}
+              <ExerciseMedia exercise={row.original} video={video} />
               {row.original.name}
             </div>
           );
@@ -123,6 +103,32 @@ function ExercisesView({ home }: Props) {
           return (
             <span className="flex items-center gap-4">
               {row.original.category_name}
+            </span>
+          );
+        },
+      },
+
+      {
+        Header: "البدائل",
+        Cell: ({ row }: { row: Row<any> }) => {
+          const alts: any[] = row.original.alternatives ?? [];
+          return alts.length === 0 ? (
+            <span className="opacity-50">—</span>
+          ) : (
+            <span className="flex flex-col gap-2 text-sm">
+              {alts.map((alt, i) => (
+                // اللقطةُ وحدها هنا (لا صورةُ العضلة معها) كي لا يطول الصفّ —
+                // وتتكبّر وتشتغل عند المرور كالتمرين الأساسيّ.
+                <span key={alt.id} className="flex items-center gap-2">
+                  <span className="opacity-60">{i + 1}.</span>
+                  <ExerciseThumb
+                    thumb={alt.video_thumb || alt.muscle_image || alt.image}
+                    video={alt.video}
+                    alt={alt.name}
+                  />
+                  <span>{alt.name}</span>
+                </span>
+              ))}
             </span>
           );
         },
