@@ -1,4 +1,4 @@
-import { Button, Img, Modal, Table, Text } from "components";
+import { Button, Img, Modal, SubState, Table, Text } from "components";
 import React, { useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useParams } from "react-router-dom";
@@ -83,7 +83,7 @@ export default function UserSubscriptions({}: Props) {
       {
         Header: "حالة الإشتراك",
         Cell: ({ row }: { row: Row<any> }) => {
-          return <span>{row.original.status}</span>;
+          return <SubState state={String(row.original.status ?? "").toLowerCase() as any} />;
         },
       },
     ];

@@ -40,7 +40,7 @@ const SingleExercise = ({
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
       <div className="flex items-center gap-4 mb-6">
         {onMoveUp !== undefined && (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 shrink-0">
             <Button
               type="button"
               secondaryBorder
@@ -64,16 +64,19 @@ const SingleExercise = ({
         <Img
           src={exercise?.exercise_muscle_image}
           alt="image"
-          className="!w-[150px]"
+          className="!w-[110px] shrink-0"
         />
         {exercise?.exercise_video_thumb && (
           <Img
             src={exercise.exercise_video_thumb}
             alt="video"
-            className="!w-[150px]"
+            className="!w-[110px] shrink-0 rounded-md object-cover"
           />
         )}
-        <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
+        {/* الاسم يلتفّ داخل البطاقة بدل أن يفيض خارجها */}
+        <Text wrap className="!w-auto flex-1 min-w-0 font-bold leading-snug">
+          {exercise?.exercise_name ?? exercise?.exercise_id?.label}
+        </Text>
         {/* [إحماء WARM-UP] الحكم من الخادم (تصنيف التمرين) — والجديد غير المحفوظ يظهر بعد الحفظ */}
         {exercise?.is_warmup && (
           <Chip tone="warning" size="sm">
@@ -114,14 +117,16 @@ const SingleExercise = ({
         />
       </div>
 
-      {onAddSpareExercise !== undefined && (
-        <Button secondaryBorder onClick={onAddSpareExercise}>
-          إضافة تمرين بديل
+      <div className="flex items-center gap-3 flex-wrap">
+        {onAddSpareExercise !== undefined && (
+          <Button secondaryBorder onClick={onAddSpareExercise}>
+            إضافة تمرين بديل
+          </Button>
+        )}
+        <Button secondaryBorder onClick={onDeleteEXercise}>
+          <Img src="/images/trash.svg" />
         </Button>
-      )}
-      <Button secondaryBorder onClick={onDeleteEXercise} className="!mt-4">
-        <Img src="/images/trash.svg" />
-      </Button>
+      </div>
     </div>
   );
 };

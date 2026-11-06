@@ -39,64 +39,68 @@ const SingleExercise = ({
 
   return (
     <div className="border-[1px] border-primary rounded-md p-3 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
-          {onMoveUp !== undefined && (
-            <div className="flex flex-col gap-1">
-              <Button
-                type="button"
-                secondaryBorder
-                disabled={!canMoveUp}
-                onClick={onMoveUp as any}
-                className="!px-2 !py-0"
-              >
-                ▲
-              </Button>
-              <Button
-                type="button"
-                secondaryBorder
-                disabled={!canMoveDown}
-                onClick={onMoveDown as any}
-                className="!px-2 !py-0"
-              >
-                ▼
-              </Button>
-            </div>
-          )}
+      {/* الاسم يلتفّ داخل البطاقة (Text افتراضيُّه سطرٌ واحد فكان يفيض خارجها
+          ويدفع شارة الجلسات وزرّ التعديل خارج الدرج). */}
+      <div className="flex items-start gap-3 mb-4">
+        {onMoveUp !== undefined && (
+          <div className="flex flex-col gap-1 shrink-0">
+            <Button
+              type="button"
+              secondaryBorder
+              disabled={!canMoveUp}
+              onClick={onMoveUp as any}
+              className="!px-2 !py-0"
+            >
+              ▲
+            </Button>
+            <Button
+              type="button"
+              secondaryBorder
+              disabled={!canMoveDown}
+              onClick={onMoveDown as any}
+              className="!px-2 !py-0"
+            >
+              ▼
+            </Button>
+          </div>
+        )}
+        <div className="flex gap-2 shrink-0">
           <Img
             src={exercise?.exercise_muscle_image}
             alt="image"
-            className="!w-[150px]"
+            className="!w-[110px]"
           />
           {exercise?.exercise_video_thumb && (
             <Img
               src={exercise.exercise_video_thumb}
               alt="video"
-              className="!w-[150px]"
+              className="!w-[110px] rounded-md object-cover"
             />
           )}
-          <Text>{exercise?.exercise_name ?? exercise?.exercise_id?.label}</Text>
         </div>
-
-        <div className={"flex items-center"}>
-          <div
-            className={`rounded-full border-[1px] p-2  ${
-              exercise?.sessions?.length === 0
-                ? "text-red-600 !border-red-600"
-                : ""
-            }`}
-          >
-            الجلسات <span className="ms-4">{exercise?.sessions?.length}</span>
-          </div>
-          <div>
-            <Button onClick={onEditExercise as any}>
+        <div className="flex flex-col gap-3 flex-1 min-w-0">
+          <Text wrap className="!w-auto font-bold leading-snug">
+            {exercise?.exercise_name ?? exercise?.exercise_id?.label}
+          </Text>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span
+              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full border-[1px] px-3 py-1 text-sm ${
+                exercise?.sessions?.length === 0
+                  ? "text-red-600 !border-red-600"
+                  : ""
+              }`}
+            >
+              الجلسات
+              <span className="font-bold">{exercise?.sessions?.length}</span>
+            </span>
+            <Button type="button" onClick={onEditExercise as any}>
               <Img src="/images/edit.svg" />
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 mb-4">
         <Text as="h5">وقت الراحة</Text>
         <div className="flex items-center gap-2 w-[120px]">
           <Input
@@ -112,14 +116,16 @@ const SingleExercise = ({
         </div>
       </div>
 
-      {onAddSpareExercise !== undefined && (
-        <Button secondaryBorder onClick={onAddSpareExercise}>
-          إضافة تمرين بديل
+      <div className="flex items-center gap-3 flex-wrap">
+        {onAddSpareExercise !== undefined && (
+          <Button secondaryBorder onClick={onAddSpareExercise}>
+            إضافة تمرين بديل
+          </Button>
+        )}
+        <Button secondaryBorder onClick={onDeleteEXercise}>
+          <Img src="/images/trash.svg" />
         </Button>
-      )}
-      <Button secondaryBorder onClick={onDeleteEXercise} className="!mt-4">
-        <Img src="/images/trash.svg" />
-      </Button>
+      </div>
     </div>
   );
 };

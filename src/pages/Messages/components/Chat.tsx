@@ -290,6 +290,10 @@ interface MsgProps {
     created_at: string;
     side: "left" | "right";
     to: string;
+    // [٤ نوفمبر ٢٠٢٦] إشعارُ القراءة — يصل للّوحة وحدها. غيابُه (خادمٌ قديم أو
+    // ردُّ الإرسال الخامّ قبل نسخة Pusher) ⇒ لا علامة، لا «لم يُقرأ».
+    is_read?: boolean;
+    read_at?: string | null;
   }>;
   messagesEndRef: any;
 }
@@ -372,8 +376,21 @@ function Msg({ messages, messagesEndRef }: MsgProps) {
                   )}
                 </div>
 
-                <span className="text-[10px] text-content-faint px-1">
+                <span className="flex items-center gap-1.5 text-[10px] text-content-faint px-1">
                   {message.created_at}
+                  {/* ✓✓ على رسالة المدرّب وحدها: هل فتح المستخدمُ شاتَه بعدها؟ */}
+                  {mine && typeof message.is_read === "boolean" && (
+                    <span
+                      className={message.is_read ? "text-brand-400 font-semibold" : ""}
+                      title={
+                        message.is_read && message.read_at
+                          ? `قرأها ${message.read_at}`
+                          : "لم يقرأها بعد"
+                      }
+                    >
+                      {message.is_read ? "✓✓ مقروءة" : "✓ لم تُقرأ"}
+                    </span>
+                  )}
                 </span>
               </div>
             </div>

@@ -1,7 +1,7 @@
-import { Button, Card, Img, SubState, Text } from "components";
+import { Button, Card, Img, Select, SubState, Text } from "components";
 import DateInput from "components/dateInput";
 import { Form, Formik, FormikHelpers } from "formik";
-import { useDeleteQuery, usePostQuery } from "hooks/useQueryHooks";
+import { useDeleteQuery, useGetQuery, usePostQuery } from "hooks/useQueryHooks";
 import moment from "moment";
 import { useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
@@ -46,6 +46,17 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
     }
   };
 
+  // قائمة الباقات لتغيير نوع الاشتراك — الاسم وحده يتكرّر بين المنصّتين، فيُلحَق به المستوى والمنصّة.
+  const { data: plans = [] }: any = useGetQuery("/subscriptions", "/subscriptions", {
+    select: ({ data }: { data: { data: any[] } }) =>
+      data.data.map((item: any) => ({
+        label: `${item?.name} — ${
+          item?.tier === "premium" ? "مميزة" : "أساسية"
+        } · ${item?.platform === "ios" ? "آيفون" : "أندرويد"}`,
+        value: item?.id,
+      })),
+  });
+
   const url = `/user-subscriptions/${subscriptionData?.id}`;
 
   const { mutateAsync: editSubscription, isLoading: isEditLoading } =
@@ -66,7 +77,21 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
    */
   const isTrialRow = !Number(subscriptionData?.subscription_id);
 
+  /**
+   * [٣١ أكتوبر ٢٠٢٦] صفُّ متجرٍ (آبل/جوجل عبر RevenueCat) للقراءة فقط — مزامنةُ المتجر تكتب فوقه عند أوّل
+   * حدث، فكان تعديلُه يردّ «تم الحفظ» ثم يُمحى بصمت (مقيسٌ على 2420). والخادم يردّه 422
+   * `store_managed_subscription`؛ والتمديدُ بـ«إضافة اشتراك» (صفٌّ يدويّ لا تلمسه المزامنة).
+   */
+  const isStoreRow = Boolean(subscriptionData?.store_managed);
+  const storeName = subscriptionData?.store === "android" ? "جوجل بلاي" : "آب ستور";
+  const readOnly = isTrialRow || isStoreRow;
+
   const onSubmit = async (values: any, helpers: FormikHelpers<any>) => {
+    if (isStoreRow) {
+      toast.info(`اشتراك ${storeName} يُدار من المتجر ولا يُعدَّل هنا. لتمديد وصول المستخدم استعمل «إضافة اشتراك».`);
+      return;
+    }
+
     if (isTrialRow) {
       toast.info(
         "صفُّ التجربة لا يُعدَّل — تنتهي التجربة بإتمام اليوم الأول أو بمضيّ سقفها الزمنيّ، لا بهذا التاريخ."
@@ -125,22 +150,30 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
           </Card>
 
           <Card className="px-10 py-6 flex flex-col gap-8">
+            {!readOnly && (
+              <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2 gap-4">
+                <Text as="h5">نوع الإشتراك</Text>
+                <div className="w-2/3">
+                  <Select name="subscription_id" options={plans ?? []} />
+                </div>
+              </div>
+            )}
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">تاريخ البداية</Text>
               <div className="w-1/4">
-                <DateInput name="start_date" isForm />
+                {isStoreRow ? <Text as="p">{subscriptionData?.start_date}</Text> : <DateInput name="start_date" isForm />}
               </div>
             </div>
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">تاريخ النهاية</Text>
 
               <div className="w-1/4">
-                <DateInput name="expire_date" isForm />
+                {isStoreRow ? <Text as="p">{subscriptionData?.expire_date}</Text> : <DateInput name="expire_date" isForm />}
               </div>
             </div>
             <div className="flex items-center justify-between border-b-[1px] border-gray-400 pb-2">
               <Text as="h5">حالة الإشتراك</Text>
-              <SubState state={subscriptionData.status} />
+              <SubState state={String(subscriptionData.status ?? "").toLowerCase() as any} />
             </div>
 
             {/*
@@ -159,6 +192,16 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
                 تنتهي التجربة بإتمام اليوم الأول أو بمضيّ سقفها الزمنيّ.
               </Text>
             )}
+            {isStoreRow && (
+              <Text
+                as="p"
+                size="sm"
+                className="!whitespace-normal !w-full !text-yellow-400 leading-relaxed"
+              >
+                اشتراك {storeName} — يديره المتجر عبر RevenueCat، وأيّ تعديلٍ هنا يُمحى عند أوّل مزامنة.
+                لتمديد وصول المستخدم استعمل «إضافة اشتراك» من صفحة اشتراكاته.
+              </Text>
+            )}
           </Card>
 
           <div className="flex items-center justify-evenly mt-6">
@@ -167,7 +210,7 @@ function UserSubscriptionsSideBar({ subscriptionData, userData }: any) {
               primary
               onClick={submitForm}
               isLoading={isEditLoading}
-              disabled={isTrialRow}
+              disabled={readOnly}
             >
               حفظ
             </Button>
